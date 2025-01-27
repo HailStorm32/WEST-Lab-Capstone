@@ -1,5 +1,3 @@
-﻿# WEST-Lab-Capstone
-
 ## About
 
 ### Summary
@@ -30,6 +28,11 @@ The SCuM observatory is designed as a portable platform that accommodates a SCuM
 > **NOTE:** Currently only supports Windows
 
 <br>
+
+#### Cloning The Repo
+This repo uses submodules to pull in the APIs for the different test equipment used in the observatory. To clone the repo, while also setting up the submodules, use the following command:
+
+    git clone --recurse-submodules <repository_url>
 
 #### Python Environment Setup
 
