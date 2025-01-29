@@ -1,4 +1,4 @@
-23876079054939819
+23879555381108661
 3rdPrty_Footprints
 2269901
 226990-1-1
@@ -14,12 +14,26 @@ RF1-01A-D-00-75-M
 2
 2
 3rdPrty_Footprints
+NoCrystal
+
+
+0
+0
+0
+3rdPrty_Footprints
 SU_48_ADI
 
 ADG732BSUZ 
 0
 48
 48
+3rdPrty_Footprints
+SuLu_Foot
+
+
+0
+54
+54
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)

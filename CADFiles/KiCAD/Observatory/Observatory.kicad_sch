@@ -34771,7 +34771,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Dev_boards:SuLu_Foot"
+		(property "Footprint" "3rdPrty_Footprints:SuLu_Foot"
 			(at 104.14 62.23 0)
 			(effects
 				(font
