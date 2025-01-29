@@ -4245,7 +4245,7 @@
 		(uuid "7ce6cdb0-908d-4258-b292-2f4f341da780")
 	)
 	(junction
-		(at 38.1 127)
+		(at 43.18 127)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "7e87d413-a934-4006-89ca-93dcecb09f48")
@@ -4618,7 +4618,7 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 127) (xy 38.1 127)
+			(xy 40.64 127) (xy 43.18 127)
 		)
 		(stroke
 			(width 0)
@@ -5338,7 +5338,7 @@
 	)
 	(wire
 		(pts
-			(xy 38.1 123.19) (xy 38.1 127)
+			(xy 43.18 123.19) (xy 43.18 127)
 		)
 		(stroke
 			(width 0)
@@ -5618,7 +5618,7 @@
 	)
 	(wire
 		(pts
-			(xy 43.18 123.19) (xy 73.66 123.19)
+			(xy 45.72 123.19) (xy 73.66 123.19)
 		)
 		(stroke
 			(width 0)
@@ -5988,7 +5988,7 @@
 	)
 	(wire
 		(pts
-			(xy 35.56 123.19) (xy 38.1 123.19)
+			(xy 40.64 123.19) (xy 43.18 123.19)
 		)
 		(stroke
 			(width 0)
@@ -6198,7 +6198,7 @@
 	)
 	(wire
 		(pts
-			(xy 38.1 127) (xy 49.53 127)
+			(xy 43.18 127) (xy 49.53 127)
 		)
 		(stroke
 			(width 0)
@@ -7108,7 +7108,7 @@
 	)
 	(wire
 		(pts
-			(xy 43.18 119.38) (xy 43.18 123.19)
+			(xy 45.72 119.38) (xy 45.72 123.19)
 		)
 		(stroke
 			(width 0)
@@ -7258,7 +7258,7 @@
 	)
 	(wire
 		(pts
-			(xy 40.64 119.38) (xy 43.18 119.38)
+			(xy 40.64 119.38) (xy 45.72 119.38)
 		)
 		(stroke
 			(width 0)
@@ -31838,7 +31838,7 @@
 	)
 	(global_label "WaveGen.1 Mux  17"
 		(shape input)
-		(at 35.56 123.19 180)
+		(at 40.64 123.19 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -31848,7 +31848,7 @@
 		)
 		(uuid "59bc203f-7ddd-4864-8091-f07ece4c87a1")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 13.646 123.19 0)
+			(at 18.726 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -32432,7 +32432,7 @@
 	)
 	(global_label "Scopes Mux  28"
 		(shape input)
-		(at 34.29 127 180)
+		(at 40.64 127 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -32442,7 +32442,7 @@
 		)
 		(uuid "b519fed5-9ca6-4c5d-be67-e20581d5ae8f")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 15.6417 127 0)
+			(at 21.9917 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
