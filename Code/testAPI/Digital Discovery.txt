@@ -1,0 +1,95 @@
+WaveForms version: 3.23.4
+
+Device name: Digital Discovery
+
+Analog input information:
+	channels: 0
+	maximum buffer size: 0
+	ADC resolution: 0 bits
+	range settable from 0.0V to 0.0V in 0 steps
+	offset settable from 0.0V to 0.0V in 0 steps
+
+Analog output information:
+Analog IO information:
+	channel 0:
+		channel name: Digital Voltage
+		channel label: VDD
+		node 0:
+			node name: Voltage
+			unit of measurement: V
+			settable from: 1.2 to 3.3 in 1000 steps
+			readable between: 0.0 to 3.3 in 0 steps
+
+		node 1:
+			node name: DINPP
+			unit of measurement: 
+			settable from: 0.0 to 1.0 in 4 steps
+			readable between: 0.0 to 1.0 in 4 steps
+
+		node 2:
+			node name: DIOPE
+			unit of measurement: 
+			settable from: 0.0 to 65535.0 in 65536 steps
+			readable between: 0.0 to 65535.0 in 65536 steps
+
+		node 3:
+			node name: DIOPP
+			unit of measurement: 
+			settable from: 0.0 to 65535.0 in 65536 steps
+			readable between: 0.0 to 65535.0 in 65536 steps
+
+		node 4:
+			node name: Drive
+			unit of measurement: 
+			settable from: 0.0 to 16.0 in 8 steps
+			readable between: 2.0 to 16.0 in 7 steps
+
+		node 5:
+			node name: Slew
+			unit of measurement: 
+			settable from: 0.0 to 2.0 in 3 steps
+			readable between: 0.0 to 2.0 in 3 steps
+
+		node 6:
+			node name: Clock
+			unit of measurement: Hz
+			settable from: 50000000.0 to 125000000.0 in 1000000 steps
+			readable between: 50000000.0 to 125000000.0 in 1 steps
+
+	channel 1:
+		channel name: Voltage Output
+		channel label: VIO
+		node 0:
+			node name: Voltage
+			unit of measurement: V
+			settable from: 0.0 to 9.0 in 0 steps
+			readable between: 0.0 to 10.0 in 1000 steps
+
+		node 1:
+			node name: Current
+			unit of measurement: A
+			settable from: 0.0 to 1.5 in 0 steps
+			readable between: 0.0 to 2.0 in 1000 steps
+
+	channel 2:
+		channel name: USB Monitor
+		channel label: USB
+		node 0:
+			node name: Voltage
+			unit of measurement: V
+			settable from: 0.0 to 0.0 in 0 steps
+			readable between: 0.0 to 6.0 in 1000 steps
+
+		node 1:
+			node name: Current
+			unit of measurement: A
+			settable from: 0.0 to 0.0 in 0 steps
+			readable between: 0.0 to 1.0 in 1000 steps
+
+Digital input information:
+	channels: 24
+	maximum buffer size: 67108864
+
+Digital output information:
+	channels: 16
+	maximum buffer size: 32768
