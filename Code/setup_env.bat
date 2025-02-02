@@ -8,6 +8,7 @@ REM    1) If it does not exist, it creates one using python -m venv env.
 REM    2) Activates the virtual environment.
 REM    3) Installs packages from requirements.txt if found.
 REM    4) Upgrades pip to avoid version-related issues.
+REM    5) Creates an untracked folder named "UserScripts" for user scripts.
 REM ----------------------------------------------------------------------------
 
 echo Checking for Python virtual environment...
@@ -37,3 +38,12 @@ IF EXIST requirements.txt (
 )
 
 echo Python virtual environment is now active.
+
+REM Create untracked folder for userscripts
+echo Checking for UserScripts folder...
+IF NOT EXIST "UserScripts" (
+    echo UserScripts folder not found. Creating one...
+    mkdir UserScripts
+)
+
+echo setup complete
