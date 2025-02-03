@@ -1,0 +1,3 @@
+[submodule "Code/__VendorAPIs/Diligent"]
+	path = Code/__VendorAPIs/Diligent
+	url = https://github.com/Digilent/WaveForms-SDK-Getting-Started-PY.git
