@@ -2,3 +2,4 @@ env/
 UserScripts/
 __pycache__/
 DoxygenOutput/
+.vscode/
