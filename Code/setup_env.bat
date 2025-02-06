@@ -49,9 +49,9 @@ IF NOT EXIST "UserScripts" (
 
 REM Create doxygen folder for documentation
 echo Checking for doxygen folder...
-IF NOT EXIST "DoxygenGen" (
+IF NOT EXIST "DoxygenOutput" (
     echo doxygen folder not found. Creating one...
-    mkdir doxygen
+    mkdir DoxygenOutput
 )
 
 echo setup complete
