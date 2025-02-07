@@ -4,3 +4,6 @@
 [submodule "Code/__VendorAPIs/ykush"]
 	path = Code/__VendorAPIs/ykush
 	url = https://github.com/Yepkit/ykush
+[submodule "Code/__VendorAPIs/RFExplorer"]
+	path = Code/__VendorAPIs/RFExplorer
+	url = https://github.com/RFExplorer/RFExplorer-for-Python
