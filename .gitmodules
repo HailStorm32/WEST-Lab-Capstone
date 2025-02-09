@@ -7,3 +7,6 @@
 [submodule "Code/__VendorAPIs/RFExplorer"]
 	path = Code/__VendorAPIs/RFExplorer
 	url = https://github.com/RFExplorer/RFExplorer-for-Python
+[submodule "Code/__VendorAPIs/pyjoulescope"]
+	path = Code/__VendorAPIs/pyjoulescope
+	url = https://github.com/jetperch/pyjoulescope.git
