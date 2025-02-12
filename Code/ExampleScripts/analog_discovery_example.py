@@ -46,7 +46,7 @@ def plot_results(buffer, x_label, y_label):
 #         time.sleep(interval)
 
 
-    return data
+#     return data
 
 if __name__ == '__main__':
     
@@ -141,14 +141,48 @@ if __name__ == '__main__':
     # Set up triggering on scope channel 1
     WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
 
-    # Generate a 10KHz square signal with 2V amplitude on channel 1
-    WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=10e03, amplitude=2)
+    # Generate a 10KHz sine power signal with 2V amplitude on channel 1
+    WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.sine_power, offset=0, frequency=10e03, amplitude=2)
 
     # Gather buffer from scope channel 1 (default configuration is 8192 samples)
     data = WF_SDK.scope.record(device_data, channel=1)
     
     plot_results(data, "time [ms]", "voltage [V]")
 
+    # Close the wavegen
+    WF_SDK.wavegen.close(device_data)
+
+    # Close the scope
+    WF_SDK.scope.close(device_data)
+
+
+    #####################################################################################################
+    # Pattern generator example
+    #####################################################################################################
+
+    WF_SDK.logic.open(device_data)
+
+    # Set up triggering on DIO0 falling edge
+    WF_SDK.logic.trigger(device_data, enable=True, channel=0, rising_edge=False)
+
+    # Generate a 100KHz PWM signal with 30% duty cycle on a DIO channel
+    WF_SDK.pattern.generate(device_data, channel=0, function=WF_SDK.pattern.function.pulse, frequency=100e03, duty_cycle=30)
+
+    '''
+    Note: DIO supports internal loopback, so you can generate a signal on DIO0 and record the signal on DIO0 
+    without any external connections.
+    '''
+
+    # Record a logic signal on a DIO channel
+    buffer = WF_SDK.logic.record(device_data, channel=0)
+
+    plot_results(buffer, "time [ms]", "logic value")
+
+    # Close the logic analyzer
+    WF_SDK.logic.close(device_data)
+
+    # Close the pattern generator
+    WF_SDK.pattern.close(device_data)
+
     # Close the device
     WF_SDK.device.close(device_data)
-    
