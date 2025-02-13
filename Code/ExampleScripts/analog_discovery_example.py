@@ -160,6 +160,8 @@ if __name__ == '__main__':
     # Pattern generator example
     #####################################################################################################
 
+    print_header("Pattern generator example")
+
     WF_SDK.logic.open(device_data)
 
     # Set up triggering on DIO0 falling edge
