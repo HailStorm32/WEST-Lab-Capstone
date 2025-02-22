@@ -16,6 +16,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__Ve
 
 import WF_SDK
 from Digital import run_logic_analysis
+from Analog import validate_analog_signals
 
 def clear_terminal():
     '''
@@ -48,7 +49,7 @@ tests = [
     { 'name': 'Radio communication',    'function': stub_function_call,     'handle': None, 'results': [] },
     { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
     { 'name': 'Serial communication',   'function': stub_function_call,     'handle': None, 'results': [] },
-    { 'name': 'Voltage validation',     'function': stub_function_call,     'handle': None, 'results': [] },
+    { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
     { 'name': 'Power Consumption',      'function': stub_function_call_2,   'handle': None, 'results': [] },
 ]
 
