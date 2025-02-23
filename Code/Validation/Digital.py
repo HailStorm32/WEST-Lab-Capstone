@@ -41,7 +41,7 @@ def run_logic_analysis(trigger_channel=0):
         tests (list): List of dictionaries containing test results for each non-trigger pin.
     """
     # Connect to the device
-    device_data = device.open()
+    device_data = device.open(device="Digital Discovery")
 
     # Initialize the logic analyzer with default settings
     logic.open(device_data, buffer_size=4096)
