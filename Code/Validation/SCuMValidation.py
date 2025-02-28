@@ -18,6 +18,13 @@ import WF_SDK
 from Digital import run_logic_analysis
 from Analog import validate_analog_signals
 
+
+####################
+# Constants
+####################
+TRIGGER_PIN_NUM = 0  # Pin number for the trigger pin
+
+
 def clear_terminal():
     '''
     Clear the terminal screen
@@ -48,8 +55,8 @@ tests = [
     { 'name': 'Program upload',         'function': stub_program_upload,    'handle': None, 'results': [] },
     { 'name': 'Radio communication',    'function': stub_function_call,     'handle': None, 'results': [] },
     { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
-    { 'name': 'Serial communication',   'function': stub_function_call,     'handle': None, 'results': [] },
     { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
+    { 'name': 'Serial communication',   'function': stub_function_call,     'handle': None, 'results': [] },
     { 'name': 'Power Consumption',      'function': stub_function_call_2,   'handle': None, 'results': [] },
 ]
 
@@ -65,24 +72,6 @@ tests = [
 # Main
 #########################################################
 if __name__ == '__main__':
-    user_input_valid = False
-
-    # Get the Digital I/O pin to use for triggering the SCuM chip from the user
-    while not user_input_valid:
-        print("Please select an available DIO pin (1-16):")
-        trigger_dio = input()
-        
-        try:
-            trigger_dio = int(trigger_dio)
-            
-            if trigger_dio < 1 or trigger_dio > 16:
-                raise
-
-            user_input_valid = True
-        except:
-            clear_terminal()
-            print("Invalid input. Please enter a number between 1 and 16")
-
     clear_terminal()
     
     # Setup and start joule scope monitoring thread
@@ -115,23 +104,24 @@ if __name__ == '__main__':
             print("Error: " + str(e))
             sys.exit(1)
 
+        print("Waiting for trigger pulse...")
+
+        # Wait for trigger pulse
+        WF_SDK.logic.trigger(dd_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
+        list = WF_SDK.logic.record(dd_handle, channel=TRIGGER_PIN_NUM)
+
         # Declare the test being ran
         print("Running test: " + test['name'])
 
-        # Send trigger signal to SCuM chip
-        # (Constant HIGH signal for .5 seconds, with inital state of LOW)
-        run_time = 0.5
-        WF_SDK.pattern.generate(dd_handle, channel=trigger_dio, idle=2, run_time=run_time, function=WF_SDK.pattern.function.pulse, frequency=1, duty_cycle=100)
-        sleep(run_time)
-
         # Close our device handle
+        WF_SDK.logic.close(dd_handle)
         WF_SDK.device.close(dd_handle) # TODO: Remove this line once we have a better way to handle device handles
 
         # Handle the Digital input/output test differently 
         # since it requires we pass in the trigger_dio value
         if test['name'] == 'Digital input/output':
             # Run the test
-            test['results'] = test['function'](trigger_dio)
+            test['results'] = test['function'](TRIGGER_PIN_NUM)
 
         else:
             # Run the test
