@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
         # Wait for trigger pulse
         WF_SDK.logic.trigger(dd_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
-        list = WF_SDK.logic.record(dd_handle, channel=TRIGGER_PIN_NUM)
+        WF_SDK.logic.record(dd_handle, channel=TRIGGER_PIN_NUM)
 
         # Declare the test being ran
         print("Running test: " + test['name'])
