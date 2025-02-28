@@ -87,7 +87,8 @@ if __name__ == '__main__':
     print("Uploading test program to SCuM chip...")
     tests[0]['results'] = tests[0]['function']()
 
-    #TODO: Add delay for settle time??
+    # Wait for power up sequence to complete
+    sleep(10)
 
     # Run the tests
     # Skip the first and last tests since they are handled differently
@@ -128,7 +129,7 @@ if __name__ == '__main__':
             test['results'] = test['function']()
 
         #TODO: remove delay 
-        sleep(1)
+        # sleep(1)
 
     # Stop the joule scope monitoring thread
     stop_event.set()
