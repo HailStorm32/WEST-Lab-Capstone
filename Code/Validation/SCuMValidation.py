@@ -17,7 +17,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__Ve
 import WF_SDK
 from Digital import run_logic_analysis
 from Analog import validate_analog_signals
-
+from scumProgram import scumProgram
 
 ####################
 # Constants
@@ -52,7 +52,7 @@ def stub_function_call_2(stop_event, return_queue):
 # List of tests to be performed
 # Program upload and Power Consumption must be the first and last tests respectively
 tests = [
-    { 'name': 'Program upload',         'function': stub_program_upload,    'handle': None, 'results': [] },
+    { 'name': 'Program upload',         'function': scumProgram,            'handle': None, 'results': [] },
     { 'name': 'Radio communication',    'function': stub_function_call,     'handle': None, 'results': [] },
     { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
     { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
@@ -87,7 +87,9 @@ if __name__ == '__main__':
     print("Uploading test program to SCuM chip...")
     tests[0]['results'] = tests[0]['function']()
 
-    #TODO: Add delay for settle time??
+    # Wait for power up sequence to complete
+    print("Waiting for SCuM chip to power up...")
+    sleep(2)
 
     # Run the tests
     # Skip the first and last tests since they are handled differently
@@ -128,14 +130,28 @@ if __name__ == '__main__':
             test['results'] = test['function']()
 
         #TODO: remove delay 
-        sleep(1)
+        # sleep(1)
 
     # Stop the joule scope monitoring thread
+    print("Stopping joule scope monitoring thread...")
     stop_event.set()
     joule_scope_thread.join()
 
     # Get the results from the joule scope monitoring thread
+    print("Getting joule scope monitoring results...")
     tests[-1]["results"] = return_queue.get()
 
     #TODO: Generate report
+
+    # Temporary print results
+    print("\n\nResults:")
+    for test in tests:
+        print(f"Test Name: {test['name']}")
+        if test['results']:
+            print("Results:")
+            for result in test['results']:
+                print(f"  - {result}")
+        else:
+            print("No results available.")
+        print("-" * 40)
 

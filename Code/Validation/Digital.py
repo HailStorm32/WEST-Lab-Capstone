@@ -46,9 +46,6 @@ def run_logic_analysis(trigger_channel=0):
     # Initialize the logic analyzer with default settings
     logic.open(device_data, buffer_size=4096)
 
-    # Set up triggering on the specified channel
-    logic.trigger(device_data, enable=True, channel=trigger_channel, rising_edge=True)
-
     sleep(1)  # Wait 1 second
 
     # **Record data for each DIO channel separately**
