@@ -93,9 +93,9 @@ if __name__ == '__main__':
     # Skip the first and last tests since they are handled differently
     for test in tests[1:len(tests)-1]:
         '''
-        Open Digial Discovery
+        Open Digital Discovery
 
-        TODO: Instantiate all device handles at the begining and pass them in as arguments
+        TODO: Instantiate all device handles at the beginning and pass them in as arguments
             This way we can avoid opening and closing the device for each test
         '''
         try:    
