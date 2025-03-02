@@ -8,20 +8,18 @@ COMMON_BAUD_RATES = [
 ]
 
 TEST_MESSAGE = b"TEST12345"  # Test message to send
+PORT = "COM4"
 
-def find_serial_port():
-    """ List available serial ports and let user choose one. """
-    ports = list(serial.tools.list_ports.comports())
-    if not ports:
-        print("No serial ports found.")
-        return None
-
-    print("Available Serial Ports:")
-    for i, port in enumerate(ports):
-        print(f"{i}: {port.device} - {port.description}")
-
-    choice = int(input("Select a serial port (number): "))
-    return ports[choice].device if 0 <= choice < len(ports) else None
+def find_serial_port(port):
+    """ Check if the given serial port is valid. """
+    ports = [p.device for p in serial.tools.list_ports.comports()]
+    if port in ports:
+        return port
+    print(f"Invalid port: {port}")
+    print("Available COM ports:")
+    for p in ports:
+        print(f" - {p}")
+    return None
 
 def test_baud_rate(port, baud_rate):
     """ Test a single baud rate for sending and receiving data correctly. """
@@ -46,9 +44,9 @@ def test_baud_rate(port, baud_rate):
         print(f"Error testing baud rate {baud_rate}: {e}")
         return False
 
-def find_best_baud_rate():
+def find_best_baud_rate(port):
     """ Scan through baud rates and find a working one. """
-    port = find_serial_port()
+    port = find_serial_port(port)
     if not port:
         return
 
@@ -63,4 +61,4 @@ def find_best_baud_rate():
     return test_results
 
 if __name__ == "__main__":
-    result = find_best_baud_rate()
+    result = find_best_baud_rate(port=PORT)
