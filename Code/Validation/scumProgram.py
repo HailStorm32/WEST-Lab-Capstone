@@ -30,7 +30,11 @@ binary_image = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source
 
 # End User Defined Parameters ************************************
 
+# Serial connections
+nRF_ser = None
 
+boot_mode='3wb'
+pad_random_payload=False
 
 def signal_handler(signal, frame):
     nRF_ser.reset_input_buffer()
@@ -42,12 +46,6 @@ def scumProgram():
 
     # Register the signal handler
     signal.signal(signal.SIGINT, signal_handler)
-
-    # Serial connections
-    nRF_ser = None
-
-    boot_mode='3wb'
-    pad_random_payload=False
 
     # Open COM port to nRF
     nRF_ser = serial.Serial(
