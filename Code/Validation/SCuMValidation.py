@@ -17,7 +17,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__Ve
 import WF_SDK
 from Digital import run_logic_analysis
 from Analog import validate_analog_signals
-
+from scumProgram import scumProgram
 
 ####################
 # Constants
@@ -41,6 +41,7 @@ def clear_terminal():
 # Will be removed once the actual functions are implemented
 ###################
 def stub_program_upload():
+
     pass
 
 def stub_function_call():
@@ -52,7 +53,7 @@ def stub_function_call_2(stop_event, return_queue):
 # List of tests to be performed
 # Program upload and Power Consumption must be the first and last tests respectively
 tests = [
-    { 'name': 'Program upload',         'function': stub_program_upload,    'handle': None, 'results': [] },
+    { 'name': 'Program upload',         'function': scumProgram,    'handle': None, 'results': [] },
     { 'name': 'Radio communication',    'function': stub_function_call,     'handle': None, 'results': [] },
     { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
     { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
