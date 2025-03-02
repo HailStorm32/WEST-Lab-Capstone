@@ -53,7 +53,7 @@ def stub_function_call_2(stop_event, return_queue):
 # List of tests to be performed
 # Program upload and Power Consumption must be the first and last tests respectively
 tests = [
-    { 'name': 'Program upload',         'function': scumProgram,    'handle': None, 'results': [] },
+    { 'name': 'Program upload',         'function': scumProgram,            'handle': None, 'results': [] },
     { 'name': 'Radio communication',    'function': stub_function_call,     'handle': None, 'results': [] },
     { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
     { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
