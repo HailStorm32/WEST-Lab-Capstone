@@ -4,6 +4,7 @@ import argparse
 import signal
 import sys
 import time
+import os
 
 
 import datetime
@@ -24,7 +25,8 @@ nRF_port="COM8"
 
 # Path to SCuM binary
 
-binary_image="C:/Users/mitch/OneDrive/SchoolFiles/_Capstone/Repo/WEST-Lab-Capstone/Code/Validation/SCuM_test.bin"
+# binary_image="C:/Users/mitch/OneDrive/SchoolFiles/_Capstone/Repo/WEST-Lab-Capstone/Code/Validation/SCuM_test.bin"
+binary_image = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin'))
 
 # End User Defined Parameters ************************************
 
