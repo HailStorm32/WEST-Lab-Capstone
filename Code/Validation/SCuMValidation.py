@@ -54,11 +54,11 @@ def stub_function_call_2(stop_event, return_queue):
 # Program upload and Power Consumption must be the first and last tests respectively
 tests = [
     { 'name': 'Program upload',         'function': scumProgram,            'handle': None, 'results': [] },
-    { 'name': 'Radio communication',    'function': stub_function_call,     'handle': None, 'results': [] },
+    # { 'name': 'Radio communication',    'function': stub_function_call,     'handle': None, 'results': [] },
     { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
     { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
-    { 'name': 'Serial communication',   'function': stub_function_call,     'handle': None, 'results': [] },
-    { 'name': 'Power Consumption',      'function': stub_function_call_2,   'handle': None, 'results': [] },
+    # { 'name': 'Serial communication',   'function': stub_function_call,     'handle': None, 'results': [] },
+    # { 'name': 'Power Consumption',      'function': stub_function_call_2,   'handle': None, 'results': [] },
 ]
 
 
@@ -89,6 +89,7 @@ if __name__ == '__main__':
     tests[0]['results'] = tests[0]['function']()
 
     # Wait for power up sequence to complete
+    print("Waiting for SCuM chip to power up...")
     sleep(10)
 
     # Run the tests
