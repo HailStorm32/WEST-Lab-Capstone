@@ -46,6 +46,10 @@ int main(void) {
 	// SCuM will pause before test
 	delay_milliseconds_synchronous(500, 1);
 	
+	gpio_set_high(TRIGGER_PIN);
+	delay_milliseconds_synchronous(500, 1);
+	gpio_set_low(TRIGGER_PIN);
+	
 
     while (true) {
         printf("Hello World! %u\n", g_tx_counter);
