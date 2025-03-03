@@ -58,7 +58,7 @@ tests = [
     { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
     { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
     # { 'name': 'Serial communication',   'function': stub_function_call,     'handle': None, 'results': [] },
-    # { 'name': 'Power Consumption',      'function': stub_function_call_2,   'handle': None, 'results': [] },
+    { 'name': 'Power Consumption',      'function': stub_function_call_2,   'handle': None, 'results': [] },
 ]
 
 
@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
     # Wait for power up sequence to complete
     print("Waiting for SCuM chip to power up...")
-    sleep(10)
+    sleep(2)
 
     # Run the tests
     # Skip the first and last tests since they are handled differently
