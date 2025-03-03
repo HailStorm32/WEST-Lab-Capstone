@@ -134,11 +134,25 @@ if __name__ == '__main__':
         # sleep(1)
 
     # Stop the joule scope monitoring thread
-    stop_event.set()
-    joule_scope_thread.join()
+    # print("Stopping joule scope monitoring thread...")
+    # stop_event.set()
+    # joule_scope_thread.join()
 
-    # Get the results from the joule scope monitoring thread
-    tests[-1]["results"] = return_queue.get()
+    # # Get the results from the joule scope monitoring thread
+    # print("Getting joule scope monitoring results...")
+    # tests[-1]["results"] = return_queue.get()
 
     #TODO: Generate report
+
+    # Temporary print results
+    print("\n\nResults:")
+    for test in tests:
+        print(f"Test Name: {test['name']}")
+        if test['results']:
+            print("Results:")
+            for result in test['results']:
+                print(f"  - {result}")
+        else:
+            print("No results available.")
+        print("-" * 40)
 
