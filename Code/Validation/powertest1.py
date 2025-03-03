@@ -1,10 +1,12 @@
 '''
-Alex Jain - March 1st, 2025
+Alex Jain - March 3rd, 2025
 
 This script is a test script to see if after a 
 yepkit power cycle the device will automatically
 call the joulescope function and record voltage/current
 and place into a text file.
+
+Version: 1.1
 '''
 
 # Import the necessary modules.
@@ -25,17 +27,20 @@ def statistics_callback_log(stats):
     t = stats['time']['range']['value'][0]
     i = stats['signals']['current']['µ']
     v = stats['signals']['voltage']['µ']
+    p = stats['signals']['power']['µ']
+    c = stats['accumulators']['charge']
+    e = stats['accumulators']['energy']
 
-    fmts = ['{x:.9f}', '{x:.3f}']
+    fmts = ['{x:.9f}', '{x:.3f}', '{x:.9f}', '{x:.9f}', '{x:.9f}']
     values = []
-    for k, fmt in zip([i, v], fmts):
+    for k, fmt in zip([i, v, p, c, e], fmts):
         value = fmt.format(x=k['value'])
-        value = f'{value} {k["unit"]}'
+        value = f'{value} {k["units"]}'
         values.append(value)
     line = ', '.join(values)
 
     try:
-        with open('joulescope_data.txt', 'a') as outfile:
+        with open("joulescope_data.txt", "a") as outfile:
             now = datetime.datetime.now()
             timestamp = now.strftime("%Y-%m-%d %H:%M:%S")
             outfile.write(f"{timestamp}, {t:.1f}: {line}\n")
@@ -58,7 +63,10 @@ def power_cycle():
 
 # Run (Main) Function that runs both power cycle and Joulescope functions.
 def run():
-    # Default values.
+    # Print working directory (debugging purposes)
+    print(f"Current working directory: {os.getcwd()}")
+
+    # Default values for joulescope.
     timeout = 10
     reduction_frequency = 1
     sampling_frequency = 2000000
@@ -66,8 +74,16 @@ def run():
     v_range = '15V'
     output_type = 0
 
-    # Call Power Cycle function.
-    power_cycle()
+    # Call Power cycle function - user input to determine Yes/No.
+    print("\nPower Cycle? [Y/N]")
+    userchoice = input("Enter choice: ")
+
+    if userchoice == 'Y' or userchoice == 'y':
+        print("Power cycling device...")
+        power_cycle()
+    else:
+        print("Not power cycling device...")
+        sys.exit(1)
 
     # Get all joulescope devices or fail if none are found.
     devices = joulescope.scan(config='off')
@@ -92,8 +108,13 @@ def run():
     print(f"Current Range set to: {device.parameter_get('i_range')}")
     print(f"Voltage Range set to: {device.parameter_get('v_range')}")
 
+    if output_type == 0:
+        print(f"Voltage Range set to: {device.parameter_get('v_range')}")
+    else:
+        print(f"Voltage Range set to: {device.parameter_get('v_range')}")
+
     try:
-        # No requirement to pull device.status() with the V1 backend
+        # No requirement to pull device.status() with the V1 backend. Set time to be 3 secs a value.
         for _ in range(timeout // 3):
             time.sleep(3)
             stats = device.statistics_get()
