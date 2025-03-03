@@ -90,5 +90,14 @@ def scumProgram():
 
     print("\r\nFinished programming.\r\n")
 
+    if nRF_ser is not None:
+        print("\rClosing serial port...")
+        nRF_ser.reset_input_buffer()
+        nRF_ser.close()
+    print("\rBye...")
 
 
+
+if __name__ == '__main__':
+    scumProgram()
+    sys.exit(0)
