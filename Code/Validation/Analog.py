@@ -1,14 +1,16 @@
 '''
-Contains the Analog class, which is used to validate analog signals.
+Contains functions to validate the analog signals of the device.
 The following signals are validated:
 - 1.1V reference voltage
 - 1.8V reference voltage
+- Clock signals
 '''
 import os
 import sys
 import ctypes     
 import time
 import numpy as np
+import matplotlib.pyplot as plt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 import WF_SDK
 from Config import *
@@ -40,9 +42,9 @@ from WF_SDK.scope import data
 
 
 # Dont allow this file to be run directly
-if __name__ == '__main__':
-    print("\n\nThis file cannot be run directly. Please run the main script.\n\n")
-    sys.exit(1)
+# if __name__ == '__main__':
+#     print("\n\nThis file cannot be run directly. Please run the main script.\n\n")
+#     sys.exit(1)
 
 
 def validate_1_1V_reference_voltage(device_data):
@@ -122,35 +124,37 @@ def continuous_record(device_data, channel, record_length_ms):
             - record_length_ms (int): The length of time to record the signal in milliseconds
 
         returns:
-            None
+            signal_data (numpy pair array): The recorded signal data [[time, voltage],...]
     """
 
     nSamples = device_data.analog.input.max_buffer_size
-    sample_length_ms = record_length_ms / 1000
-
+    sample_length_s = record_length_ms / 1000
+    # frequency = nSamples / sample_length_s
+    frequency =  100e06#WF_SDK.scope.data.sampling_frequency 
     buffer = (ctypes.c_double * nSamples)()   # create an empty buffer
 
     # Set up for acquisition
     dwf.FDwfAnalogInChannelEnableSet(device_data.handle, ctypes.c_int(channel), ctypes.c_bool(True))    # Enable the channel
     dwf.FDwfAnalogInChannelRangeSet(device_data.handle, ctypes.c_int(channel), ctypes.c_double(5))      # Set the range to 5V
     dwf.FDwfAnalogInAcquisitionModeSet(device_data.handle, ctypes.c_int(1))                             # Set to ScanShift AcquisitionMode
-    dwf.FDwfAnalogInFrequencySet(device_data.handle, ctypes.c_double(nSamples/sample_length_ms))        # Set the frequency
+    dwf.FDwfAnalogInFrequencySet(device_data.handle, ctypes.c_double(frequency))                        # Set the frequency
     dwf.FDwfAnalogInBufferSizeSet(device_data.handle, ctypes.c_int(nSamples))                           # Set the buffer size   
     dwf.FDwfAnalogInConfigure(device_data.handle, ctypes.c_bool(True), ctypes.c_bool(False))            # Force configure the device
 
     time.sleep(1)
 
-    # Begin acquisition
-    if dwf.FDwfAnalogInConfigure(device_data.handle, ctypes.c_bool(False), ctypes.c_bool(True)) == 0:
-        check_error()
-    
     # Create a numpy array to store the buffered data
     buffer_np = np.array([])
 
-    status = ctypes.c_byte()    # variable to store buffer status
+    # Variable to store buffer status
+    status = ctypes.c_byte()    
+
+    # Begin acquisition
+    if dwf.FDwfAnalogInConfigure(device_data.handle, ctypes.c_bool(False), ctypes.c_bool(True)) == 0:
+        check_error()
 
     start_time = time.time()
-    while (time.time() - start_time) * 1000 < sample_length_ms:
+    while (time.time() - start_time) < sample_length_s:
 
         # Wait for a full buffer
         sample_count = ctypes.c_int(0)
@@ -167,23 +171,72 @@ def continuous_record(device_data, channel, record_length_ms):
         # Convert buffer to numpy array and append to it
         buffer_np = np.append(buffer_np, np.array(buffer))
 
+    # Generate buffer for time moments
+    time_1 = np.arange(len(buffer_np)) * 1e03 / (frequency)  # convert time to ms
+    
+    # Combine the time and data arrays into a paired array  [[time, voltage],...]
+    signal_data = np.column_stack((time_1, buffer_np))
 
     ## DEBUG
 
     # Save the numpy array to a CSV file
-    np.savetxt("analog_signal.csv", buffer_np, delimiter=",")
+    # np.savetxt("analog_signal.csv", buffer_np, delimiter=",")
 
-    import matplotlib.pyplot as plt
-
-    # generate buffer for time moments
-    # time_1 = np.arange(len(buffer)) * 1e03 / WF_SDK.scope.data.sampling_frequency  # convert time to ms
-    time_1 = np.arange(len(buffer)) * 1e03 / ( nSamples/sample_length_ms )  # convert time to ms
+    # Save the paired array to a CSV file
+    np.savetxt("paired_signal_data.csv", signal_data, delimiter=",", header="time,voltage", comments='', fmt='%f')
 
     # plot
-    plt.plot(time_1, buffer), 
+    plt.plot(signal_data[:, 0], signal_data[:, 1])
     plt.xlabel("time [ms]")
     plt.ylabel("voltage [V]")
     plt.show()
+
+    #################################################
+    # data = WF_SDK.scope.record(device_data, channel=1)
+
+    # # # Generate buffer for time moments
+    # time_1 = np.arange(len(data)) * 1e03 / (20e06)  # convert time to ms
+    
+    # # # Combine the time and data arrays into a paired array  [[time, voltage],...]
+    # signal_data = np.column_stack((time_1, data))
+    #################################################
+
+    return signal_data
+
+def determine_signal_frequency(signal_data):
+    '''
+    Determine the frequency of a signal
+
+    Parameters:
+        signal_data (numpy pair array): The recorded signal data [[time, voltage],...]
+
+    Returns:
+        frequency (float): The frequency of the signal
+    '''
+
+    time_ms = signal_data[:, 0]
+    voltage = signal_data[:, 1]
+
+    # Convert time from milliseconds to seconds
+    time = time_ms / 1000.0
+
+    # Determine the sampling interval and sampling frequency
+    dt = np.mean(np.diff(time))
+    # fs = 1.0 / dt  # Sampling frequency in Hz
+
+    # Remove any DC offset from the voltage
+    voltage_detrended = voltage - np.mean(voltage)
+
+    # Compute the FFT
+    N = len(voltage_detrended)
+    fft_vals = np.fft.fft(voltage_detrended)
+    freqs = np.fft.fftfreq(N, d=dt)
+
+    # Consider only the positive frequencies
+    mask = freqs > 0
+    dominant_freq = freqs[mask][np.argmax(np.abs(fft_vals[mask]))]
+
+    print("Dominant frequency: {:.2f} Hz".format(dominant_freq))
 
 def validate_analog_signals():
     '''
@@ -228,3 +281,38 @@ def validate_analog_signals():
     WF_SDK.device.close(device_data)
 
     return test_results
+
+if __name__ == '__main__':
+    # Open the device
+    try:    
+        device_data = WF_SDK.device.open("analogdiscovery2")
+    except Exception as e:
+        print("Error: " + str(e))
+        sys.exit(1)
+
+    WF_SDK.scope.open(device_data)
+
+    WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
+
+    # Generate a sine wave on channel 2
+    print("Generating sine wave on channel 2...")
+    # Generate a 10KHz sine wave with 2V amplitude on channel 1
+    WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=25e06, amplitude=2) # 10e03
+
+    time.sleep(2)
+
+    # Record the analog signal for 5ms
+    data = continuous_record(device_data, 1, 5)
+
+    # Determine the frequency of the signal
+    freq = determine_signal_frequency(data)
+
+    # data = WF_SDK.scope.record(device_data, channel=1)
+    # Convert the list to a numpy array
+    # data_np = np.array(data)
+
+    # Save the numpy array to a CSV file
+    # np.savetxt("recorded_signal.csv", data_np, delimiter=",")
+
+    # Close the device
+    WF_SDK.device.close(device_data)
