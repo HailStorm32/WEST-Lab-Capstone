@@ -6,7 +6,7 @@ yepkit power cycle the device will automatically
 call the joulescope function and record voltage/current
 and place into a text file.
 
-Version: 1.1
+Version: 1.2
 '''
 
 # Import the necessary modules.
@@ -20,10 +20,8 @@ import joulescope
 # From Joulescope example script.
 global output_type
 
-# Callback Statistics - From Joulescope example script.
-# Reduced to only voltage and current.
+# Callback Statistics Log - From Joulescope example script.
 def statistics_callback_log(stats):
-    # Note for later: Add power, charge, energy??
     t = stats['time']['range']['value'][0]
     i = stats['signals']['current']['µ']
     v = stats['signals']['voltage']['µ']
@@ -55,11 +53,11 @@ def power_cycle():
         return
     
     # Power Cycle USB Downstream Port 1 (Nordic/SCuM).
-    print("Turning off USB Port 1")
-    subprocess.run([ykushcmd_path, "-d", "1"], shell=True)
+    print("Turning off USB Port 3")
+    subprocess.run([ykushcmd_path, "-d", "3"], shell=True)
     time.sleep(5)
-    print("Turning on USB Port 1")
-    subprocess.run([ykushcmd_path, "-u", "1"], shell=True)
+    print("Turning on USB Port 3")
+    subprocess.run([ykushcmd_path, "-u", "3"], shell=True)
 
 # Run (Main) Function that runs both power cycle and Joulescope functions.
 def run():
@@ -102,7 +100,7 @@ def run():
     device.parameter_set('v_range', v_range)
 
     # Print all settings to console.
-    print(f"Timer set to: {timeout}"
+    print(f"Timer set to: {timeout}")
     print(f"Reduction Frequency set to: {device.parameter_get('reduction_frequency')}")
     print(f"Sampling Frequency set to: {device.parameter_get('sampling_frequency')}")
     print(f"Current Range set to: {device.parameter_get('i_range')}")
@@ -115,10 +113,7 @@ def run():
 
     try:
         # No requirement to pull device.status() with the V1 backend. Set time to be 3 secs a value.
-        for _ in range(timeout // 3):
-            time.sleep(3)
-            stats = device.statistics_get()
-            statistics_callback_log(stats)
+        time.sleep(timeout)
     finally:
         device.close()
 
