@@ -41,6 +41,9 @@ def stub_program_upload():
 def stub_function_call():
     pass
 
+def stub_self_check():
+    return True
+
 def stub_function_call_2(stop_event, return_queue):
     pass
 
@@ -68,7 +71,24 @@ tests = [
 #########################################################
 if __name__ == '__main__':
     clear_terminal()
-    
+
+    # Run self test for spectrum analyzer
+    print("Running self test for spectrum analyzer...")
+    self_test_result = stub_self_check() # TODO: Replace with spectrum analyzer self test function
+
+    if not self_test_result:
+        print("Spectrum analyzer self test failed!\n Exiting...")
+
+        # Fail the tests
+        for test in tests:
+            test['results'] = None
+
+        #TODO: Generate report
+
+        sys.exit(1)
+    else:
+        print("Spectrum analyzer self test passed!\n")
+
     # Setup and start joule scope monitoring thread
     stop_event = threading.Event()
     return_queue = queue.Queue()
