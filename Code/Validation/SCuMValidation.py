@@ -20,12 +20,6 @@ from Analog import validate_analog_signals
 from scumProgram import scumProgram
 from Config import *
 
-####################
-# Constants
-####################
-TRIGGER_PIN_NUM = 0  # Pin number for the trigger pin
-
-
 def clear_terminal():
     '''
     Clear the terminal screen

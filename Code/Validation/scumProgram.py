@@ -5,9 +5,9 @@ import signal
 import sys
 import time
 import os
-
-
 import datetime
+
+from Config import SCUM_NRF_COM_PORT
 
 def get_current_time():
   """
@@ -21,7 +21,7 @@ def get_current_time():
 # User Defined Parameters ****************************************
 
 # Com port of nRF board 
-nRF_port="COM8" 
+nRF_port=SCUM_NRF_COM_PORT 
 
 # Path to SCuM binary
 binary_image = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin'))
