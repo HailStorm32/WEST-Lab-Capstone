@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__Ve
 
 from WF_SDK import device, logic, pattern, error  # Import instruments
 from time import sleep  # Needed for delays
+from Config import DIGITAL_DEVICE  # Import the device name
 
 CONSECUTIVE_ONES_REQUIRED = 10  # Minimum consecutive '1's required for passing
 
@@ -41,7 +42,7 @@ def run_logic_analysis(trigger_channel=0):
         tests (list): List of dictionaries containing test results for each non-trigger pin.
     """
     # Connect to the device
-    device_data = device.open(device="Digital Discovery")
+    device_data = device.open(device=DIGITAL_DEVICE)
 
     # Initialize the logic analyzer with default settings
     logic.open(device_data, buffer_size=4096)

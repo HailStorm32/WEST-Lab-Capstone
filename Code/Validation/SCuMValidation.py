@@ -18,6 +18,7 @@ import WF_SDK
 from Digital import run_logic_analysis
 from Analog import validate_analog_signals
 from scumProgram import scumProgram
+from Config import *
 
 ####################
 # Constants
@@ -101,7 +102,7 @@ if __name__ == '__main__':
             This way we can avoid opening and closing the device for each test
         '''
         try:    
-            dd_handle = WF_SDK.device.open("Digital Discovery")
+            dd_handle = WF_SDK.device.open(DIGITAL_DEVICE)
         except Exception as e:
             print("Error: " + str(e))
             sys.exit(1)
