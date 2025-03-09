@@ -39,6 +39,7 @@ sys.path.append(constants_path)
 import dwfconstants as constants
 from WF_SDK.device import check_error
 from WF_SDK.scope import data
+import csv
 
 
 # Dont allow this file to be run directly
@@ -129,8 +130,8 @@ def continuous_record(device_data, channel, record_length_ms):
 
     nSamples = device_data.analog.input.max_buffer_size
     sample_length_s = record_length_ms / 1000
-    # frequency = nSamples / sample_length_s
-    frequency =  100e06#WF_SDK.scope.data.sampling_frequency 
+    frequency = nSamples / sample_length_s
+    # frequency =  100e06#WF_SDK.scope.data.sampling_frequency 
     buffer = (ctypes.c_double * nSamples)()   # create an empty buffer
 
     # Set up for acquisition
@@ -141,7 +142,7 @@ def continuous_record(device_data, channel, record_length_ms):
     dwf.FDwfAnalogInBufferSizeSet(device_data.handle, ctypes.c_int(nSamples))                           # Set the buffer size   
     dwf.FDwfAnalogInConfigure(device_data.handle, ctypes.c_bool(True), ctypes.c_bool(False))            # Force configure the device
 
-    time.sleep(1)
+    time.sleep(.3)
 
     # Create a numpy array to store the buffered data
     buffer_np = np.array([])
@@ -182,8 +183,8 @@ def continuous_record(device_data, channel, record_length_ms):
     # Save the numpy array to a CSV file
     # np.savetxt("analog_signal.csv", buffer_np, delimiter=",")
 
-    # Save the paired array to a CSV file
-    np.savetxt("paired_signal_data.csv", signal_data, delimiter=",", header="time,voltage", comments='', fmt='%f')
+    # # Save the paired array to a CSV file
+    # np.savetxt("paired_signal_data.csv", signal_data, delimiter=",", header="time,voltage", comments='', fmt='%f')
 
     # plot
     plt.plot(signal_data[:, 0], signal_data[:, 1])
@@ -238,6 +239,8 @@ def determine_signal_frequency(signal_data):
 
     print("Dominant frequency: {:.2f} Hz".format(dominant_freq))
 
+    return dominant_freq
+
 def validate_analog_signals():
     '''
     Validate the analog signals
@@ -282,6 +285,66 @@ def validate_analog_signals():
 
     return test_results
 
+def test_frequency_measurement_accuracy(device_data):
+    """
+    Test the accuracy of the frequency measurement.
+
+    Parameters:
+        device_data (object): The device data object
+
+    Returns:
+        None
+    """
+    channel = 1
+    min_freq = 1e3  # 1 kHz
+    max_freq = 25e06  # 25 MHz
+    step_freq = 50e3  # 1 kHz
+    record_length_ms = 1  # 5 ms
+
+    results = []
+
+    for freq in np.arange(min_freq, max_freq + step_freq, step_freq):
+        WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
+        print(f"Generating square wave with frequency {freq} Hz...")
+        # Generate a square wave with the current frequency
+        WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=freq, amplitude=2)
+        
+        time.sleep(.5)
+        
+        print(f"Recording the analog signal for {record_length_ms} ms...")
+        # Record the analog signal
+        data = continuous_record(device_data, channel, record_length_ms)
+
+        print("Determining the frequency of the recorded signal...")
+        # Determine the frequency of the signal
+        measured_freq = determine_signal_frequency(data)
+
+        if measured_freq is None:
+            print(f"Error: Could not determine frequency for {freq} Hz.")
+            continue
+
+        # Calculate the delta between the measured and expected frequency
+        delta = abs(measured_freq - freq)
+
+        # Store the result
+        results.append({
+            'expected_frequency': freq,
+            'measured_frequency': measured_freq,
+            'delta': delta
+        })
+
+        # Print the result
+        print(f"Expected: {freq} Hz, Measured: {measured_freq} Hz, Delta: {delta} Hz")
+
+    # Save the results to a CSV file
+    with open('frequency_measurement_accuracy_results.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Expected Frequency (Hz)', 'Measured Frequency (Hz)', 'Delta (Hz)'])
+        for result in results:
+            writer.writerow([result['expected_frequency'], result['measured_frequency'], result['delta']])
+
+    print("Results have been saved to 'frequency_measurement_accuracy_results.csv'")
+
 if __name__ == '__main__':
     # Open the device
     try:    
@@ -292,21 +355,32 @@ if __name__ == '__main__':
 
     WF_SDK.scope.open(device_data)
 
-    WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
+    while True:
+        WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
+        
+        frequency = 500e03
+        WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=frequency, amplitude=2) # 10e03
 
-    # Generate a sine wave on channel 2
-    print("Generating sine wave on channel 2...")
-    # Generate a 10KHz sine wave with 2V amplitude on channel 1
-    WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=25e06, amplitude=2) # 10e03
+        # time.sleep(2)
 
-    time.sleep(2)
+        # Record the analog signal for 5ms
+        data = continuous_record(device_data, 1, 5)
 
-    # Record the analog signal for 5ms
-    data = continuous_record(device_data, 1, 5)
+        # Determine the frequency of the signal
+        freq = determine_signal_frequency(data)
 
-    # Determine the frequency of the signal
-    freq = determine_signal_frequency(data)
+        if abs(freq - frequency) > 1:
+            print(f"Delta: {abs(freq - frequency)} Hz")
+        else:
+            print("Delta: 0.0 Hz")
 
+    # ################################################
+    # Test the frequency measurement accuracy
+    
+    # test_frequency_measurement_accuracy(device_data)
+    
+    # ##################################################
+    # #raw scope record
     # data = WF_SDK.scope.record(device_data, channel=1)
     # Convert the list to a numpy array
     # data_np = np.array(data)
