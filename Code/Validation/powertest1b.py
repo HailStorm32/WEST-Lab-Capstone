@@ -123,3 +123,4 @@ Additional Notes 03/10/2025:
 to signal it to stop.
 2. Separate function for setup? (name it device_operations)
 3. Find someway to close said thread - current idea for test: user input.
+'''
