@@ -7,9 +7,10 @@ The following signals are validated:
 '''
 import os
 import sys
-import ctypes     
+from ctypes import *   
 import time
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 import WF_SDK
@@ -22,21 +23,21 @@ from Config import *
 # load the dynamic library, get constants path (the path is OS specific)
 if sys.platform.startswith("win"):
     # on Windows
-    dwf = ctypes.cdll.dwf
+    dwf = cdll.dwf
     constants_path = "C:" + os.sep + "Program Files (x86)" + os.sep + "Digilent" + os.sep + "WaveFormsSDK" + os.sep + "samples" + os.sep + "py"
 elif sys.platform.startswith("darwin"):
     # on macOS
     lib_path = os.sep + "Library" + os.sep + "Frameworks" + os.sep + "dwf.framework" + os.sep + "dwf"
-    dwf = ctypes.cdll.LoadLibrary(lib_path)
+    dwf = cdll.LoadLibrary(lib_path)
     constants_path = os.sep + "Applications" + os.sep + "WaveForms.app" + os.sep + "Contents" + os.sep + "Resources" + os.sep + "SDK" + os.sep + "samples" + os.sep + "py"
 else:
     # on Linux
-    dwf = ctypes.cdll.LoadLibrary("libdwf.so")
+    dwf = cdll.LoadLibrary("libdwf.so")
     constants_path = os.sep + "usr" + os.sep + "share" + os.sep + "digilent" + os.sep + "waveforms" + os.sep + "samples" + os.sep + "py"
 
 # import constants
 sys.path.append(constants_path)
-import dwfconstants as constants
+from dwfconstants import *
 from WF_SDK.device import check_error
 from WF_SDK.scope import data
 import csv
@@ -204,42 +205,113 @@ def continuous_record(device_data, channel, record_length_ms):
 
     return signal_data
 
-def determine_signal_frequency(signal_data):
+def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample_rate_hz=100e6, v_range_min=0, v_range_max=2):
     '''
     Determine the frequency of a signal
 
     Parameters:
-        signal_data (numpy pair array): The recorded signal data [[time, voltage],...]
+        device_data (object): The device data object
+        channel (int): The channel to measure
+        n_measurements (int): The number of measurements to average
+        sample_rate_hz (float): The sample rate in Hz (max 100 MHz)
+        v_range_min (float): The minimum voltage range
+        v_range_max (float): The maximum voltage range
 
     Returns:
         frequency (float): The frequency of the signal
     '''
+    # Validate input
+    if n_measurements < 1:
+        raise ValueError("n_measurements must be greater than 0")
+    elif sample_rate_hz < 1:
+        raise ValueError("sample_rate_hz must be greater than 0")
+    elif sample_rate_hz > 100e6:
+        raise ValueError("sample_rate_hz must be less than 100 MHz")
 
-    time_ms = signal_data[:, 0]
-    voltage = signal_data[:, 1]
+    # Setup to capture up to 32Ki of samples
+    n_buff_max = c_int()
+    dwf.FDwfAnalogInBufferSizeInfo(device_data.handle, 0, byref(n_buff_max))
+    n_samples = min(32768, n_buff_max.value)
+    n_samples = int(2**round(math.log2(n_samples)))
 
-    # Convert time from milliseconds to seconds
-    time = time_ms / 1000.0
+    # Set up acquisition
+    dwf.FDwfAnalogInFrequencySet(device_data.handle, c_double(sample_rate_hz))
+    dwf.FDwfAnalogInBufferSizeSet(device_data.handle, n_samples)
+    dwf.FDwfAnalogInChannelEnableSet(device_data.handle, 0, channel) # enable channel 0 (C1)
+    dwf.FDwfAnalogInChannelRangeSet(device_data.handle,  c_double(v_range_min), c_double(v_range_max)) # pk2pk
 
-    # Determine the sampling interval and sampling frequency
-    dt = np.mean(np.diff(time))
-    # fs = 1.0 / dt  # Sampling frequency in Hz
+    # Begin acquisition
+    if dwf.FDwfAnalogInConfigure(device_data.handle, c_bool(True), c_bool(True)) == 0 :
+        check_error()
 
-    # Remove any DC offset from the voltage
-    voltage_detrended = voltage - np.mean(voltage)
+    # Convert the sample rate to a c_double
+    sample_rate_hz = c_double(sample_rate_hz)
+    # dwf.FDwfAnalogInFrequencyGet(device_data.handle, byref(sample_rate_hz))
+    # print("Samples: "+str(nSamples)+"  Rate: "+str(hzRate.value/1e6)+"MHz") 
 
-    # Compute the FFT
-    N = len(voltage_detrended)
-    fft_vals = np.fft.fft(voltage_detrended)
-    freqs = np.fft.fftfreq(N, d=dt)
+    # Create buffers for samples, window, and bins
+    samples = (c_double*n_samples)()
+    window = (c_double*n_samples)()
+    n_bins = int(n_samples/2+1)
+    bins = (c_double*n_bins)()
+    maxFrequency = sample_rate_hz.value/2  # nyquist limit
 
-    # Consider only the positive frequencies
-    mask = freqs > 0
-    dominant_freq = freqs[mask][np.argmax(np.abs(fft_vals[mask]))]
+    # Set up the window
+    dwf.FDwfSpectrumWindow(byref(window), c_int(n_samples), DwfWindowFlatTop, c_double(1.0), None)
+    # print("Range: DC to "+str(hzTop/1e0)+" Hz  Resolution: "+str(hzTop/(nBins-1)/1e3)+" kHz") 
 
-    print("Dominant frequency: {:.2f} Hz".format(dominant_freq))
+    weighted_freq_sum = 0
 
-    return dominant_freq
+    # Perform measurements
+    for i in range(n_measurements):
+
+        # Wait for a full buffer
+        while True:
+            sts = c_byte()
+            # Fetch status and data from device
+            if dwf.FDwfAnalogInStatus(device_data.handle, c_bool(True), byref(sts)) == 0 :
+                check_error()
+            if sts.value == DwfStateDone.value :
+                break
+        
+        # Get the data
+        dwf.FDwfAnalogInStatusData(device_data.handle, c_int(channel - 1), samples, n_samples) 
+        
+        # Apply the window
+        for i in range(n_samples):
+            samples[i] = samples[i]*window[i]
+
+        # Perform the FFT
+        dwf.FDwfSpectrumFFT(byref(samples), n_samples, byref(bins), None, n_bins)
+
+        # Find the peak
+        iPeak = 0
+        vPeak = float('-inf')
+        for i in range(5, n_bins): # skip DC lobe
+            if bins[i] < vPeak: continue
+            vPeak = bins[i]
+            iPeak = i
+
+        # print("C"+str(channel)+" peak: "+str(hzTop*iPeak/(nBins-1)/1e0)+" Hz  ")
+        
+        # Perform a weighted average
+        if iPeak < n_bins-5: # weighted average
+            s = 0
+            m = 0
+            for i in range(-4,5):
+                t = bins[iPeak+i]
+                s += (iPeak+i)*t
+                m += t
+            iPeak = s/m
+
+        weighted_freq_sum += maxFrequency*iPeak/(n_bins-1)/1e0
+
+    # print("C"+str(channel)+" weighted: "+str(weighted_freq)+" Hz")
+
+    weighted_freq_avg = weighted_freq_sum / n_measurements
+
+    return weighted_freq_avg
+
 
 def validate_analog_signals():
     '''
@@ -311,13 +383,13 @@ def test_frequency_measurement_accuracy(device_data):
         
         time.sleep(.5)
         
-        print(f"Recording the analog signal for {record_length_ms} ms...")
-        # Record the analog signal
-        data = continuous_record(device_data, channel, record_length_ms)
+        # print(f"Recording the analog signal for {record_length_ms} ms...")
+        # # Record the analog signal
+        # data = continuous_record(device_data, channel, record_length_ms)
 
         print("Determining the frequency of the recorded signal...")
         # Determine the frequency of the signal
-        measured_freq = determine_signal_frequency(data)
+        measured_freq = determine_signal_frequency(device_data)
 
         if measured_freq is None:
             print(f"Error: Could not determine frequency for {freq} Hz.")
@@ -327,14 +399,16 @@ def test_frequency_measurement_accuracy(device_data):
         delta = abs(measured_freq - freq)
 
         # Store the result
+        percent_difference = (delta / freq) * 100
         results.append({
             'expected_frequency': freq,
             'measured_frequency': measured_freq,
-            'delta': delta
+            'delta': delta,
+            'percent_difference': percent_difference
         })
 
         # Print the result
-        print(f"Expected: {freq} Hz, Measured: {measured_freq} Hz, Delta: {delta} Hz")
+        print(f"Expected: {freq} Hz, Measured: {measured_freq} Hz, Delta: {delta} Hz, Percent Difference: {percent_difference:.3f}%")
 
     # Save the results to a CSV file
     with open('frequency_measurement_accuracy_results.csv', mode='w', newline='') as file:
@@ -353,40 +427,46 @@ if __name__ == '__main__':
         print("Error: " + str(e))
         sys.exit(1)
 
-    WF_SDK.scope.open(device_data)
+    WF_SDK.scope.open(device_data, sampling_frequency=100e6)
 
-    while True:
-        WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
+    # while True:
+    #     WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
         
-        frequency = 500e03
-        WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=frequency, amplitude=2) # 10e03
+    #     frequency = 20e06
+    #     WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=frequency, amplitude=2) # 10e03
 
-        # time.sleep(2)
+    #     time.sleep(2)
 
-        # Record the analog signal for 5ms
-        data = continuous_record(device_data, 1, 5)
+    #     # Record the analog signal for 5ms
+    #     # data = continuous_record(device_data, 1, 5)
 
-        # Determine the frequency of the signal
-        freq = determine_signal_frequency(data)
+    #     # ##################################################
+    #     # #raw scope record
+    #     # data = WF_SDK.scope.record(device_data, channel=1)
+    #     # # Convert the list to a numpy array
+    #     # data_np = np.array(data)
 
-        if abs(freq - frequency) > 1:
-            print(f"Delta: {abs(freq - frequency)} Hz")
-        else:
-            print("Delta: 0.0 Hz")
+    #     # # Generate buffer for time moments
+    #     # time_1 = np.arange(len(data_np)) * 1e03 / (100e6)  # convert time to ms
+        
+    #     # # Combine the time and data arrays into a paired array  [[time, voltage],...]
+    #     # signal_data = np.column_stack((time_1, data_np))
+
+    #     # # Save the numpy array to a CSV file
+    #     # np.savetxt("recorded_signal.csv", data_np, delimiter=",")
+
+    #     # Determine the frequency of the signal
+    #     freq = determine_signal_frequency(device_data)
+
+    #     if abs(freq - frequency) > 1:
+    #         print(f"Delta: {abs(freq - frequency)} Hz")
+    #     else:
+    #         print("Delta: 0.0 Hz")
 
     # ################################################
     # Test the frequency measurement accuracy
     
-    # test_frequency_measurement_accuracy(device_data)
-    
-    # ##################################################
-    # #raw scope record
-    # data = WF_SDK.scope.record(device_data, channel=1)
-    # Convert the list to a numpy array
-    # data_np = np.array(data)
-
-    # Save the numpy array to a CSV file
-    # np.savetxt("recorded_signal.csv", data_np, delimiter=",")
+    test_frequency_measurement_accuracy(device_data)
 
     # Close the device
     WF_SDK.device.close(device_data)
