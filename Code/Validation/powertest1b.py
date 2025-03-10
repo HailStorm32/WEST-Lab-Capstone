@@ -6,7 +6,7 @@ yepkit power cycle the device will automatically
 call the joulescope function and record voltage/current
 and place into a text file.
 
-Version: 1.2
+Version: 1.2.1
 '''
 
 # Import the necessary modules.
@@ -25,11 +25,8 @@ def statistics_callback_log(stats):
     t = stats['time']['range']['value'][0]
     i = stats['signals']['current']['µ']
     v = stats['signals']['voltage']['µ']
-    p = stats['signals']['power']['µ']
-    c = stats['accumulators']['charge']
-    e = stats['accumulators']['energy']
 
-    fmts = ['{x:.9f}', '{x:.3f}', '{x:.9f}', '{x:.9f}', '{x:.9f}']
+    fmts = ['{x:.9f}', '{x:.3f}']
     values = []
     for k, fmt in zip([i, v, p, c, e], fmts):
         value = fmt.format(x=k['value'])
@@ -60,6 +57,7 @@ def power_cycle():
     subprocess.run([ykushcmd_path, "-u", "3"], shell=True)
 
 # Run (Main) Function that runs both power cycle and Joulescope functions.
+# Note 03/10/2025: Run this as a thread so device.close() can be called later in master function.
 def run():
     # Print working directory (debugging purposes)
     print(f"Current working directory: {os.getcwd()}")
@@ -119,3 +117,9 @@ def run():
 
 if __name__ == '__main__':
     run()
+''' 
+Additional Notes 03/10/2025:
+1. Global variable (stop_event) required, ie threading.event object 
+to signal it to stop.
+2. Separate function for setup? (name it device_operations)
+3. Find someway to close said thread - current idea for test: user input.
