@@ -368,47 +368,47 @@ def test_frequency_measurement_accuracy(device_data):
         None
     """
     channel = 1
-    min_freq = 1e3  # 1 kHz
-    max_freq = 25e06  # 25 MHz
-    step_freq = 50e3  # 1 kHz
-    record_length_ms = 1  # 5 ms
-
     results = []
 
-    for freq in np.arange(min_freq, max_freq + step_freq, step_freq):
-        WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
-        print(f"Generating square wave with frequency {freq} Hz...")
-        # Generate a square wave with the current frequency
-        WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=freq, amplitude=2)
-        
-        time.sleep(.5)
-        
-        # print(f"Recording the analog signal for {record_length_ms} ms...")
-        # # Record the analog signal
-        # data = continuous_record(device_data, channel, record_length_ms)
+    # Define frequency ranges and steps
+    frequency_ranges = [
+        (10, 800, 10),
+        (800, 1000, 100),
+        (1000, 60000, 1000),
+        (60000, 50000000, 50000)
+    ]
 
-        print("Determining the frequency of the recorded signal...")
-        # Determine the frequency of the signal
-        measured_freq = determine_signal_frequency(device_data)
+    for min_freq, max_freq, step_freq in frequency_ranges:
+        for freq in np.arange(min_freq, max_freq + step_freq, step_freq):
+            WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
+            print(f"Generating square wave with frequency {freq} Hz...")
+            # Generate a square wave with the current frequency
+            WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=freq, amplitude=2)
+            
+            time.sleep(.5)
+            
+            print("Determining the frequency of the recorded signal...")
+            # Determine the frequency of the signal
+            measured_freq = determine_signal_frequency(device_data)
 
-        if measured_freq is None:
-            print(f"Error: Could not determine frequency for {freq} Hz.")
-            continue
+            if measured_freq is None:
+                print(f"Error: Could not determine frequency for {freq} Hz.")
+                continue
 
-        # Calculate the delta between the measured and expected frequency
-        delta = abs(measured_freq - freq)
+            # Calculate the delta between the measured and expected frequency
+            delta = abs(measured_freq - freq)
 
-        # Store the result
-        percent_difference = (delta / freq) * 100
-        results.append({
-            'expected_frequency': freq,
-            'measured_frequency': measured_freq,
-            'delta': delta,
-            'percent_difference': percent_difference
-        })
+            # Store the result
+            percent_difference = (delta / freq) * 100
+            results.append({
+                'expected_frequency': freq,
+                'measured_frequency': measured_freq,
+                'delta': delta,
+                'percent_difference': percent_difference
+            })
 
-        # Print the result
-        print(f"Expected: {freq} Hz, Measured: {measured_freq} Hz, Delta: {delta} Hz, Percent Difference: {percent_difference:.3f}%")
+            # Print the result
+            print(f"Expected: {freq} Hz, Measured: {measured_freq} Hz, Delta: {delta} Hz, Percent Difference: {percent_difference:.3f}%")
 
     # Save the results to a CSV file
     with open('frequency_measurement_accuracy_results.csv', mode='w', newline='') as file:
