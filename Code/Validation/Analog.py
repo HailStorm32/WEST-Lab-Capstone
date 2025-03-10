@@ -11,6 +11,7 @@ import time
 import numpy as np
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 import WF_SDK
+from Config import *
 
 ##################
 # Stuff for interfacing with the Digilent WaveForms SDK
@@ -36,14 +37,6 @@ sys.path.append(constants_path)
 import dwfconstants as constants
 from WF_SDK.device import check_error
 from WF_SDK.scope import data
-
-
-# Constants
-MEASUREMENT_CHANNEL_1_1V = 1
-MEASUREMENT_CHANNEL_1_8V = 2
-
-ACCEPTABLE_VOLTAGE_RANGE_1_1V = [1.0, 1.2]
-ACCEPTABLE_VOLTAGE_RANGE_1_8V = [1.7, 1.9]
 
 
 # Dont allow this file to be run directly
