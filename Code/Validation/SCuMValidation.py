@@ -10,8 +10,6 @@ The following tests are performed:
 import os
 import sys
 from time import sleep
-import threading
-import queue
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 
 import WF_SDK
@@ -44,7 +42,10 @@ def stub_function_call():
 def stub_self_check():
     return True
 
-def stub_function_call_2(stop_event, return_queue):
+def stub_start_power_monitor():
+    pass
+
+def stub_stop_power_monitor():
     pass
 
 # List of tests to be performed
@@ -55,7 +56,7 @@ tests = [
     { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
     { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
     { 'name': 'Serial communication',   'function': stub_function_call,     'handle': None, 'results': [] },
-    { 'name': 'Power Consumption',      'function': stub_function_call_2,   'handle': None, 'results': [] },
+    { 'name': 'Power Consumption',      'function': None,                   'handle': None, 'results': [] },
 ]
 
 
@@ -89,13 +90,8 @@ if __name__ == '__main__':
     else:
         print("Spectrum analyzer self test passed!\n")
 
-    # Setup and start joule scope monitoring thread
-    stop_event = threading.Event()
-    return_queue = queue.Queue()
-    joule_scope_thread = threading.Thread(target=stub_function_call_2, args=(stop_event, return_queue))
-
-    # Start the thread
-    joule_scope_thread.start()
+    # Startup the joule scope monitoring thread
+    stub_start_power_monitor() # TODO: Replace with actual function
 
 
     # Upload the test program to the SCuM chip
@@ -147,14 +143,9 @@ if __name__ == '__main__':
         #TODO: remove delay 
         # sleep(1)
 
-    # Stop the joule scope monitoring thread
-    print("Stopping joule scope monitoring thread...")
-    stop_event.set()
-    joule_scope_thread.join()
-
-    # Get the results from the joule scope monitoring thread
+    # Stop the joule scope monitoring and get the results
     print("Getting joule scope monitoring results...")
-    tests[-1]["results"] = return_queue.get()
+    tests[-1]["results"] = stub_stop_power_monitor() # TODO: Replace with actual function
 
     #TODO: Generate report
 
