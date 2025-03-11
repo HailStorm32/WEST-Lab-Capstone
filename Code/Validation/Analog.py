@@ -207,7 +207,9 @@ def continuous_record(device_data, channel, record_length_ms):
 
 def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample_rate_hz=100e6, v_range_min=0, v_range_max=2):
     '''
-    Determine the frequency of a signal
+    Determine the frequency of a signal. 
+    Accurate for frequencies between 60 Hz and 25 MHz (both inclusive)
+    Outside this range, the accuracy drops off
 
     Parameters:
         device_data (object): The device data object
@@ -226,7 +228,7 @@ def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample
     elif sample_rate_hz < 1:
         raise ValueError("sample_rate_hz must be greater than 0")
     elif sample_rate_hz > 100e6:
-        raise ValueError("sample_rate_hz must be less than 100 MHz")
+        raise ValueError("sample_rate_hz must be less than or equal to 100 MHz")
 
     # Setup to capture up to 32Ki of samples
     n_buff_max = c_int()
@@ -246,7 +248,6 @@ def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample
 
     # Convert the sample rate to a c_double
     sample_rate_hz = c_double(sample_rate_hz)
-    # dwf.FDwfAnalogInFrequencyGet(device_data.handle, byref(sample_rate_hz))
     # print("Samples: "+str(nSamples)+"  Rate: "+str(hzRate.value/1e6)+"MHz") 
 
     # Create buffers for samples, window, and bins
@@ -310,7 +311,15 @@ def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample
 
     weighted_freq_avg = weighted_freq_sum / n_measurements
 
-    return weighted_freq_avg
+    # If the frequency is too low and the sample rate is too high, try again with a lower sample rate
+    if (weighted_freq_avg >= 800e0 and weighted_freq_avg <= 60e3) and sample_rate_hz.value > 1e6:
+        return determine_signal_frequency(device_data, channel, n_measurements, 1e6, v_range_min, v_range_max)
+    elif weighted_freq_avg <= 800e0 and sample_rate_hz.value > 100e3:
+        return determine_signal_frequency(device_data, channel, n_measurements, 100e3, v_range_min, v_range_max)
+    
+    # Else return the frequency as is
+    else:
+        return weighted_freq_avg
 
 
 def validate_analog_signals():
@@ -371,11 +380,12 @@ def test_frequency_measurement_accuracy(device_data):
     results = []
 
     # Define frequency ranges and steps
+    # (min_freq, max_freq, step_freq)
     frequency_ranges = [
         (10, 800, 10),
         (800, 1000, 100),
         (1000, 60000, 1000),
-        (60000, 50000000, 50000)
+        (60000, 49000000, 50000)
     ]
 
     for min_freq, max_freq, step_freq in frequency_ranges:
