@@ -42,6 +42,7 @@ from WF_SDK.device import check_error
 from WF_SDK.scope import data
 import csv
 
+DEBUG = True
 
 # Dont allow this file to be run directly
 # if __name__ == '__main__':
@@ -220,7 +221,7 @@ def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample
         v_range_max (float): The maximum voltage range
 
     Returns:
-        frequency (float): The frequency of the signal
+        frequency (float): The frequency of the signal in Hz
     '''
     # Validate input
     if n_measurements < 1:
@@ -339,6 +340,11 @@ def validate_analog_signals():
         print("Error: " + str(e))
         return test_results # return the test results (all failed)
 
+
+    #############################
+    # Voltage Validation
+    #############################
+
     # Validate the 1.1V reference voltage
     result = validate_1_1V_reference_voltage(device_data)
 
@@ -359,7 +365,48 @@ def validate_analog_signals():
         print("1.8V reference voltage: FAIL (unable to measure)")
         test_results[1]['pass'] = False
 
-    #TODO: Add validation for clocks
+
+    #############################
+    # Clock Validation
+    #############################
+
+    for clock in CLOCKS_TO_TEST:
+        print(f"Validating {clock['name']} clock signal...")
+
+        if DEBUG:
+            WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=clock['exp_freq_hz'], amplitude=2)
+
+        # TODO: Send signal to change MUX to clock signal
+
+        # Determine the frequency of the signal
+        freq = determine_signal_frequency(device_data, channel=1)
+        
+        # Determine PPM
+        ppm = ((freq - clock['exp_freq_hz']) / clock['exp_freq_hz']) * 1e6
+
+        # Validate PPM and store the result
+        if abs(ppm) <= clock['tolerance_ppm']:
+            print(f"{clock['name']} clock signal test: PASS at {freq} Hz ({ppm:.3f} ppm)")
+
+            test_results.append({
+                'test': f"{clock['name']} clock signal",
+                'pass': True,
+                'values': [
+                    {'name': 'measured_frequency', 'value': freq},
+                    {'name': 'ppm', 'value': ppm}
+                ]
+            })
+        else:
+            print(f"{clock['name']} clock signal test: FAIL at {freq} Hz ({ppm:.3f} ppm)")
+
+            test_results.append({
+                'test': f"{clock['name']} clock signal",
+                'pass': False,
+                'values': [
+                    {'name': 'measured_frequency', 'value': freq},
+                    {'name': 'ppm', 'value': ppm}
+                ]
+            })
 
     # close the device
     WF_SDK.device.close(device_data)
