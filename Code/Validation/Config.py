@@ -26,7 +26,7 @@ MEASUREMENT_CHANNEL_1_8V = 2  # AD2 scope channel for measuring the 1.8V referen
 ACCEPTABLE_VOLTAGE_RANGE_1_1V = [1.0, 1.2]  # Acceptable range (in volts) for the 1.1V reference voltage
 ACCEPTABLE_VOLTAGE_RANGE_1_8V = [1.7, 1.9]  # Acceptable range (in volts) for the 1.8V reference voltage
 
-CLOCKS_TO_TEST = [
+CLOCKS_TO_TEST = [          # List of clocks to test
     {'name': "HFCLK",   'exp_freq_hz': 16000000,    'tolerance_ppm': 5},
     {'name': "LFCLK",   'exp_freq_hz': 32768,       'tolerance_ppm': 5},
     {'name': "RC",      'exp_freq_hz': 10,          'tolerance_ppm': 5}
