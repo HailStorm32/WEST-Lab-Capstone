@@ -116,95 +116,135 @@ def validate_1_8V_reference_voltage(device_data):
         return None
     
 
-def continuous_record(device_data, channel, record_length_ms):
+def timed_scope_capture(device_data, channel, record_length_ms=2000, sampling_frequency_hz=100000, v_range_min=0, v_range_max=2):
     """
-        Continually record an analog signal for the given time
-        using ScanShift Acquisition
+    Continually record an analog signal for the given time
 
-        parameters: 
-            - device_data (object): The device data object
-            - channel (int): The channel to record
-            - record_length_ms (int): The length of time to record the signal in milliseconds
+    parameters: 
+        - device_data (object): The device data object
+        - channel (int): The channel to record
+        - record_length_ms (int): The length of time to record the signal in milliseconds
+        - sampling_frequency_hz (int): The sampling frequency in Hz
+        - v_range_min (float): The minimum voltage range
+        - v_range_max (float): The maximum voltage range
 
-        returns:
-            signal_data (numpy pair array): The recorded signal data [[time, voltage],...]
+    returns:
+        signal_data (numpy pair array): The recorded signal data [[time, voltage],...]
+        A CSV file named 'record.csv' containing the recorded signal data
     """
 
-    nSamples = device_data.analog.input.max_buffer_size
-    sample_length_s = record_length_ms / 1000
-    frequency = nSamples / sample_length_s
-    # frequency =  100e06#WF_SDK.scope.data.sampling_frequency 
-    buffer = (ctypes.c_double * nSamples)()   # create an empty buffer
+    '''
+    TOTO:
+    - Add a unique name to the CSV file that includes the date/time
+    - Catch issues with record length and sampling frequency mismatch
+    '''
 
-    # Set up for acquisition
-    dwf.FDwfAnalogInChannelEnableSet(device_data.handle, ctypes.c_int(channel), ctypes.c_bool(True))    # Enable the channel
-    dwf.FDwfAnalogInChannelRangeSet(device_data.handle, ctypes.c_int(channel), ctypes.c_double(5))      # Set the range to 5V
-    dwf.FDwfAnalogInAcquisitionModeSet(device_data.handle, ctypes.c_int(1))                             # Set to ScanShift AcquisitionMode
-    dwf.FDwfAnalogInFrequencySet(device_data.handle, ctypes.c_double(frequency))                        # Set the frequency
-    dwf.FDwfAnalogInBufferSizeSet(device_data.handle, ctypes.c_int(nSamples))                           # Set the buffer size   
-    dwf.FDwfAnalogInConfigure(device_data.handle, ctypes.c_bool(True), ctypes.c_bool(False))            # Force configure the device
 
-    time.sleep(.3)
+    # Validate input
+    if record_length_ms < 1:
+        raise ValueError("record_length_ms must be greater than 0")
+    elif sampling_frequency_hz < 1:
+        raise ValueError("sampling_frequency_hz must be greater than 0")
+    elif sampling_frequency_hz > 100e6:
+        raise ValueError("sampling_frequency_hz must be less than or equal to 100 MHz")
 
-    # Create a numpy array to store the buffered data
-    buffer_np = np.array([])
+    # Declare variables
+    sts = c_byte()
+    sampling_frequency_hz = c_double(sampling_frequency_hz)
+    record_length_s = c_double(record_length_ms/1000)
+    n_samples = sampling_frequency_hz.value * record_length_s.value
+    sample_buf = (c_double*int(n_samples))()
+    samples_avail = c_int()
+    lost_sample_cnt = c_int()
+    corrupted_sample_cnt = c_int()
+    is_sample_lost = False
+    is_signal_corrupted = False
 
-    # Variable to store buffer status
-    status = ctypes.c_byte()    
+    dwf.FDwfDeviceAutoConfigureSet(device_data.handle, c_bool(False)) # disable auto configure
 
-    # Begin acquisition
-    if dwf.FDwfAnalogInConfigure(device_data.handle, ctypes.c_bool(False), ctypes.c_bool(True)) == 0:
-        check_error()
+    # Set up acquisition
+    dwf.FDwfAnalogInChannelEnableSet(device_data.handle, c_int(channel - 1), c_bool(True)) # enable channel 0 (C1)
+    dwf.FDwfAnalogInChannelRangeSet(device_data.handle, c_double(v_range_min), c_double(v_range_max)) # pk2pk
+    dwf.FDwfAnalogInAcquisitionModeSet(device_data.handle, acqmodeRecord) # acquisition mode
+    dwf.FDwfAnalogInFrequencySet(device_data.handle, sampling_frequency_hz)
+    dwf.FDwfAnalogInRecordLengthSet(device_data.handle, record_length_s) # -1 infinite record length
+    dwf.FDwfAnalogInConfigure(device_data.handle, c_int(1), c_int(0))
 
-    start_time = time.time()
-    while (time.time() - start_time) < sample_length_s:
+    # Wait at least 2 seconds for the offset to stabilize
+    time.sleep(2)
 
-        # Wait for a full buffer
-        sample_count = ctypes.c_int(0)
-        while sample_count.value != nSamples:
-            ret = dwf.FDwfAnalogInStatus(device_data.handle, ctypes.c_bool(True), ctypes.byref(status))
-            ret &= dwf.FDwfAnalogInStatusSamplesValid(device_data.handle, ctypes.byref(sample_count))
-            if ret == 0:
-                check_error()
-    
-        # Copy buffer (takes channel number as 0-indexed)
-        if dwf.FDwfAnalogInStatusData(device_data.handle, ctypes.c_int(channel - 1), buffer, ctypes.c_int(nSamples)) == 0:
-            check_error()
+    dwf.FDwfAnalogInConfigure(device_data.handle, c_bool(False), c_bool(True))
 
-        # Convert buffer to numpy array and append to it
-        buffer_np = np.append(buffer_np, np.array(buffer))
+    sample_count = 0
 
-    # Generate buffer for time moments
-    time_1 = np.arange(len(buffer_np)) * 1e03 / (frequency)  # convert time to ms
-    
+    print("Starting Capture...")    
+    while sample_count < n_samples:
+
+        # Fetch status and data from device
+        dwf.FDwfAnalogInStatus(device_data.handle, c_bool(True), byref(sts))
+        if sample_count == 0 and (sts == DwfStateConfig or sts == DwfStatePrefill or sts == DwfStateArmed) :
+            # Acquisition not yet started.
+            continue
+        
+        # Get the status of the record
+        dwf.FDwfAnalogInStatusRecord(device_data.handle, byref(samples_avail), byref(lost_sample_cnt), byref(corrupted_sample_cnt))
+
+        # Update the sample count
+        sample_count += lost_sample_cnt.value
+
+        # Check if samples were lost or corrupted
+        if lost_sample_cnt.value :
+            is_sample_lost = True
+        if corrupted_sample_cnt.value :
+            is_signal_corrupted = True
+
+        # If there are no samples available, go to the next iteration
+        if samples_avail.value==0 :
+            continue
+            
+        # If the sample count + available samples is greater than the total number of samples, only take the remaining samples
+        if sample_count + samples_avail.value > n_samples :
+            samples_avail = c_int(n_samples-sample_count)
+
+        # Get the data
+        dwf.FDwfAnalogInStatusData(device_data.handle, c_int(channel - 1), byref(sample_buf, sizeof(c_double)*sample_count), samples_avail)
+        sample_count += samples_avail.value
+
+    dwf.FDwfAnalogOutReset(device_data.handle, c_int(0))
+    dwf.FDwfDeviceCloseAll()
+
+    print("Recording done")
+    if is_sample_lost:
+        print("Samples were lost! Reduce frequency")
+    if is_signal_corrupted:
+        print("Samples could be corrupted! Reduce frequency")
+
+
     # Combine the time and data arrays into a paired array  [[time, voltage],...]
-    signal_data = np.column_stack((time_1, buffer_np))
+    timestamps = np.arange(len(sample_buf)) * 1e03 / (sampling_frequency_hz.value)  # Create matching timestamps
+    signal_data = np.column_stack((timestamps, sample_buf))
 
-    ## DEBUG
 
-    # Save the numpy array to a CSV file
-    # np.savetxt("analog_signal.csv", buffer_np, delimiter=",")
+    f = open("record.csv", "w") # TODO: Change this to a unique name that includes date/time
+    f.write("Timestamp,Voltage\n")
+    for i in range(len(sample_buf)):
+        f.write(f"{timestamps[i]},{sample_buf[i]}\n")
+    f.close()
 
-    # # Save the paired array to a CSV file
-    # np.savetxt("paired_signal_data.csv", signal_data, delimiter=",", header="time,voltage", comments='', fmt='%f')
+    # plt.plot(np.fromiter(sample_buf, dtype=float))
+    # plt.show()
 
-    # plot
-    plt.plot(signal_data[:, 0], signal_data[:, 1])
-    plt.xlabel("time [ms]")
-    plt.ylabel("voltage [V]")
-    plt.show()
-
-    #################################################
-    # data = WF_SDK.scope.record(device_data, channel=1)
-
-    # # # Generate buffer for time moments
-    # time_1 = np.arange(len(data)) * 1e03 / (20e06)  # convert time to ms
-    
-    # # # Combine the time and data arrays into a paired array  [[time, voltage],...]
-    # signal_data = np.column_stack((time_1, data))
-    #################################################
+    #plot the signal in debug mode
+    if DEBUG:
+        plt.plot(timestamps, sample_buf)
+        plt.xlabel('Time (ms)')
+        plt.ylabel('Voltage (V)')
+        plt.title('Recorded Signal')
+        plt.show()
 
     return signal_data
+
+
 
 def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample_rate_hz=100e6, v_range_min=0, v_range_max=2):
     '''
@@ -498,6 +538,8 @@ if __name__ == '__main__':
 
     WF_SDK.scope.open(device_data, sampling_frequency=100e6)
 
+    timed_scope_capture(device_data, channel=1, record_length_ms=5000, sampling_frequency_hz=100e3, v_range_min=0, v_range_max=5)
+
     # while True:
     #     WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
         
@@ -535,7 +577,7 @@ if __name__ == '__main__':
     # ################################################
     # Test the frequency measurement accuracy
     
-    test_frequency_measurement_accuracy(device_data)
+    # test_frequency_measurement_accuracy(device_data)
 
     # Close the device
     WF_SDK.device.close(device_data)
