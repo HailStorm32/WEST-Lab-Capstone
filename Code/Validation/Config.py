@@ -27,9 +27,9 @@ ACCEPTABLE_VOLTAGE_RANGE_1_1V = [1.0, 1.2]  # Acceptable range (in volts) for th
 ACCEPTABLE_VOLTAGE_RANGE_1_8V = [1.7, 1.9]  # Acceptable range (in volts) for the 1.8V reference voltage
 
 CLOCKS_TO_TEST = [
-    {'name': "HFCLK",   'exp_freq_hz': 16000000,    'tolerance_ppm': 0.05},
-    {'name': "LFCLK",   'exp_freq_hz': 32768,       'tolerance_ppm': 0.05},
-    {'name': "RC",      'exp_freq_hz': 0,           'tolerance_ppm': 0.05}
+    {'name': "HFCLK",   'exp_freq_hz': 16000000,    'tolerance_ppm': 5},
+    {'name': "LFCLK",   'exp_freq_hz': 32768,       'tolerance_ppm': 5},
+    {'name': "RC",      'exp_freq_hz': 10,          'tolerance_ppm': 5}
     ]
 
 

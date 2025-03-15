@@ -82,7 +82,7 @@ def validate_1_1V_reference_voltage(device_data):
         print("Error: " + str(e))
         return None
 
-    
+
 def validate_1_8V_reference_voltage(device_data):
     '''
     Validate the 1.8V reference voltage
@@ -329,8 +329,8 @@ def validate_analog_signals():
     '''
     # Create structure to store test results
     test_results = [
-        { 'test': '1.1V reference voltage', 'pass': False },
-        { 'test': '1.8V reference voltage', 'pass': False },
+        { 'test': '1.1V reference voltage', 'pass': False, 'values': [] },
+        { 'test': '1.8V reference voltage', 'pass': False, 'values': [] },
     ]
 
     # Open the device
@@ -351,9 +351,15 @@ def validate_analog_signals():
     if result:
         print(f"1.1V reference voltage test: {'PASS' if result[1] else 'FAIL'} at {result[0]}V")
         test_results[0]['pass'] = result[1]
+        test_results[0]['values'] = [
+            {'name': 'measured_voltage', 'value': result[0]}
+        ]
     else:
         print("1.1V reference voltage: FAIL (unable to measure)")
         test_results[0]['pass'] = False
+        test_results[0]['values'] = [
+            {'name': 'measured_voltage', 'value': None}
+        ]
     
     # Validate the 1.8V reference voltage
     result = validate_1_8V_reference_voltage(device_data)
@@ -361,9 +367,15 @@ def validate_analog_signals():
     if result:
         print(f"1.8V reference voltage test: {'PASS' if result[1] else 'FAIL'} at {result[0]}V")
         test_results[1]['pass'] = result[1]
+        test_results[1]['values'] = [
+            {'name': 'measured_voltage', 'value': result[0]}
+        ]
     else:
         print("1.8V reference voltage: FAIL (unable to measure)")
         test_results[1]['pass'] = False
+        test_results[1]['values'] = [
+            {'name': 'measured_voltage', 'value': None}
+        ]
 
 
     #############################
