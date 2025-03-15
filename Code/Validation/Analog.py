@@ -4,16 +4,23 @@ The following signals are validated:
 - 1.1V reference voltage
 - 1.8V reference voltage
 - Clock signals
+
+The following examples were uses as references:
+C:\Program Files (x86)\Digilent\WaveFormsSDK\samples\py\AnalogIn_Record.py
+C:\Program Files (x86)\Digilent\WaveFormsSDK\samples\py\AnalogIn_Frequency.py
 '''
-import os
-import sys
-from ctypes import *   
-import time
-import numpy as np
+import csv
 import math
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+import sys
+import time
+from ctypes import *
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 import WF_SDK
+from WF_SDK.device import check_error
 from Config import *
 
 ##################
@@ -38,16 +45,13 @@ else:
 # import constants
 sys.path.append(constants_path)
 from dwfconstants import *
-from WF_SDK.device import check_error
-from WF_SDK.scope import data
-import csv
 
-DEBUG = True
+DEBUG = False
 
 # Dont allow this file to be run directly
-# if __name__ == '__main__':
-#     print("\n\nThis file cannot be run directly. Please run the main script.\n\n")
-#     sys.exit(1)
+if __name__ == '__main__':
+    print("\n\nThis file cannot be run directly. Please run the main script.\n\n")
+    sys.exit(1)
 
 
 def validate_1_1V_reference_voltage(device_data):
@@ -210,6 +214,7 @@ def timed_scope_capture(device_data, channel, record_length_ms=2000, sampling_fr
         dwf.FDwfAnalogInStatusData(device_data.handle, c_int(channel - 1), byref(sample_buf, sizeof(c_double)*sample_count), samples_avail)
         sample_count += samples_avail.value
 
+    # Stop the acquisition and reset the device
     dwf.FDwfAnalogOutReset(device_data.handle, c_int(0))
     dwf.FDwfDeviceCloseAll()
 
@@ -219,11 +224,9 @@ def timed_scope_capture(device_data, channel, record_length_ms=2000, sampling_fr
     if is_signal_corrupted:
         print("Samples could be corrupted! Reduce frequency")
 
-
     # Combine the time and data arrays into a paired array  [[time, voltage],...]
     timestamps = np.arange(len(sample_buf)) * 1e03 / (sampling_frequency_hz.value)  # Create matching timestamps
     signal_data = np.column_stack((timestamps, sample_buf))
-
 
     f = open("record.csv", "w") # TODO: Change this to a unique name that includes date/time
     f.write("Timestamp,Voltage\n")
@@ -243,7 +246,6 @@ def timed_scope_capture(device_data, channel, record_length_ms=2000, sampling_fr
         plt.show()
 
     return signal_data
-
 
 
 def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample_rate_hz=100e6, v_range_min=0, v_range_max=2):
@@ -366,6 +368,14 @@ def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample
 def validate_analog_signals():
     '''
     Validate the analog signals
+    This function validates the following signals:
+    - 1.1V reference voltage
+    - 1.8V reference voltage
+    - Clock signals
+    Parameters:
+        None
+    Returns:
+        test_results (list): List of dictionaries containing test results for each signal
     '''
     # Create structure to store test results
     test_results = [
@@ -465,6 +475,7 @@ def validate_analog_signals():
 
     return test_results
 
+
 def test_frequency_measurement_accuracy(device_data):
     """
     Test the accuracy of the frequency measurement.
@@ -527,57 +538,3 @@ def test_frequency_measurement_accuracy(device_data):
             writer.writerow([result['expected_frequency'], result['measured_frequency'], result['delta']])
 
     print("Results have been saved to 'frequency_measurement_accuracy_results.csv'")
-
-if __name__ == '__main__':
-    # Open the device
-    try:    
-        device_data = WF_SDK.device.open("analogdiscovery2")
-    except Exception as e:
-        print("Error: " + str(e))
-        sys.exit(1)
-
-    WF_SDK.scope.open(device_data, sampling_frequency=100e6)
-
-    timed_scope_capture(device_data, channel=1, record_length_ms=5000, sampling_frequency_hz=100e3, v_range_min=0, v_range_max=5)
-
-    # while True:
-    #     WF_SDK.scope.trigger(device_data, enable=True, source=WF_SDK.scope.trigger_source.analog, channel=1, level=0)
-        
-    #     frequency = 20e06
-    #     WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=frequency, amplitude=2) # 10e03
-
-    #     time.sleep(2)
-
-    #     # Record the analog signal for 5ms
-    #     # data = continuous_record(device_data, 1, 5)
-
-    #     # ##################################################
-    #     # #raw scope record
-    #     # data = WF_SDK.scope.record(device_data, channel=1)
-    #     # # Convert the list to a numpy array
-    #     # data_np = np.array(data)
-
-    #     # # Generate buffer for time moments
-    #     # time_1 = np.arange(len(data_np)) * 1e03 / (100e6)  # convert time to ms
-        
-    #     # # Combine the time and data arrays into a paired array  [[time, voltage],...]
-    #     # signal_data = np.column_stack((time_1, data_np))
-
-    #     # # Save the numpy array to a CSV file
-    #     # np.savetxt("recorded_signal.csv", data_np, delimiter=",")
-
-    #     # Determine the frequency of the signal
-    #     freq = determine_signal_frequency(device_data)
-
-    #     if abs(freq - frequency) > 1:
-    #         print(f"Delta: {abs(freq - frequency)} Hz")
-    #     else:
-    #         print("Delta: 0.0 Hz")
-
-    # ################################################
-    # Test the frequency measurement accuracy
-    
-    # test_frequency_measurement_accuracy(device_data)
-
-    # Close the device
-    WF_SDK.device.close(device_data)

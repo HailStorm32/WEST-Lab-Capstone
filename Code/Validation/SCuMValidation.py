@@ -59,13 +59,21 @@ tests = [
     { 'name': 'Power Consumption',      'function': None,                   'handle': None, 'results': [] },
 ]
 
+'''
+example_test_return = [
+    { 'test': 'pin 1', 'pass': False, value: [] },
+    { 'test': 'pin 2', 'pass': False, value: [] },
+    { 'test': 'pin 3', 'pass': True,  value: [] },
+    { 'test': 'pin 4', 'pass': False, value: [] },
+]
 
-# test = [
-#     { 'test': 'pin 1', 'pass': False },
-#     { 'test': 'pin 2', 'pass': False },
-#     { 'test': 'pin 3', 'pass': True },
-#     { 'test': 'pin 4', 'pass': False },
-# ]
+value_example = [
+    { 'name': 'pin 1', 'value': 0 },
+    { 'name': 'pin 2', 'value': 1 },
+    { 'name': 'pin 3', 'value': 1 },
+    { 'name': 'pin 4', 'value': 0 },
+    ]
+'''
 
 #########################################################
 # Main
