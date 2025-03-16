@@ -35,9 +35,9 @@ CLOCKS_TO_TEST = [          # List of clocks to test
 ########################
 # Git Validation
 ########################
-GIT_DIRECTORY = "../WSN_Repo"  # Directory where the Git repository is located
-GIT_REPO_URL = "" # URL of the Git repository for validation
-GIT_BRANCH = ""  # Branch of the Git repository for validation
+#TODO: Revert path back to original before merging to master
+GIT_DIRECTORY = "C:\\Users\\demet\\Documents\\WEST-Lab-Capstone\\Code\\GitTestingRepos\\openwsn-fw"  # Directory where the Git repository is located
+GIT_BRANCH = "develop"  # Branch of the Git repository for validation
 
 TIME_TO_RUN = "12:00"  # Time of day to run the validation in 24-hour format (e.g., 14:30 for 2:30 PM)
 RUN_IN_DEV_MODE = True  # Set to True if running in development mode (bypasses time check)
