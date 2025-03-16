@@ -32,6 +32,15 @@ CLOCKS_TO_TEST = [          # List of clocks to test
     {'name': "RC",      'exp_freq_hz': 10,          'tolerance_ppm': 5}
     ]
 
+########################
+# Git Validation
+########################
+GIT_DIRECTORY = "../WSN_Repo"  # Directory where the Git repository is located
+GIT_REPO_URL = "" # URL of the Git repository for validation
+GIT_BRANCH = ""  # Branch of the Git repository for validation
+
+TIME_TO_RUN = "12:00"  # Time of day to run the validation in 24-hour format (e.g., 14:30 for 2:30 PM)
+RUN_IN_DEV_MODE = True  # Set to True if running in development mode (bypasses time check)
 
 ########################
 # Logic (DO NOT EDIT)

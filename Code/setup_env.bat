@@ -10,6 +10,7 @@ REM    3) Installs packages from requirements.txt if found.
 REM    4) Upgrades pip to avoid version-related issues.
 REM    5) Creates an untracked folder named "UserScripts" for user scripts.
 REM    6) Creates the doxygen folder for documentation.
+REM    7) Creates the git verification repositories folder.
 REM ----------------------------------------------------------------------------
 
 echo Checking for Python virtual environment...
@@ -52,6 +53,13 @@ echo Checking for doxygen folder...
 IF NOT EXIST "DoxygenOutput" (
     echo doxygen folder not found. Creating one...
     mkdir DoxygenOutput
+)
+
+REM Create untracked folder for git verification repositories
+echo Checking for doxygen folder...
+IF NOT EXIST "GitTestingRepos" (
+    echo GitTestingRepos folder not found. Creating one...
+    mkdir GitTestingRepos
 )
 
 echo setup complete
