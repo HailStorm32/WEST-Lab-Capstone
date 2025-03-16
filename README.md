@@ -21,28 +21,35 @@ The SCuM observatory is designed as a portable platform that accommodates a SCuM
 <br>
 
 ## Setup
-<br>
 
-### Code Development Environment
+### Pre-Setup
+You will need to install the following programs
+
+ - [Git](https://git-scm.com/downloads/win)
+ - Python 3.10.11 or greater
+ - [Embedded Studio for ARM (legacy)](https://www.segger.com/downloads/embedded-studio/#ESforARM) **version 5.70a**
+	 > Needed for the nRF driver
+ -   [WaveForms](https://digilent.com/reference/software/waveforms/waveforms-3/start) 
+	 > NOTE: Needs to be installed to `C:\Program Files (x86)\Digilent`
+- [insert other programs]
+
+### Code Environment
 
 > **NOTE:** Currently only supports Windows
 
-<br>
-
-#### Cloning The Repo
+#### 1. Cloning The Repo
 This repo uses submodules to pull in the APIs for the different test equipment used in the observatory. To clone the repo, while also setting up the submodules, use the following command:
 
-    git clone --recurse-submodules <repository_url>
+    git clone --recurse-submodules https://github.com/HailStorm32/WEST-Lab-Capstone.git
 
-#### Python Environment Setup
+#### 2. Run Setup Script
+Navigate to the `Code` directory in a terminal (powershell) and run `setup_env.bat`
 
- 1. Install **Python 3.10.11** or greater
- 2. Navigate to the `Code` directory in a terminal (powershell) and run `setup_env.bat`
+This script will setup the python virtual environment and directories
 
 After running the script you should now have a `env` directory. 
 
-
-#### Running in The Virtual Environment
+#### 3.  Running in The Virtual Environment
 You can run Python scripts within the virtual environment one of three ways:
 
 ##### Entering the ENV
@@ -53,7 +60,7 @@ To leave, run `deactivate`
 ##### Pointing to the ENV
 To run scripts in the environment without entering it, you can use the path to virtual Python interpreter like as follows
 
-    env\Scripts\python.exe --version
+    env\Scripts\python.exe path/to/script.py
 
 ##### ENV in IDE
 You can point your IDE to the virtual Python interpreter, enabling you to run the scripts from the IDE.
