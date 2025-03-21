@@ -959,6 +959,131 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "power:+5V"
+			(power)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "+5V"
+				(at 0 3.556 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"+5V\""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "+5V_0_1"
+				(polyline
+					(pts
+						(xy -0.762 1.27) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "+5V_1_1"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:GND"
 			(power)
 			(pin_numbers
@@ -1062,6 +1187,24 @@
 		)
 	)
 	(junction
+		(at 137.16 86.36)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "81f203ed-6ab6-42c9-97de-fb2285c67018")
+	)
+	(junction
+		(at 137.16 88.9)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "88f17a01-12a5-4f4e-bcf8-e560d875f0a0")
+	)
+	(junction
+		(at 87.63 88.9)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "8ef0cd94-6e95-4dfa-b1f8-126408a1c670")
+	)
+	(junction
 		(at 158.75 81.28)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1078,6 +1221,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b9e4cf9c-4dec-4d76-97d3-7f69758766f7")
+	)
+	(junction
+		(at 101.6 93.98)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "bbc69955-822f-4146-884f-3dba50f3bf4b")
 	)
 	(wire
 		(pts
@@ -1211,7 +1360,7 @@
 	)
 	(wire
 		(pts
-			(xy 134.62 88.9) (xy 138.43 88.9)
+			(xy 134.62 88.9) (xy 137.16 88.9)
 		)
 		(stroke
 			(width 0)
@@ -1251,6 +1400,26 @@
 	)
 	(wire
 		(pts
+			(xy 87.63 88.9) (xy 121.92 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6c48dad2-f29b-4266-98f4-f8c620cce774")
+	)
+	(wire
+		(pts
+			(xy 137.16 86.36) (xy 137.16 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6e80748e-b0cf-4a21-ad07-aa2250fbe48f")
+	)
+	(wire
+		(pts
 			(xy 134.62 109.22) (xy 138.43 109.22)
 		)
 		(stroke
@@ -1268,6 +1437,26 @@
 			(type default)
 		)
 		(uuid "720324d6-d545-48f1-a3c2-c7988c40d4fd")
+	)
+	(wire
+		(pts
+			(xy 137.16 86.36) (xy 158.75 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7a7276e6-e83e-430b-b812-90cfde42d3f0")
+	)
+	(wire
+		(pts
+			(xy 87.63 81.28) (xy 87.63 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "829c6e86-9da9-4fe2-a28a-29a373dae1a5")
 	)
 	(wire
 		(pts
@@ -1291,7 +1480,7 @@
 	)
 	(wire
 		(pts
-			(xy 134.62 86.36) (xy 158.75 86.36)
+			(xy 134.62 86.36) (xy 137.16 86.36)
 		)
 		(stroke
 			(width 0)
@@ -1318,6 +1507,16 @@
 			(type default)
 		)
 		(uuid "b993b167-810e-4efb-9f1b-e809308534aa")
+	)
+	(wire
+		(pts
+			(xy 137.16 88.9) (xy 138.43 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c3293596-a6fb-43b5-a06e-29853a5d4cbc")
 	)
 	(wire
 		(pts
@@ -1351,13 +1550,23 @@
 	)
 	(wire
 		(pts
-			(xy 118.11 88.9) (xy 121.92 88.9)
+			(xy 85.09 88.9) (xy 87.63 88.9)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "cf72d288-af0a-4510-840e-b148397197d7")
+	)
+	(wire
+		(pts
+			(xy 101.6 86.36) (xy 101.6 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d1693fa9-7c92-4367-b6eb-9e4b79a8ae5a")
 	)
 	(wire
 		(pts
@@ -1368,16 +1577,6 @@
 			(type default)
 		)
 		(uuid "d373b8b0-24df-426b-88f0-22c6c54c4045")
-	)
-	(wire
-		(pts
-			(xy 97.79 86.36) (xy 121.92 86.36)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "dc366dc3-556c-4ceb-9676-4005a4982652")
 	)
 	(wire
 		(pts
@@ -1408,6 +1607,16 @@
 			(type default)
 		)
 		(uuid "f03cc982-d94c-42a0-b22d-994e22a82d7c")
+	)
+	(wire
+		(pts
+			(xy 101.6 86.36) (xy 121.92 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f8edccb5-6749-46f0-9dad-3dcb449c1c1c")
 	)
 	(wire
 		(pts
@@ -7918,7 +8127,97 @@
 			"RwAAAFUAAABKAAAAdAAAAFQAAABrAAAAYwAAAFQAAAAxAAAAOQAAAEIAAAB5AAAAeAAAAHEAAABm"
 			"AAAAMgAAAE4AAAB0AAAAUAAAAGQAAABLAAAAWQAAAGYAAAB6AAAAUgAAADIAAAAxAAAAOAAAADYA"
 			"AABFAAAAcQAAAHAAAABnAAAAdgAAAGQAAAByAAAAYwAAAHkAAAByAAAARwAAAGQAAAA3AAAAYgAA"
-			"AEMAAABrAAAATgAAAFAAAAA5AAAAMQAAAA=="
+			"AEMAAABrAAAATgAAAFAAAAA5AAAAMQAAAEUAAAAvAAAANQAAAGsAAABiAAAAMgAAADgAAABqAAAA"
+			"cgAAAEwAAABGAAAAMwAAADMAAABvAAAASwAAAFMAAAA1AAAAWAAAAG4AAAByAAAAbgAAAHMAAAAx"
+			"AAAAeQAAAFYAAABEAAAAYwAAAFkAAABOAAAAcwAAAFEAAABYAAAAWAAAAEEAAABxAAAAYQAAAG8A"
+			"AAAvAAAAZAAAAGEAAABPAAAAUAAAAHkAAABuAAAAUwAAAC8AAABiAAAAYgAAAFQAAABuAAAAagAA"
+			"AEQAAABEAAAAdAAAADgAAABrAAAAeQAAAHQAAABjAAAAYwAAADQAAAA3AAAAMwAAADkAAAA4AAAA"
+			"SQAAAFUAAAB0AAAAYwAAAFkAAABhAAAASwAAAEYAAAA2AAAAVQAAAG4AAABGAAAAawAAADAAAABi"
+			"AAAAOQAAAGgAAABnAAAAZQAAAFIAAABKAAAAbQAAAGcAAABTAAAAcAAAADEAAAAwAAAAYQAAAHEA"
+			"AABSAAAAUAAAACsAAAB2AAAANAAAAEMAAABEAAAAZwAAADEAAABDAAAAQwAAAEMAAABHAAAARQAA"
+			"AEUAAABFAAAASwAAAEkAAABjAAAAeQAAAGkAAAA0AAAAegAAADIAAABJAAAANgAAAGgAAABzAAAA"
+			"OQAAAHIAAAA1AAAAQQAAAEMAAAB4AAAAcwAAAFYAAABmAAAASgAAAEsAAABDAAAATAAAAGcAAABG"
+			"AAAAMQAAACsAAAB0AAAAUQAAADkAAAAzAAAAWQAAAFoAAAAzAAAANgAAAHMAAABpAAAAQQAAAGoA"
+			"AABMAAAAVwAAAHIAAABZAAAAQwAAAEQAAAB5AAAAbgAAAE8AAAB6AAAASwAAAGYAAABVAAAASAAA"
+			"AHMAAABXAAAAZQAAAEMAAAA4AAAASgAAAEsAAAArAAAAYQAAAHAAAABDAAAAVwAAAEUAAAB5AAAA"
+			"bAAAAFUAAABaAAAAWgAAAGsAAAA1AAAAdQAAAE0AAABMAAAARAAAAGYAAABkAAAAUAAAAC8AAAAz"
+			"AAAAcAAAAGEAAABGAAAAVQAAADgAAABuAAAAVwAAAHEAAABkAAAAawAAAGUAAABaAAAANgAAAG0A"
+			"AAArAAAAWAAAAHkAAABJAAAAUgAAAGgAAABRAAAAVwAAAG8AAABCAAAAcwAAADcAAAB1AAAAawAA"
+			"AE8AAABBAAAATAAAAGoAAAAwAAAAWgAAAHgAAABFAAAAcgAAAEwAAABxAAAAcgAAAHMAAAAwAAAA"
+			"dQAAAGwAAAA5AAAAeQAAADUAAAA3AAAAdQAAAFkAAABFAAAAVQAAAFEAAABFAAAAcgAAAHUAAABZ"
+			"AAAATgAAADQAAABlAAAAdQAAAFgAAAB0AAAAZwAAAFoAAABWAAAANgAAAFgAAABqAAAAcAAAAEMA"
+			"AABBAAAAcQAAAHcAAABWAAAAagAAAGsAAABoAAAAaAAAAEIAAABCAAAAQwAAAEMAAABDAAAASAAA"
+			"AEUAAABMAAAAWQAAAHgAAAB3AAAAbgAAADYAAAAyAAAAMAAAAEQAAABuAAAAVwAAAHIAAABwAAAA"
+			"QQAAAEgAAABWAAAAbAAAAGwAAABJAAAAUAAAAEEAAAAzAAAANQAAAE4AAABPAAAATgAAAEQAAABm"
+			"AAAATAAAAEgAAAAxAAAAOQAAADgAAABiAAAAdwAAAEYAAABYAAAAWgAAAHYAAAByAAAAbgAAAFkA"
+			"AABwAAAAVwAAADEAAABOAAAAWQAAAE4AAABFAAAAWQAAAG0AAABWAAAAOQAAAGUAAAA4AAAAUgAA"
+			"AFMAAABtAAAASgAAAHQAAABUAAAAZwAAAFYAAAB6AAAAagAAAGoAAAB0AAAAQwAAAEoAAABmAAAA"
+			"NgAAAFcAAABPAAAANwAAAGwAAABnAAAAMAAAAFQAAABNAAAAVwAAAFMAAABsAAAAKwAAAFUAAAB5"
+			"AAAAbgAAAHMAAAB3AAAASgAAAGcAAABqAAAAbgAAAEgAAABGAAAAZAAAAHoAAABGAAAAeAAAADAA"
+			"AAArAAAARQAAAGIAAABGAAAAdgAAAGIAAAAyAAAAOAAAAGoAAABQAAAASgAAAEwAAABWAAAASwAA"
+			"AFUAAABsAAAAcgAAAGYAAABzAAAAQgAAADMAAABVAAAAVwAAADAAAABQAAAAVwAAAEQAAABKAAAA"
+			"VwAAAGEAAABUAAAAeAAAAE0AAABYAAAAWAAAADkAAAB6AAAAYgAAAFcAAAA0AAAAbAAAAGIAAABX"
+			"AAAAVwAAAE8AAAB5AAAATgAAACsAAAB5AAAASwAAADMAAABzAAAATAAAAE8AAAByAAAAeAAAAFEA"
+			"AAB0AAAAUAAAAGYAAABuAAAAVgAAAGwAAABxAAAAVgAAAGQAAABLAAAAbgAAAFoAAAAwAAAAZgAA"
+			"AGsAAAA3AAAAUgAAAHYAAABwAAAAaQAAAG4AAABMAAAAawAAAG8AAABoAAAAYgAAAEsAAAB0AAAA"
+			"SwAAACsAAABnAAAAbwAAAHoAAAA0AAAALwAAAEoAAAAwAAAAZwAAAGoAAABOAAAAcQAAAG4AAABy"
+			"AAAAbQAAAEQAAABsAAAANwAAAHgAAABJAAAAWQAAAFEAAABRAAAAUQAAAGcAAABnAAAAaAAAAGgA"
+			"AABMAAAAaQAAAEMAAABFAAAAZQAAADYAAAB6AAAARgAAAFYAAABWAAAANAAAAE8AAAAvAAAAYQAA"
+			"AG8AAABWAAAAQQAAAFMAAABtAAAAQwAAAFEAAABnAAAAaAAAAGoAAAB3AAAAaQAAAE8AAABJAAAA"
+			"bQAAADgAAABFAAAAagAAAEkAAABVAAAAaQAAAGgAAABCAAAAQQAAAHkAAAA0AAAAegAAAHcAAABX"
+			"AAAARAAAAEEAAABaAAAAcAAAAGgAAABWAAAAbgAAAEgAAAArAAAAMQAAACsAAABjAAAAKwAAADMA"
+			"AABEAAAAMAAAAGcAAAB2AAAAMQAAADEAAAA3AAAAQwAAAHEAAAA1AAAAdAAAAHAAAABnAAAANgAA"
+			"AC8AAABzAAAAZgAAAC8AAABkAAAAKwAAAEwAAAB6AAAARwAAADEAAABmAAAAdAAAAHIAAAB4AAAA"
+			"OAAAAHMAAABxAAAATQAAADUAAABZAAAAbAAAAEUAAAByAAAANwAAAFQAAABCAAAAMwAAAG8AAAAx"
+			"AAAAVAAAAHYAAABYAAAARgAAAEgAAAA5AAAAMQAAAC8AAAA0AAAAWgAAADUAAABlAAAAQQAAAHQA"
+			"AABhAAAANgAAAG4AAABBAAAAawAAAGMAAABYAAAARAAAAFcAAABzAAAAaAAAAFgAAAB6AAAASAAA"
+			"ADUAAAA5AAAATAAAAEcAAAA5AAAAcQAAAHAAAAA2AAAAMgAAAC8AAAB1AAAASAAAAE8AAABtAAAA"
+			"egAAAHYAAAA1AAAANgAAAHgAAABNAAAATwAAAFgAAAA0AAAAcAAAAHIAAABlAAAAawAAAEgAAAA3"
+			"AAAAawAAADEAAABjAAAAZgAAAGYAAABuAAAAcAAAACsAAABzAAAAYQAAAFEAAABtAAAAMAAAAFQA"
+			"AAAzAAAAegAAAHoAAABRAAAAUAAAADMAAAB6AAAAMAAAAHoAAAB2AAAAagAAAFIAAABvAAAAZQAA"
+			"ADUAAABiAAAARAAAACsAAAA1AAAAdAAAAFQAAABNAAAAKwAAAGgAAABxAAAAYQAAAFcAAABrAAAA"
+			"UAAAAFAAAABFAAAAVQAAAGoAAABQAAAAUAAAACsAAABwAAAAWAAAAE4AAAA2AAAAWQAAADYAAABM"
+			"AAAAUAAAAHcAAAA1AAAAagAAAEYAAAAyAAAAbwAAAEwAAABBAAAATgAAAHgAAAAvAAAAYwAAAGsA"
+			"AAB6AAAAWgAAAGwAAABYAAAASwAAAHcAAABWAAAAVwAAAGYAAAAzAAAATQAAADIAAABtAAAAZQAA"
+			"AGUAAAB1AAAAegAAADEAAAB4AAAAMQAAADUAAABGAAAANwAAAFEAAABmAAAAZQAAAGUAAAArAAAA"
+			"UAAAAE0AAABEAAAAdQAAAGgAAABmAAAAWAAAADkAAABJAAAAeQAAAEYAAAAvAAAAdQAAADQAAABQ"
+			"AAAAUgAAADAAAAB6AAAAZQAAAGkAAABmAAAAQQAAAEUAAABzAAAANQAAAEcAAABiAAAAQwAAAG0A"
+			"AABIAAAARgAAAFgAAABhAAAANAAAADYAAAA3AAAARAAAAHkAAABMAAAAVAAAAHUAAAA3AAAARwAA"
+			"ADcAAABsAAAAZAAAAEkAAABtAAAAVwAAAEkAAABYAAAAZQAAAHQAAABPAAAAaAAAAGQAAAB1AAAA"
+			"TQAAAEgAAABwAAAASAAAAHEAAABXAAAANgAAAC8AAAB5AAAAQQAAAGUAAABTAAAAZQAAAHEAAABZ"
+			"AAAASAAAAGIAAABZAAAAdgAAAEMAAABIAAAAVQAAAEIAAAByAAAATwAAAEwAAABxAAAALwAAAEcA"
+			"AAAzAAAAYQAAAEgAAABhAAAAdAAAAEUAAABZAAAAUQAAAE8AAABZAAAAawAAADgAAAB2AAAAbwAA"
+			"AEgAAAArAAAAYQAAADYAAABPAAAARwAAAHUAAABTAAAAKwAAADAAAABsAAAASgAAAGEAAABvAAAA"
+			"RQAAADQAAAByAAAAQwAAAHcAAABLAAAAcQAAADcAAABUAAAAUgAAAFEAAABMAAAATgAAAGcAAABM"
+			"AAAARwAAAGcAAAA3AAAARgAAAHMAAABNAAAARAAAAHkAAABSAAAAYQAAAGgAAAA3AAAAcgAAAHIA"
+			"AABGAAAAQgAAAFcAAABiAAAAQQAAAHgAAABFAAAAaAAAAHMAAABqAAAAYQAAAG4AAAB3AAAAdQAA"
+			"AG0AAAB2AAAAYgAAAG4AAABwAAAAbAAAAE4AAAA5AAAAWAAAADIAAABtAAAATQAAADcAAABmAAAA"
+			"VgAAADkAAABZAAAARQAAADkAAAAyAAAASgAAAHUAAABGAAAAdgAAAGgAAAB0AAAANAAAAFYAAAA1"
+			"AAAAYwAAAEQAAABBAAAAMwAAAGYAAABJAAAAdgAAAFIAAAB1AAAANAAAAFIAAABOAAAAYwAAAE8A"
+			"AABIAAAATgAAAE0AAABuAAAAYQAAADYAAABkAAAAdQAAAGEAAABoAAAAOAAAAGkAAAB5AAAAZAAA"
+			"AG8AAAAyAAAAZwAAAHUAAAB0AAAAegAAAHgAAAB4AAAAeAAAAGgAAABCAAAAQgAAAEMAAABDAAAA"
+			"QwAAAEcAAABFAAAAawAAAEEAAABTAAAAaAAAADQAAABEAAAANQAAAGIAAAA5AAAANgAAAHMAAABl"
+			"AAAAUAAAAGsAAAAwAAAAcQAAAEcAAABZAAAALwAAAGUAAAAvAAAAcAAAAEoAAAAyAAAAbgAAAGoA"
+			"AABxAAAAYgAAAEsAAAA4AAAAMwAAAHUAAABwAAAAQgAAAEIAAABjAAAATQAAAG4AAABGAAAAcgAA"
+			"ADQAAABtAAAANwAAAHIAAABVAAAAUAAAAHYAAAB4AAAARgAAAFIAAABWAAAAOAAAADkAAABlAAAA"
+			"NQAAAGwAAABzAAAATAAAAEwAAABWAAAAcQAAAFgAAAB1AAAAWgAAADEAAABIAAAAUAAAAFYAAABG"
+			"AAAAeAAAAEcAAABJAAAAOAAAAEQAAABCAAAAVwAAADkAAAB5AAAAdgAAAFMAAAArAAAAQQAAAGgA"
+			"AABuAAAANwAAAHEAAABoAAAAUAAAAHcAAABwAAAAOAAAADQAAABkAAAAZQAAAFkAAABZAAAAWgAA"
+			"AFgAAABGAAAALwAAAEIAAABZAAAAYQAAAGgAAAA2AAAAMQAAAHQAAAByAAAAaAAAAEIAAABCAAAA"
+			"QwAAAHAAAABtAAAAcQAAAHoAAAA0AAAARAAAAEMAAABCAAAAZQAAADIAAABBAAAASwAAAEkAAABx"
+			"AAAAVQAAAEkAAABJAAAAWQAAAFEAAABRAAAAcAAAADEAAABCAAAAdwAAAG4AAAA1AAAAVwAAAG8A"
+			"AAB3AAAAcQAAAC8AAABjAAAAMQAAAGMAAAAyAAAAVAAAAEwAAABtAAAASQAAAG8AAAB1AAAATQAA"
+			"AGUAAABRAAAAcgAAAGkAAAA2AAAATAAAADYAAABrAAAANQAAAEoAAABsAAAARQAAAFoAAABaAAAA"
+			"UwAAAGcAAAA4AAAALwAAAGsAAABoAAAAVQAAAFIAAABxAAAASQAAAGkAAAB2AAAARwAAAEEAAABO"
+			"AAAAZQAAAHUAAABUAAAATgAAAHUAAABxAAAASwAAAEYAAABnAAAASQAAAEIAAAB3AAAAcgAAAEMA"
+			"AABqAAAAcQAAAFMAAABTAAAAQwAAAFoAAABUAAAAQwAAAGcAAAB5AAAAMAAAADUAAABKAAAAMgAA"
+			"AG8AAAA4AAAAcQAAADMAAAArAAAAaQAAAC8AAAArAAAANAAAAFAAAABzAAAASgAAAFgAAABoAAAA"
+			"TwAAAHMAAAAyAAAAUgAAAEUAAAByAAAATwAAAFIAAABsAAAAOQAAAEoAAAAvAAAARwAAAFoAAABB"
+			"AAAAZwAAAHAAAABKAAAAOQAAADAAAAB1AAAATwAAAFYAAAA1AAAAbwAAADQAAABSAAAAbwAAAFgA"
+			"AABtAAAASQAAAHkAAABKAAAAcgAAAGkAAABLAAAANwAAAFUAAABkAAAANQAAAGwAAAByAAAAVAAA"
+			"AFgAAABDAAAANgAAADYAAABkAAAATAAAAFEAAABiAAAAbQAAACsAAAB6AAAARAAAAG8AAAArAAAA"
+			"NwAAAEYAAABVAAAAYwAAADQAAABUAAAAdQAAAEIAAABmAAAAOAAAAE8AAABoAAAANAAAAHYAAABx"
+			"AAAAVwAAAGcAAABJAAAAdAAAADkAAABzAA=="
 		)
 	)
 	(global_label "AD_DIO_10"
@@ -8253,7 +8552,7 @@
 	)
 	(global_label "AD_DC_Supply+"
 		(shape input)
-		(at 118.11 88.9 180)
+		(at 85.09 88.9 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -8263,7 +8562,7 @@
 		)
 		(uuid "d45bba49-7b62-4ff0-b705-a81be73ad5cd")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 100.4293 88.9 0)
+			(at 67.4093 88.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8561,72 +8860,6 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 97.79 86.36 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "4812737d-defa-4a49-b324-742c31d7d415")
-		(property "Reference" "#PWR05"
-			(at 97.79 92.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 97.79 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 97.79 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 97.79 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 97.79 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "e4f092f6-d243-4cd0-8b9f-af14be6125b0")
-		)
-		(instances
-			(project ""
-				(path "/70f40ce9-32c8-42da-85f6-43c2f6e1fb63/8524221f-2795-4c43-bbcc-559842e72345"
-					(reference "#PWR05")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
 		(at 158.75 86.36 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -8752,6 +8985,72 @@
 			(project "Observatory"
 				(path "/70f40ce9-32c8-42da-85f6-43c2f6e1fb63/8524221f-2795-4c43-bbcc-559842e72345"
 					(reference "#PWR08")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 87.63 81.28 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "def08fc1-d1c3-4424-92c4-c621776dd4dd")
+		(property "Reference" "#PWR037"
+			(at 87.63 85.09 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 87.63 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 87.63 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 87.63 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 87.63 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "109dfd93-e1d1-411f-9d9e-10f443cd3b54")
+		)
+		(instances
+			(project "Observatory"
+				(path "/70f40ce9-32c8-42da-85f6-43c2f6e1fb63/8524221f-2795-4c43-bbcc-559842e72345"
+					(reference "#PWR037")
 					(unit 1)
 				)
 			)
