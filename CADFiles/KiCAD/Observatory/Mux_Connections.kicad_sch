@@ -1337,6 +1337,14 @@
 		(uuid "6ba35f01-3faf-464f-b18c-9c4c39cb7164")
 	)
 	(no_connect
+		(at 217.17 39.37)
+		(uuid "7c928671-fc52-4753-9f8b-4c57c0e3692d")
+	)
+	(no_connect
+		(at 101.6 52.07)
+		(uuid "d40551ac-252f-4592-a6f6-5e71ed9dfe66")
+	)
+	(no_connect
 		(at 101.6 123.19)
 		(uuid "eb3dadce-d0e9-4e02-a058-24f9f1929eea")
 	)
@@ -1481,16 +1489,6 @@
 			(type default)
 		)
 		(uuid "180d0d61-9859-4f70-a322-86ce5ae6edcc")
-	)
-	(wire
-		(pts
-			(xy 217.17 39.37) (xy 220.98 39.37)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "18ad6bf3-11f0-4189-88a4-da7fe8a32e65")
 	)
 	(wire
 		(pts
@@ -2234,16 +2232,6 @@
 	)
 	(wire
 		(pts
-			(xy 101.6 52.07) (xy 106.68 52.07)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "af50d76c-3e60-446d-a1c1-50f24a83ee1e")
-	)
-	(wire
-		(pts
 			(xy 40.64 31.75) (xy 45.72 31.75)
 		)
 		(stroke
@@ -2831,28 +2819,6 @@
 		(uuid "03169cbd-718f-495c-8069-993fdcf0b9de")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 240.7773 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Scope 2 Mux  32"
-		(shape input)
-		(at 220.98 39.37 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "06e44a41-8acb-404c-adcb-c8cf5a670488")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 240.7773 39.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4618,28 +4584,6 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Scope 1 Mux  32"
-		(shape input)
-		(at 106.68 52.07 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left)
-		)
-		(uuid "dcaf89a8-6dd2-4f70-ba6e-80d29534e6e9")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 126.4773 52.07 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
 				(hide yes)
 			)
 		)
