@@ -5745,7 +5745,6 @@
 		)
 	)
 	(footprint "Connector_PinHeader_2.54mm:PinHeader_2x11_P2.54mm_Vertical"
-		(locked yes)
 		(layer "F.Cu")
 		(uuid "6a4f5f58-3b36-4727-8124-cf567f95c484")
 		(at 47.368999 65.62)
@@ -9335,7 +9334,6 @@
 		)
 	)
 	(footprint "Connector_PinHeader_2.54mm:PinHeader_2x15_P2.54mm_Vertical"
-		(locked yes)
 		(layer "F.Cu")
 		(uuid "816590ab-5ea6-4ddf-b11b-279814338cb3")
 		(at 238.92 60.637)
@@ -16602,7 +16600,6 @@
 		)
 	)
 	(footprint "3rdPrty_Footprints:SuLu_Foot"
-		(locked yes)
 		(layer "F.Cu")
 		(uuid "d4c9e730-f93a-41fe-b68d-a423aabad402")
 		(at 76.768999 77.988 -90)
@@ -36819,7 +36816,7 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "WEST LAB CAPSTONE SCUM OBSERVATORY REV1"
+	(gr_text "WEST LAB CAPSTONE SCUM OBSERVATORY REV2"
 		(at 247.95 93.35 270)
 		(layer "B.SilkS")
 		(uuid "b1423667-82d7-45f3-ab62-4160197ac0c6")

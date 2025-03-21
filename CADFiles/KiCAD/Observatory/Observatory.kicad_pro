@@ -503,7 +503,9 @@
     "meta": {
       "version": 4
     },
-    "net_colors": null,
+    "net_colors": {
+      "AD_DC_Supply+": "rgb(255, 0, 177)"
+    },
     "netclass_assignments": null,
     "netclass_patterns": [
       {
