@@ -4,6 +4,12 @@
 	(generator_version "9.0")
 	(uuid "68d7dac2-f246-44dc-a2c8-8d69d4111fae")
 	(paper "A4")
+	(title_block
+		(title "SCuM Observatory")
+		(date "2025-03-21")
+		(rev "2")
+		(company "West Lab")
+	)
 	(lib_symbols)
 	(junction
 		(at 78.74 80.01)

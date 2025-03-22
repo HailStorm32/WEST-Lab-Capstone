@@ -4,6 +4,12 @@
 	(generator_version "9.0")
 	(uuid "b90a1efa-4747-4cc4-9365-4af9138049a1")
 	(paper "A4")
+	(title_block
+		(title "SCuM Observatory")
+		(date "2025-03-21")
+		(rev "2")
+		(company "West Lab")
+	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_02x05_Top_Bottom"
 			(pin_names
