@@ -23,9 +23,6 @@ def get_current_time():
 # Com port of nRF board 
 nRF_port=SCUM_NRF_COM_PORT 
 
-# Path to SCuM binary
-binary_image = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin'))
-
 # End User Defined Parameters ************************************
 
 # Serial connections
@@ -40,7 +37,7 @@ def signal_handler(signal, frame):
     print("\rBye...")
     exit(0)
 
-def scumProgram():
+def scum_program(binary_image):
 
     # Register the signal handler
     signal.signal(signal.SIGINT, signal_handler)

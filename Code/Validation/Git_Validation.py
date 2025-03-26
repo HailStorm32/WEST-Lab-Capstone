@@ -11,7 +11,7 @@ import time
 
 from Config import *
 from Analog import validate_analog_signals
-from scumProgram import scumProgram
+from scumProgram import scum_program
 import os
 import sys
 
