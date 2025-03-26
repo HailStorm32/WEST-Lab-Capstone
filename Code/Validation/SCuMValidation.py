@@ -15,7 +15,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__Ve
 import WF_SDK
 from Digital import run_logic_analysis
 from Analog import validate_analog_signals
-from scumProgram import scumProgram
+from scumProgram import scum_program
 from Config import *
 
 def clear_terminal():
@@ -51,7 +51,7 @@ def stub_stop_power_monitor():
 # List of tests to be performed
 # Program upload and Power Consumption must be the first and last tests respectively
 tests = [
-    { 'name': 'Program upload',         'function': scumProgram,            'handle': None, 'results': [] },
+    { 'name': 'Program upload',         'function': scum_program,           'handle': None, 'results': [] },
     { 'name': 'Radio communication',    'function': stub_function_call,     'handle': None, 'results': [] },
     { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
     { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
     # Upload the test program to the SCuM chip
     print("Uploading test program to SCuM chip...")
-    tests[0]['results'] = tests[0]['function']()
+    tests[0]['results'] = tests[0]['function'](os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin')))
 
     # Wait for power up sequence to complete
     print("Waiting for SCuM chip to power up...")

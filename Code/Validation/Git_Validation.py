@@ -11,7 +11,7 @@ import time
 
 from Config import *
 from Analog import validate_analog_signals
-from scumProgram import scumProgram
+from scumProgram import scum_program
 import os
 import sys
 
@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
                         # Flash the SCuM chip
                         print("Flashing the SCuM chip...")
-                        scumProgram()
+                        scum_program(binary['path'])
 
                         # Run the validation test
                         validate_analog_signals()
