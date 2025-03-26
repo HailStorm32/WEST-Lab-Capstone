@@ -33,7 +33,7 @@ You will need to install the following programs
 	 > NOTE: Needs to be installed to `C:\Program Files (x86)\Digilent`
  - [Windows Driver for Adalm-Pluto SDR](https://wiki.analog.com/university/tools/pluto/drivers/windows)
    	 > The observatory is currently setup to operate under Windows OS. Future work may be done to adapt to other operatings systems.
-     	 > Note that when using multiple Adalm-Pluto SDRs, the IP addresses of each device must be unique, and are modifiable through the device configuration files. (https://wiki.analog.com/university/tools/pluto/users/customizing)
+     	 NOTE: When using multiple Adalm-Pluto SDRs, the IP addresses of each device must be unique, and are modifiable through the device configuration files. (https://wiki.analog.com/university/tools/pluto/users/customizing)
 - [insert other programs]
 
 ### Code Environment
