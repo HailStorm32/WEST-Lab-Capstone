@@ -81,11 +81,37 @@ def pull_latest_changes():
 if __name__ == "__main__":
 
     last_commit_hash = None  # Variable to store the last commit hash checked
+    test_results = {}  # List to store test results
 
     # Check if the GitTestingRepos directory exists
     if not os.path.exists(GIT_DIRECTORY):
         print(f"Error: The directory '{GIT_DIRECTORY}' does not exist. Please run the setup script to initialize the environment, and ensure the Git repository is cloned to GitTestingRepos.")
         sys.exit(1)
+
+    # Create list for test results
+    for binary in GIT_BINARY_PATHS:
+        binary_name = os.path.basename(binary['path']) 
+        test_results[binary_name] = {'results': []} 
+
+    '''
+    test_results format:
+    {
+        'binary_name': {
+            'results': [
+                {'test': 'test_name', 'pass': True/False, 'value': []},
+                {'test': 'test_name2', 'pass': True/False, 'value': []}
+            ]
+        },
+        # Add more binaries as needed
+    }
+
+    Value list is formatted as:
+    [
+        {'name': 'value_name1', 'value': 0},
+        {'name': 'value_name2', 'value': 1},
+        # Add more values as needed
+    ]
+    '''
 
     while 1:
 
@@ -123,12 +149,11 @@ if __name__ == "__main__":
                         print("Flashing the SCuM chip...")
                         scum_program(binary['path'])
 
-                        # Run the validation test
-                        validate_analog_signals()
-                    
+                        # Run the validation test and store the results
+                        test_results[os.path.basename(binary['path'])]['results'].append(validate_analog_signals())
                     else:
                         print("No new commits detected.")
 
 
         # Sleep for a while before checking again
-        time.sleep(60)
+        time.sleep(60) 
