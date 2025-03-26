@@ -1,3 +1,5 @@
 xmltodict==0.13.0
 matplotlib==3.10.0
 pyserial==3.5
+pylibiio==0.25
+pyadi_iio=0.0.19
