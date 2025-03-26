@@ -31,6 +31,8 @@ You will need to install the following programs
 	 > Needed for the nRF driver
  -   [WaveForms](https://digilent.com/reference/software/waveforms/waveforms-3/start) 
 	 > NOTE: Needs to be installed to `C:\Program Files (x86)\Digilent`
+ - [Windows Driver for Adalm-Pluto SDR](https://wiki.analog.com/university/tools/pluto/drivers/windows)
+   	 > The observatory is currently setup to operate under Windows OS. Future work may be done to adapt to other operatings systems.
 - [insert other programs]
 
 ### Code Environment
