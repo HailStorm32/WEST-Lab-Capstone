@@ -91,8 +91,14 @@ def scum_program(binary_image):
         nRF_ser.close()
     print("\rBye...")
 
+    return {
+        'test': 'Program upload',
+        'pass': True,
+        'value': []
+    }
+
 
 
 if __name__ == '__main__':
-    scumProgram()
+    scum_program()
     sys.exit(0)
