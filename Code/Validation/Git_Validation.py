@@ -75,8 +75,19 @@ def pull_latest_changes():
         return False
     
     return True
-    
 
+# List of tests to be performed on each binary
+# NOTE: Program upload and Power Consumption must be the first and last tests respectively
+tests = [
+    { 'name': 'Program upload',         'function': scum_program,            },
+    { 'name': 'Analog validation',      'function': validate_analog_signals, },
+    { 'name': 'Power Consumption',      'function': None,                    },
+]
+
+# Sanity check
+if tests[0]['name'] != "Program upload": 
+    print("Error: The first test must be 'Program upload'. Exiting...")
+    sys.exit(1)
 
 if __name__ == "__main__":
 
@@ -88,24 +99,35 @@ if __name__ == "__main__":
         print(f"Error: The directory '{GIT_DIRECTORY}' does not exist. Please run the setup script to initialize the environment, and ensure the Git repository is cloned to GitTestingRepos.")
         sys.exit(1)
 
-    # Create list for test results
+    # Create test results structure
     for binary in GIT_BINARY_PATHS:
         binary_name = os.path.basename(binary['path']) 
-        test_results[binary_name] = {'results': []} 
+        test_results[binary_name] = {'tests': {}} 
+
+        for test in tests:
+            test_results[binary_name]['tests'][test['name']] = {'results': []}
 
     '''
     test_results format:
     {
         'binary_name': {
-            'results': [
-                {'test': 'test_name', 'pass': True/False, 'value': []},
-                {'test': 'test_name2', 'pass': True/False, 'value': []}
-            ]
+            'tests': {
+                'test_name':  {'results': []},
+                'test_name2': {'results': []},
+            }
         },
         # Add more binaries as needed
     }
 
-    Value list is formatted as:
+    results list is formatted as:
+    [
+        { 'sub-test': 'pin 1', 'pass': False, value: [] },
+        { 'sub-test': 'pin 2', 'pass': False, value: [] },
+        # Add more values as needed
+
+    ]
+
+    value list is formatted as:
     [
         {'name': 'value_name1', 'value': 0},
         {'name': 'value_name2', 'value': 1},
@@ -129,6 +151,9 @@ if __name__ == "__main__":
                     print(f"Error: The binary file '{binary['path']}' does not exist.")
                     continue
 
+                # Get the binary name
+                binary_name = os.path.basename(binary['path']) 
+
                 print("Checking for new changes...")
 
                 # Pull the latest changes from the Git repository
@@ -143,14 +168,33 @@ if __name__ == "__main__":
                         print(f"Changes detected: {current_commit_hash}")
                         binary['lastHash'] = current_commit_hash
 
-                        print("Running validation tests...")
+                        # Cycle through all the tests
+                        # Skip the last tests since it is handled differently
+                        for test in tests[0:len(tests)-1]:
 
-                        # Flash the SCuM chip
-                        print("Flashing the SCuM chip...")
-                        scum_program(binary['path'])
+                            # Create handle to test results structure
+                            results_handle = test_results[binary_name][test['name']]['results']
 
-                        # Run the validation test and store the results
-                        test_results[os.path.basename(binary['path'])]['results'].append(validate_analog_signals())
+                            # Handle program upload differently
+                            if test['name'] == 'Program upload':
+                                # Flash the SCuM chip with the new binary
+                                print(f"Flashing the SCuM chip with {binary['path']}...")
+
+                                try:
+                                    results_handle = test['function'](binary['path'])
+                                except Exception as e:
+                                    print(f"Error flashing SCuM chip for {binary['path']}:\n {e}")
+                                    results_handle = {
+                                            'test': 'Program upload',
+                                            'pass': False,
+                                            'value': []
+                                        }
+                                    break
+                            else:
+                                
+                                print(f"Running test: {test['name']}...")
+
+                                results_handle = test['function']()
                     else:
                         print("No new commits detected.")
 
