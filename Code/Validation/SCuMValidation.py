@@ -10,6 +10,7 @@ The following tests are performed:
 import os
 import sys
 from time import sleep
+import random  # For simulating power consumption data
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 
 import WF_SDK
@@ -33,46 +34,75 @@ def clear_terminal():
 # These functions are placeholders for the actual functions that will be implemented elsewhere
 # Will be removed once the actual functions are implemented
 ###################
-def stub_program_upload():
-    pass
+def stub_program_upload(arg1):
+    return [{'sub-test': 'Program upload', 'pass': True, 'values': []}]  # Placeholder for actual program upload results
 
 def stub_function_call():
-    pass
+    return [{'sub-test': 'Random test', 'pass': random.choice([True, False]), 'values': [{'name': 'random_value', 'value': random.randint(0, 100)}]}]
 
 def stub_self_check():
-    return True
+    return [{'sub-test': 'Radio self test', 'pass': True, 'values': []}]  # Placeholder for actual self-check results
 
 def stub_start_power_monitor():
     pass
 
 def stub_stop_power_monitor():
-    pass
+    # Simulate random power monitoring data
+    return [
+        {'sub-test': 'Voltage', 'pass': random.choice([True, False]), 'values': [{'name': 'voltage', 'value': random.uniform(1.0, 3.3)}]},
+        {'sub-test': 'Current', 'pass': random.choice([True, False]), 'values': [{'name': 'current', 'value': random.uniform(0.01, 0.1)}]},
+        {'sub-test': 'Power', 'pass': random.choice([True, False]), 'values': [{'name': 'power', 'value': random.uniform(0.01, 0.33)}]}
+    ]
+
+binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin'))
 
 # List of tests to be performed
-# Program upload and Power Consumption must be the first and last tests respectively
-tests = [
-    { 'name': 'Program upload',         'function': scum_program,           'handle': None, 'results': [] },
-    { 'name': 'Radio communication',    'function': stub_function_call,     'handle': None, 'results': [] },
-    { 'name': 'Digital input/output',   'function': run_logic_analysis,     'handle': None, 'results': [] },
-    { 'name': 'Analog validation',      'function': validate_analog_signals,'handle': None, 'results': [] },
-    { 'name': 'Serial communication',   'function': stub_function_call,     'handle': None, 'results': [] },
-    { 'name': 'Power Consumption',      'function': None,                   'handle': None, 'results': [] },
-]
+# Independent tests are run outside the main loop
+tests = {
+    'Program upload':         { 'function': stub_program_upload,            'independent': True},  # scum_program
+    'Radio Self Test':        { 'function': stub_self_check,         'independent': True},
+    'Radio communication':    { 'function': stub_function_call,      'independent': False}, 
+    'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
+    'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
+    'Serial communication':   { 'function': stub_function_call,      'independent': False}, 
+    'Power Consumption':      { 'function': None,                    'independent': True}, 
+}
+
+# Create test results structure
+test_results = {}  # List to store test results
+
+# We only need one test unit for SCuM validation, so we will use 'SCuM-Validation' as the key
+test_results['SCuM-Validation'] = {'tests': {}} 
+
+for test in tests:
+    test_results['SCuM-Validation']['tests'][test] = {'results': []}
 
 '''
-example_test_return = [
-    { 'test': 'pin 1', 'pass': False, value: [] },
-    { 'test': 'pin 2', 'pass': False, value: [] },
-    { 'test': 'pin 3', 'pass': True,  value: [] },
-    { 'test': 'pin 4', 'pass': False, value: [] },
+test_results format:
+{
+    'unit_test': {
+        'tests': {
+            'test_name':  {'results': []},
+            'test_name2': {'results': []},
+        }
+    },
+    # Add more unit tests as needed
+}
+
+results list is formatted as:
+[
+    { 'sub-test': 'pin 1', 'pass': False, values: [] },
+    { 'sub-test': 'pin 2', 'pass': False, values: [] },
+    # Add more sub tests as needed
+
 ]
 
-value_example = [
-    { 'name': 'pin 1', 'value': 0 },
-    { 'name': 'pin 2', 'value': 1 },
-    { 'name': 'pin 3', 'value': 1 },
-    { 'name': 'pin 4', 'value': 0 },
-    ]
+value list is formatted as:
+[
+    {'name': 'value_name1', 'value': 0},
+    {'name': 'value_name2', 'value': 1},
+    # Add more values as needed
+]
 '''
 
 #########################################################
@@ -81,16 +111,18 @@ value_example = [
 if __name__ == '__main__':
     clear_terminal()
 
+    # Get the name of the first unit test
+    first_unit_test_name = list(test_results.keys())[0]
+
+    # Get handle to self test results
+    results_handle = test_results[first_unit_test_name]['tests']['Radio Self Test']['results']
+
     # Run self test for spectrum analyzer
     print("Running self test for spectrum analyzer...")
-    self_test_result = stub_self_check() # TODO: Replace with spectrum analyzer self test function
+    results_handle.extend(stub_self_check()) # TODO: Replace with spectrum analyzer self test function
 
-    if not self_test_result:
+    if len(results_handle) == 0 or not results_handle[0]['pass']:
         print("Spectrum analyzer self test failed!\n Exiting...")
-
-        # Fail the tests
-        for test in tests:
-            test['results'] = None
 
         #TODO: Generate report
 
@@ -101,18 +133,38 @@ if __name__ == '__main__':
     # Startup the joule scope monitoring thread
     stub_start_power_monitor() # TODO: Replace with actual function
 
-
     # Upload the test program to the SCuM chip
     print("Uploading test program to SCuM chip...")
-    tests[0]['results'] = tests[0]['function'](os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin')))
+    try:
+        test_results[first_unit_test_name]['tests']['Program upload']['results'] = tests['Program upload']['function'](binary_path)
+    
+    except Exception as e:
+        print(f"Error flashing SCuM chip for {binary_path}:\n {e}")
+
+        test_results['SCuM-Validation']['tests']['Program upload']['results'] = [{
+                                    'sub-test': 'Program upload',
+                                    'pass': False,
+                                    'values': [
+                                        {'name': 'binary name', 'value': binary_path},
+                                        {'name': 'error', 'value': str(e)}
+                                        ]
+                                }]
+        
+        #TODO: Generate report
+        sys.exit(1)
+        
 
     # Wait for power up sequence to complete
     print("Waiting for SCuM chip to power up...")
     sleep(2)
 
     # Run the tests
-    # Skip the first and last tests since they are handled differently
-    for test in tests[1:len(tests)-1]:
+    for test_name, test_info in tests.items():
+
+        # Skip independent tests as they are run elsewhere
+        if test_info['independent']:
+            continue
+
         '''
         Open Digital Discovery
 
@@ -131,41 +183,62 @@ if __name__ == '__main__':
         WF_SDK.logic.trigger(dd_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
         WF_SDK.logic.record(dd_handle, channel=TRIGGER_PIN_NUM)
 
-        # Declare the test being ran
-        print("Running test: " + test['name'])
+        # Declare the test being run
+        print(f"Running test: {test_name}")
 
         # Close our device handle
         WF_SDK.logic.close(dd_handle)
         WF_SDK.device.close(dd_handle) # TODO: Remove this line once we have a better way to handle device handles
 
+        # Create handle to test's results structure
+        results_handle = test_results[first_unit_test_name]['tests'][test_name]['results']
+
         # Handle the Digital input/output test differently 
         # since it requires we pass in the trigger_dio value
-        if test['name'] == 'Digital input/output':
+        if test_name == 'Digital input/output':
             # Run the test
-            test['results'] = test['function'](TRIGGER_PIN_NUM)
+            results_handle.extend(test_info['function'](TRIGGER_PIN_NUM))
 
         else:
             # Run the test
-            test['results'] = test['function']()
+            results_handle.extend(test_info['function']())
 
         #TODO: remove delay 
         # sleep(1)
 
     # Stop the joule scope monitoring and get the results
     print("Getting joule scope monitoring results...")
-    tests[-1]["results"] = stub_stop_power_monitor() # TODO: Replace with actual function
+
+    # Get handle to Power Consumption's results
+    results_handle = test_results[first_unit_test_name]['tests']['Power Consumption']['results']
+    
+    results_handle.extend(stub_stop_power_monitor()) # TODO: Replace with actual function
 
     #TODO: Generate report
 
     # Temporary print results
-    print("\n\nResults:")
-    for test in tests:
-        print(f"Test Name: {test['name']}")
-        if test['results']:
-            print("Results:")
-            for result in test['results']:
-                print(f"  - {result}")
-        else:
-            print("No results available.")
+    print("\nTest Results:")
+    print("=" * 40)
+
+    for unit_test, unit_data in test_results.items():
+        print(f"Unit Test: {unit_test}")
         print("-" * 40)
+
+        for test_name, test_data in unit_data['tests'].items():
+            print(f"  Test Name: {test_name}")
+            print("  Results:")
+            
+            if not test_data['results']:
+                print("    No results available.")
+            else:
+                for result in test_data['results']:
+                    print("    Sub-Test:")
+                    print(f"      - Sub-Test Name: {result.get('sub-test', 'N/A')}")
+                    print(f"      - Pass: {'Yes' if result.get('pass') else 'No'}")
+                    print("      - Values:")
+                    for value in result.get('values', []):
+                        print(f"        * {value['name']}: {value['value']}")
+            print("-" * 40)
+
+    print("=" * 40)
 

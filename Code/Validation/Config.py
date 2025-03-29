@@ -8,7 +8,7 @@ import os
 # Master Script Configuration
 ########################
 
-AD2_FOR_DIGITAL = False # Set to True if using Analog Discovery 2 in place of the Digital Discovery
+AD2_FOR_DIGITAL = True # Set to True if using Analog Discovery 2 in place of the Digital Discovery
 
 TRIGGER_PIN_NUM = 0  # DIO pin on AD2/DD used for the trigger pin
 
