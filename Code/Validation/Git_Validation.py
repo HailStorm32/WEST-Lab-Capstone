@@ -132,6 +132,8 @@ if __name__ == "__main__":
 
     while 1:
 
+        changes_found = False
+
         # Check if the current time matches the specified time to run
         now = datetime.now()
         if RUN_IN_DEV_MODE or now.strftime("%H:%M") == TIME_TO_RUN:
@@ -158,6 +160,8 @@ if __name__ == "__main__":
 
                     # If there are changes, run the validation tests
                     if current_commit_hash and current_commit_hash != binary['lastHash']:
+
+                        changes_found = True
 
                         # Store the last commit hash for future comparisons
                         print(f"Changes detected: {current_commit_hash}")
@@ -200,9 +204,9 @@ if __name__ == "__main__":
                     else:
                         print("No new commits detected.")
 
-            # TODO: Generate report
-
-            # TODO: Add logic to only generate report if tests were ran
+            if changes_found:
+                pass
+                # TODO: Generate report
 
         # Sleep for a while before checking again
         time.sleep(60) 
