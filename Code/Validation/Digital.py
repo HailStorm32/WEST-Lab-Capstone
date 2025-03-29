@@ -61,7 +61,7 @@ def run_logic_analysis(trigger_channel=0):
             continue  # Skip the trigger channel (do not add it to tests)
 
         test_result = {
-            'test': f'pin {ch}',  # Ensure correct pin numbering
+            'sub-test': f'pin {ch}',  # Ensure correct pin numbering
             'pass': has_consecutive_ones(all_buffers[ch], CONSECUTIVE_ONES_REQUIRED)
         }
         tests.append(test_result)
@@ -69,7 +69,7 @@ def run_logic_analysis(trigger_channel=0):
     # Print test results
     for test in tests:
         status = "Passed" if test["pass"] else "Failed"
-        print(f"{test['test']} {status}")
+        print(f"{test['sub-test']} {status}")
 
     # Reset the logic analyzer
     logic.close(device_data)

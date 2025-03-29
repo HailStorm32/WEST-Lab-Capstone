@@ -77,17 +77,12 @@ def pull_latest_changes():
     return True
 
 # List of tests to be performed on each binary
-# NOTE: Program upload and Power Consumption must be the first and last tests respectively
-tests = [
-    { 'name': 'Program upload',         'function': scum_program,            },
-    { 'name': 'Analog validation',      'function': validate_analog_signals, },
-    { 'name': 'Power Consumption',      'function': None,                    },
-]
-
-# Sanity check
-if tests[0]['name'] != "Program upload": 
-    print("Error: The first test must be 'Program upload'. Exiting...")
-    sys.exit(1)
+# Independent tests are run outside the main loop
+tests = {
+    'Program upload':       { 'function': scum_program,            'independent': False },
+    'Analog validation':    { 'function': validate_analog_signals, 'independent': False },
+    'Power Consumption':    { 'function': None,                    'independent': True  }, 
+}
 
 if __name__ == "__main__":
 
@@ -105,25 +100,25 @@ if __name__ == "__main__":
         test_results[binary_name] = {'tests': {}} 
 
         for test in tests:
-            test_results[binary_name]['tests'][test['name']] = {'results': []}
+            test_results[binary_name]['tests'][test] = {'results': []}
 
     '''
     test_results format:
     {
-        'binary_name': {
+        'unit_test': {
             'tests': {
                 'test_name':  {'results': []},
                 'test_name2': {'results': []},
             }
         },
-        # Add more binaries as needed
+        # Add more unit tests as needed
     }
 
     results list is formatted as:
     [
-        { 'sub-test': 'pin 1', 'pass': False, value: [] },
-        { 'sub-test': 'pin 2', 'pass': False, value: [] },
-        # Add more values as needed
+        { 'sub-test': 'pin 1', 'pass': False, values: [] },
+        { 'sub-test': 'pin 2', 'pass': False, values: [] },
+        # Add more sub tests as needed
 
     ]
 
@@ -173,32 +168,39 @@ if __name__ == "__main__":
                         binary['lastHash'] = current_commit_hash
 
                         # Cycle through all the tests
-                        # Skip the last tests since it is handled differently
-                        for test in tests[0:len(tests)-1]:
+                        for test_name, test_info in tests.items():
+
+                            # Skip independent tests as they are run elsewhere
+                            if test_info['independent']:
+                                continue
 
                             # Create handle to test results structure
-                            results_handle = test_results[binary_name][test['name']]['results']
+                            results_handle = test_results[binary_name]['tests'][test_name]['results']
 
                             # Handle program upload differently
-                            if test['name'] == 'Program upload':
+                            if test_name == 'Program upload':
                                 # Flash the SCuM chip with the new binary
                                 print(f"Flashing the SCuM chip with {binary['path']}...")
 
                                 try:
-                                    results_handle = test['function'](binary['path'])
+                                    results_handle.extend(test_info['function'](binary['path']))
                                 except Exception as e:
                                     print(f"Error flashing SCuM chip for {binary['path']}:\n {e}")
                                     results_handle = {
                                             'test': 'Program upload',
                                             'pass': False,
-                                            'value': []
+                                            'values': [
+                                                {'name': 'binary name', 'value': binary['path']},
+                                                {'name': 'error', 'value': str(e)}
+                                                ]
                                         }
                                     break
+                            
                             else:
                                 
-                                print(f"Running test: {test['name']}...")
+                                print(f"Running test: {test_name}...")
 
-                                results_handle = test['function']()
+                                results_handle.extend(test_info['function']())
                     else:
                         print("No new commits detected.")
 

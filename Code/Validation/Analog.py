@@ -379,8 +379,8 @@ def validate_analog_signals():
     '''
     # Create structure to store test results
     test_results = [
-        { 'test': '1.1V reference voltage', 'pass': False, 'values': [] },
-        { 'test': '1.8V reference voltage', 'pass': False, 'values': [] },
+        { 'sub-test': '1.1V reference voltage', 'pass': False, 'values': [] },
+        { 'sub-test': '1.8V reference voltage', 'pass': False, 'values': [] },
     ]
 
     # Open the device
@@ -451,7 +451,7 @@ def validate_analog_signals():
             print(f"{clock['name']} clock signal test: PASS at {freq} Hz ({ppm:.3f} ppm)")
 
             test_results.append({
-                'test': f"{clock['name']} clock signal",
+                'sub-test': f"{clock['name']} clock signal",
                 'pass': True,
                 'values': [
                     {'name': 'measured_frequency', 'value': freq},
@@ -462,7 +462,7 @@ def validate_analog_signals():
             print(f"{clock['name']} clock signal test: FAIL at {freq} Hz ({ppm:.3f} ppm)")
 
             test_results.append({
-                'test': f"{clock['name']} clock signal",
+                'sub-test': f"{clock['name']} clock signal",
                 'pass': False,
                 'values': [
                     {'name': 'measured_frequency', 'value': freq},
