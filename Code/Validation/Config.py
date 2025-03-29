@@ -38,16 +38,13 @@ CLOCKS_TO_TEST = [          # List of clocks to test
 # Git Validation
 ########################
 
-#TODO: Revert path back to original before merging to master
-
 GIT_DIRECTORY = os.path.join(os.path.dirname(__file__), '../GitTestingRepos/openwsn-fw/')  # Directory where the Git repository is located
-# GIT_BRANCH = "wip_testing"  # Branch of the Git repository for validation  #TODO: Change to "develop" before merging to master
 
 TIME_TO_RUN = "12:00"  # Time of day to run the validation in 24-hour format (e.g., 14:30 for 2:30 PM)
 RUN_IN_DEV_MODE = True  # Set to True if running in development mode (bypasses time check)
 
 GIT_BINARY_PATHS = [
-    { 'path': os.path.join(GIT_DIRECTORY, "projects/scum/01bsp_sctimer_gpio/test_bin.bin"), 'branch': "wip_testing", 'lastHash': None },  # Path to the
+    { 'path': os.path.join(GIT_DIRECTORY, "projects/scum/01bsp_sctimer_gpio/test_bin.bin"), 'branch': "wip_testing", 'lastHash': None },  # Path to the binary file
 ]
 
 ########################
