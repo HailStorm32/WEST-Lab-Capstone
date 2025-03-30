@@ -5,15 +5,17 @@ flash the SCuM chip, and run the validation tests.
 Script will run at a specified time each day.
 
 '''
-from datetime import datetime
-import subprocess
-import time
-
-from Config import *
-from Analog import validate_analog_signals
-from scumProgram import scum_program
 import os
+import subprocess
 import sys
+import time
+from datetime import datetime
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
+
+from Analog import validate_analog_signals
+from Config import *
+from Utilities import ReportGeneration
+from scumProgram import scum_program
 
 def get_commit_hash():
     """
@@ -205,8 +207,7 @@ if __name__ == "__main__":
                         print("No new commits detected.")
 
             if changes_found:
-                pass
-                # TODO: Generate report
+                ReportGeneration.generate_html_report(test_results)
 
         # Sleep for a while before checking again
         time.sleep(60) 

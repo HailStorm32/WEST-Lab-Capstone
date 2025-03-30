@@ -124,7 +124,7 @@ if __name__ == '__main__':
     if len(results_handle) == 0 or not results_handle[0]['pass']:
         print("Spectrum analyzer self test failed!\n Exiting...")
 
-        #TODO: Generate report
+        ReportGeneration.generate_html_report(test_results)
 
         sys.exit(1)
     else:
@@ -150,7 +150,7 @@ if __name__ == '__main__':
                                         ]
                                 }]
         
-        #TODO: Generate report
+        ReportGeneration.generate_html_report(test_results)
         sys.exit(1)
         
 
@@ -215,6 +215,7 @@ if __name__ == '__main__':
     results_handle.extend(stub_stop_power_monitor()) # TODO: Replace with actual function
 
     #TODO: Generate report
+    ReportGeneration.generate_html_report(test_results)
 
     # Temporary print results
     print("\nTest Results:")
