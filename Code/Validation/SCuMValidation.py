@@ -8,16 +8,18 @@ The following tests are performed:
 - Radio communication
 '''
 import os
+import random  # For simulating power consumption data (remove once actual data is available)
 import sys
 from time import sleep
-import random  # For simulating power consumption data
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
 
 import WF_SDK
-from Digital import run_logic_analysis
 from Analog import validate_analog_signals
-from scumProgram import scum_program
 from Config import *
+from Digital import run_logic_analysis
+from Utilities import ReportGeneration
+from scumProgram import scum_program
 
 def clear_terminal():
     '''
@@ -125,7 +127,6 @@ if __name__ == '__main__':
         print("Spectrum analyzer self test failed!\n Exiting...")
 
         ReportGeneration.generate_html_report(test_results)
-
         sys.exit(1)
     else:
         print("Spectrum analyzer self test passed!\n")
@@ -214,7 +215,6 @@ if __name__ == '__main__':
     
     results_handle.extend(stub_stop_power_monitor()) # TODO: Replace with actual function
 
-    #TODO: Generate report
     ReportGeneration.generate_html_report(test_results)
 
     # Temporary print results
