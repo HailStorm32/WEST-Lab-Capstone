@@ -5,11 +5,14 @@ Records voltage/current values.
 Calculates results & displays them.
 
 To do:
-- Change results variable to acctually say
-whether or not a test has passed/failed.
-(Basically compare values with standard values)
+- Combine functions to be two functions that can be called
+- One function should be called to start joulescope and have it running
+ie run()
+- One function should be called to stop joulescope and calc/display results
+Combine joulescope_results with stop.device()
+- Check if printed results actually prints the raw data.
 
-Version: 1.5
+Version: 1.5.1
 '''
 
 # Import the necessary modules.
@@ -107,12 +110,12 @@ def joulescope_results(file_path):
 
             # Format Results
             results = [
-                { 'test': 'voltage_avg', 'pass': None, 'value': f"{voltage_avg:.3f}" },
-                { 'test': 'voltage_min', 'pass': None, 'value': f"{voltage_min:.3f}" },
-                { 'test': 'voltage_max', 'pass': None, 'value': f"{voltage_max:.3f}" },
-                { 'test': 'current_avg', 'pass': None, 'value': f"{current_avg:.9f}" },
-                { 'test': 'current_min', 'pass': None, 'value': f"{current_min:.9f}" },
-                { 'test': 'current_max', 'pass': None, 'value': f"{current_max:.9f}" },
+                { 'test': 'voltage_avg', 'pass': None, 'value': {voltage_avg} },
+                { 'test': 'voltage_min', 'pass': None, 'value': {voltage_min} },
+                { 'test': 'voltage_max', 'pass': None, 'value': {voltage_max} },
+                { 'test': 'current_avg', 'pass': None, 'value': {current_avg} },
+                { 'test': 'current_min', 'pass': None, 'value': {current_min} },
+                { 'test': 'current_max', 'pass': None, 'value': {current_max} },
             ]
 
             # Print the results
