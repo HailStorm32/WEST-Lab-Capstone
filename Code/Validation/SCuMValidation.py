@@ -100,10 +100,21 @@ results list is formatted as:
 ]
 
 value list is formatted as:
-[
+[   
+    # Example of one off values
     {'name': 'value_name1', 'value': 0},
-    {'name': 'value_name2', 'value': 1},
-    # Add more values as needed
+    {'name': 'value_name2', 'value': 55.3},
+
+    # Example of a list value (to be used for graphs)
+    {'name': 'value_name3', 'value': [1.2, 2.3, 3.4]},  # Example of a list value
+    
+    # Example of a 2D list value (to be used for graphs)
+    # Must also contain a dictionary with x and y axis labels
+    {'name': 'value_name4', 'value': [[1,3], [1,2]}]},  # Example of a 2D list value
+    {'name': 'axis_label', 'value': {'x-label': 'x axis name', 'y-label': 'y axis name'}},  # Example of a dictionary value
+
+    # Example of a path to a graph image
+    {'name': 'value_name5', 'value': "path/to/graph.png"},  # Example of path to a graph image
 ]
 '''
 

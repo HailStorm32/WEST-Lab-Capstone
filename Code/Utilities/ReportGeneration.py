@@ -1,52 +1,57 @@
-import base64
+import os
 import matplotlib.pyplot as plt
-import random
-from datetime import datetime, timezone
+import base64
 from io import BytesIO
-
+from datetime import datetime, timezone
+import random
 
 def generate_html_report(test_results, filename="test_results_report.html"):
     """
     Generate a self-contained HTML report from test results and save it to a file.
-    Automatically graphs list-type values and embeds them as images.
-
+    
+    This report supports:
+      - Plotting a list-of-numbers (line graph with default labels).
+      - Plotting a list-of-[x,y] pairs.
+          * If custom axis labels are provided (with a value object named "axis_label"), those are used.
+          * Otherwise, "no label given" is used for both axes, and a warning is logged.
+      - Embedding an image if a value is a valid path to an image file.
+          * If the path is invalid, it logs a warning and displays that the path was not valid.
+      - Only one graph is supported per sub-test.
+    
     Args:
-        test_results (dict): Dictionary of test results (see format spec).
-        filename (str): Output HTML file path.
-
+        test_results (dict): The dictionary containing the test results.
+        filename (str): The output HTML file path.
+    
     Returns:
         None
     """
 
-    def get_unit_pass_status(tests):
-        """
-        Determine if an entire unit test has passed.
+    # ----------------------------
+    # Helper: Check if a string looks like an image path.
+    # ----------------------------
+    def is_image_path(s):
+        if not isinstance(s, str):
+            return False
+        lower = s.lower()
+        return lower.endswith('.png') or lower.endswith('.jpg') or lower.endswith('.jpeg') or lower.endswith('.gif')
 
-        A unit is only considered passed if every test has non-empty results
-        AND all its sub-tests passed.
-        """
-        for test_data in tests.values():
-            results = test_data.get("results", [])
-            if not results or not all(sub.get("pass", False) for sub in results):
-                return False
-        return True
-
-    def encode_plot_image(data, title):
-        """
-        Create a line plot from a list of values and return it as base64 string.
-
-        Args:
-            data (list): The y-values for the graph
-            title (str): The name of the value (used for labeling)
-
-        Returns:
-            str: A base64-encoded PNG image string for embedding in HTML
-        """
+    # ----------------------------
+    # Helper: Create a plot and return a base64-encoded image.
+    # If 'data' is a list-of-[x,y] pairs, plot x and y separately.
+    # Otherwise, treat it as a list-of-numbers.
+    # ----------------------------
+    def encode_plot_image(data, title, x_label="Index", y_label="Value"):
         fig, ax = plt.subplots()
-        ax.plot(data, marker='o')
+        # Check if data is a list-of-pairs (each element is a list with 2 items)
+        if isinstance(data, list) and data and isinstance(data[0], list) and len(data[0]) == 2:
+            xs = [pair[0] for pair in data]
+            ys = [pair[1] for pair in data]
+            ax.plot(xs, ys, marker='o')
+        else:
+            ax.plot(data, marker='o')
         ax.set_title(title)
-        ax.set_xlabel("Index")
-        ax.set_ylabel("Value")
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
         plt.tight_layout()
 
         buf = BytesIO()
@@ -55,8 +60,10 @@ def generate_html_report(test_results, filename="test_results_report.html"):
         buf.seek(0)
         return base64.b64encode(buf.read()).decode('utf-8')
 
+    # ----------------------------
+    # Helper: Return CSS styles for the HTML report.
+    # ----------------------------
     def get_css_styles():
-        """Return the CSS block used in the HTML."""
         return """
         <style>
             body {
@@ -92,9 +99,20 @@ def generate_html_report(test_results, filename="test_results_report.html"):
         """
 
     # ----------------------------
-    # Begin HTML construction
+    # Helper: Determine if the whole unit test passes.
+    # A unit test passes only if every contained test has non-empty results and all sub-tests pass.
     # ----------------------------
-    html = [
+    def get_unit_pass_status(tests):
+        for test_data in tests.values():
+            results = test_data.get("results", [])
+            if not results or not all(sub.get("pass", False) for sub in results):
+                return False
+        return True
+
+    # ----------------------------
+    # Begin constructing the HTML report
+    # ----------------------------
+    html_parts = [
         "<!DOCTYPE html>",
         "<html>",
         "<head>",
@@ -106,10 +124,9 @@ def generate_html_report(test_results, filename="test_results_report.html"):
         "<h1>Test Results Report</h1>"
     ]
 
-    # Add report generation date in UTC
+    # Insert UTC timestamp
     now = datetime.now(timezone.utc).strftime("%B %d, %Y — %H:%M UTC")
-    html.append(f"<p><em>Generated on: {now}</em></p>")
-
+    html_parts.append(f"<p><em>Generated on: {now}</em></p>")
 
     # ----------------------------
     # Loop through each unit test
@@ -119,63 +136,118 @@ def generate_html_report(test_results, filename="test_results_report.html"):
         unit_pass = get_unit_pass_status(tests)
         unit_status = "✅ PASSED" if unit_pass else "❌ FAILED"
         unit_class = "passed" if unit_pass else "failed"
-
-        html.append(f"<div class='unit-test'><h2>{unit_name} - <span class='{unit_class}'>{unit_status}</span></h2>")
+        html_parts.append(f"<div class='unit-test'><h2>{unit_name} - <span class='{unit_class}'>{unit_status}</span></h2>")
 
         # ------------------------
-        # Loop through each test
+        # Loop through each test in the unit
         # ------------------------
         for test_name, test_data in tests.items():
             results = test_data.get("results", [])
             if not results:
-                html.append(f"<div class='test'><h3>{test_name} - <span class='failed'>FAILED</span></h3>")
-                html.append("<p>No sub-tests provided.</p></div>")
+                html_parts.append(f"<div class='test'><h3>{test_name} - <span class='failed'>FAILED</span></h3>")
+                html_parts.append("<p>No sub-tests provided.</p></div>")
                 continue
 
             test_pass = all(sub.get("pass", False) for sub in results)
             test_status = "PASSED" if test_pass else "FAILED"
             test_class = "passed" if test_pass else "failed"
-            html.append(f"<div class='test'><h3>{test_name} - <span class='{test_class}'>{test_status}</span></h3>")
+            html_parts.append(f"<div class='test'><h3>{test_name} - <span class='{test_class}'>{test_status}</span></h3>")
 
             # ---------------------
-            # Loop through sub-tests
+            # Loop through each sub-test in the test
             # ---------------------
             for sub in results:
                 sub_name = sub.get("sub-test", "Unnamed Sub-Test")
                 sub_pass = sub.get("pass", False)
                 sub_status = "PASSED" if sub_pass else "FAILED"
                 sub_class = "passed" if sub_pass else "failed"
-                html.append(f"<div class='sub-test'><strong>{sub_name}</strong>: <span class='{sub_class}'>{sub_status}</span></div>")
+                html_parts.append(f"<div class='sub-test'><strong>{sub_name}</strong>: <span class='{sub_class}'>{sub_status}</span></div>")
 
                 # -----------------
-                # List/Graph values
+                # Process sub-test values:
+                #   1. Custom Pair Plot: Look for a data object (list-of-[x,y] pairs) and optionally an "axis_label" object.
+                #      * If axis labels are missing, use "no label given" and log a warning.
+                #   2. Otherwise, if a value is a list, plot it using default labels.
+                #   3. If a value is a string and looks like an image path, verify the path.
+                #      * If the file exists, embed it.
+                #      * Otherwise, log a warning and display that the path is not valid.
+                #   4. Else, simply display the value.
                 # -----------------
                 values = sub.get("values", [])
+                processed_indices = set()  # Track values already used in a custom plot
+                axis_label_obj = None
+                data_obj = None
+
+                # First pass: Identify custom pair plot objects.
+                for i, val in enumerate(values):
+                    if val.get("name") == "axis_label" and isinstance(val.get("value"), dict):
+                        axis_label_obj = val
+                        processed_indices.add(i)
+                    elif isinstance(val.get("value"), list):
+                        v = val.get("value")
+                        if v and isinstance(v[0], list) and len(v[0]) == 2:
+                            data_obj = val
+                            processed_indices.add(i)
+
+                # If a data object is found, generate a plot.
+                if data_obj is not None:
+                    if axis_label_obj is not None:
+                        # Use provided axis labels.
+                        x_label = axis_label_obj["value"].get("x-label", "no label given")
+                        y_label = axis_label_obj["value"].get("y-label", "no label given")
+                    else:
+                        # No axis labels provided; use defaults and log it.
+                        x_label = "no label given"
+                        y_label = "no label given"
+                        print(f"Warning: No axis labels provided for data '{data_obj.get('name', 'Data Plot')}'. Using default labels.")
+                    encoded_img = encode_plot_image(data_obj["value"], data_obj.get("name", "Data Plot"), x_label, y_label)
+                    html_parts.append(
+                        f"<ul class='values'><li>{data_obj.get('name', 'Data Plot')}:<br>"
+                        f"<img src='data:image/png;base64,{encoded_img}' alt='Graph for {data_obj.get('name', '')}'></li></ul>"
+                    )
+
+                # Process remaining values individually.
                 if values:
-                    html.append("<ul class='values'>")
-                    for val in values:
+                    html_parts.append("<ul class='values'>")
+                    for i, val in enumerate(values):
+                        # Skip items already processed in custom plot.
+                        if i in processed_indices:
+                            continue
                         val_name = val.get("name", "Unnamed Value")
                         val_data = val.get("value", "")
+                        # Case: value is a list (line graph).
                         if isinstance(val_data, list):
                             encoded_img = encode_plot_image(val_data, val_name)
-                            html.append(f"<li>{val_name}:<br><img src='data:image/png;base64,{encoded_img}' alt='Graph for {val_name}'></li>")
+                            html_parts.append(f"<li>{val_name}:<br><img src='data:image/png;base64,{encoded_img}' alt='Graph for {val_name}'></li>")
+                        # Case: value is a string that looks like an image path.
+                        elif isinstance(val_data, str) and is_image_path(val_data):
+                            if os.path.exists(val_data):
+                                try:
+                                    with open(val_data, "rb") as image_file:
+                                        encoded = base64.b64encode(image_file.read()).decode('utf-8')
+                                    html_parts.append(f"<li>{val_name}:<br><img src='data:image/png;base64,{encoded}' alt='Embedded Image for {val_name}'></li>")
+                                except Exception as e:
+                                    print(f"Error reading image at {val_data}: {e}")
+                                    html_parts.append(f"<li>{val_name}: <span class='failed'>Error reading image.</span></li>")
+                            else:
+                                print(f"Image path not valid: {val_data}")
+                                html_parts.append(f"<li>{val_name}: <span class='failed'>Image path not valid: {val_data}</span></li>")
                         else:
-                            html.append(f"<li>{val_name}: {val_data}</li>")
-                    html.append("</ul>")
+                            # Default: simply display the value.
+                            html_parts.append(f"<li>{val_name}: {val_data}</li>")
+                    html_parts.append("</ul>")
 
-            html.append("</div>")  # Close test
-        html.append("</div>")  # Close unit-test
+            html_parts.append("</div>")  # End test
+        html_parts.append("</div>")  # End unit-test
+    html_parts.append("</body>")
+    html_parts.append("</html>")
 
     # ----------------------------
-    # Close and write HTML file
+    # Write the HTML report to file
     # ----------------------------
-    html.append("</body></html>")
     with open(filename, "w", encoding="utf-8") as f:
-        f.write("\n".join(html))
-
+        f.write("\n".join(html_parts))
     print(f"✅ HTML report saved to '{filename}'")
-
-
 
 
 
@@ -211,8 +283,13 @@ if __name__ == "__main__":
                         {'sub-test': 'Voltage Drop Analysis - Pin Eta', 'pass': False, 'values': [{'name': 'Voltage', 'value': [random.uniform(1.0, 2.0) for _ in range(100)]}]},
                     ]
                 },
+                'Current Evaluation': {
+                    'results': [          # CASE: [x, y] pairs for x-y plot with axis labels and a single value
+                        {'sub-test': 'Current Over Time', 'pass': True, 'values': [{'name': 'Current', 'value': [[x, random.uniform(0.0, 5.0)] for x in range(100, 10100, 100)]}, {'name': 'axis_label', 'value': {'x-label': 'Time (s)', 'y-label': 'Current (A)'}},  {'name': 'Avg Current (A)', 'value': 42}]},
+                    ]
+                },
             }
-        },
+        },   
         'Signal Calibration Tests': {
             'tests': {
                 'Frequency Accuracy Check': {
@@ -224,6 +301,15 @@ if __name__ == "__main__":
                 'Signal Integrity Test': {
                     'results': [
                         {'sub-test': 'Signal Noise Test - Channel Kappa', 'pass': True, 'values': [{'name': 'Noise Level', 'value': 0.05}]},
+                                        # CASE: path to image plot
+                        {'sub-test': 'Signal Distortion - Channel Lambda', 'pass': False, 'values': [{'name': 'Signal Distortion', 'value': "C:\\Users\\demet\\Documents\\WEST-Lab-Capstone\\Code\\UserScripts\\img_matplotlib_plotting4.png"}]},
+                    ]
+                },
+                'Test Evaluation': {
+                    'results': [         # CASE: [x, y] pairs for x-y plot but no axis labels
+                        {'sub-test': 'Signal B Over Time', 'pass': False, 'values': [{'name': 'Signal B', 'value': [[x, random.uniform(0.0, 5.0)] for x in range(100, 10100, 100)]}]},
+                                        # CASE: invalid path to image plot
+                        {'sub-test': 'Signal C Distortion', 'pass': False, 'values': [{'name': 'Signal C Distortion', 'value': "C:\\Users\\demet\\Documents\\WEST-Lab-Capstone\\Code\\UserScripts\\no_image_here.png"}]},
                     ]
                 },
             }
@@ -231,4 +317,4 @@ if __name__ == "__main__":
     }
     html_report = generate_html_report(sample_results)
 
-    print("HTML report generated and saved to 'test_results_report.html'.")  # No sub-tests, considered as failed.
+    print("HTML report generated and saved to 'test_results_report.html'.")
