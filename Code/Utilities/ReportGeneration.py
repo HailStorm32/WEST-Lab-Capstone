@@ -310,7 +310,9 @@ def generate_html_report(test_results, filename="test_results_report.html"):
 
 
 
-
+##########
+# For testing purposes only
+# Remove or comment out once development is complete
 if __name__ == "__main__":
     import random
     # Sample test results 
@@ -345,8 +347,16 @@ if __name__ == "__main__":
                     ]
                 },
                 'Current Evaluation': {
-                    'results': [          # CASE: [x, y] pairs for x-y plot with axis labels and a single value
-                        {'sub-test': 'Current Over Time', 'pass': True, 'values': [{'name': 'Current', 'value': [[x, random.uniform(0.0, 5.0)] for x in range(100, 10100, 100)]}, {'name': 'axis_label', 'value': {'x-label': 'Time (s)', 'y-label': 'Current (A)'}},  {'name': 'Avg Current (A)', 'value': 42}]},
+                    'results': [          
+                        {  # CASE: [x, y] pairs for x-y plot with axis labels and a single value
+                            'sub-test': 'Current Over Time', 
+                            'pass': True, 
+                            'values': [
+                                {'name': 'Current', 'value': [[x, random.uniform(0.0, 5.0)] for x in range(100, 10100, 100)]}, 
+                                {'name': 'axis_label', 'value': {'x-label': 'Time (s)', 'y-label': 'Current (A)'}},  
+                                {'name': 'Avg Current (A)', 'value': 42}
+                            ]
+                        },
                     ]
                 },
             }
@@ -356,8 +366,17 @@ if __name__ == "__main__":
                 'Frequency Accuracy Check': {
                     'results': [
                         {'sub-test': 'Frequency Calibration - Channel Theta', 'pass': True, 'values': [{'name': 'Frequency', 'value': 50.1}]},
-                                # CASE: two [x,y] pair plots with axis labels
-                        {'sub-test': 'Frequency Calibration - Channel Iota', 'pass': True, 'values': [{'name': 'Frequency', 'value': [[x, random.uniform(0.0, 100.0)] for x in range(100, 10100, 100)]}, {'name': 'axis_label', 'value': {'x-label': 'Time (s)', 'y-label': 'Frequency (Hz)'}}, {'name': 'Not Frequency', 'value': [[x, random.uniform(0.0, 100.0)] for x in range(0, 101)]}, {'name': 'axis_label', 'value': {'x-label': 'Not Time (s)', 'y-label': 'Not Frequency (Hz)'}}]},
+                                
+                        {    # CASE: two [x,y] pair plots with axis labels
+                            'sub-test': 'Frequency Calibration - Channel Iota',
+                            'pass': True,
+                            'values': [
+                                {'name': 'Frequency', 'value': [[x, random.uniform(0.0, 100.0)] for x in range(100, 10100, 100)]},
+                                {'name': 'axis_label', 'value': {'x-label': 'Time (s)', 'y-label': 'Frequency (Hz)'}},
+                                {'name': 'Not Frequency','value': [[x, random.uniform(0.0, 100.0)] for x in range(0, 101)] },
+                                {'name': 'axis_label', 'value': {'x-label': 'Not Time (s)', 'y-label': 'Not Frequency (Hz)'}}
+                            ]
+                        },
                     ]
                 },
                 'Signal Integrity Test': {
