@@ -111,7 +111,7 @@ value list is formatted as:
     # Example of a 2D list value (to be used for graphs)
     # Must also contain a dictionary with x and y axis labels
     {'name': 'value_name4', 'value': [[1,3], [1,2]}]},  # Example of a 2D list value
-    {'name': 'axis_label', 'value': {'x-label': 'x axis name', 'y-label': 'y axis name'}},  # Example of a dictionary value
+    {'name': 'axis_labels', 'value': {'x-label': 'x axis name', 'y-label': 'y axis name'}},  # Example of a dictionary value
 
     # Example of a path to a graph image
     {'name': 'value_name5', 'value': "path/to/graph.png"},  # Example of path to a graph image

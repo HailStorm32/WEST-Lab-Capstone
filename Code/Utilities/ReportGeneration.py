@@ -12,7 +12,7 @@ def generate_html_report(test_results, filename="test_results_report.html"):
       1. Process the list of value objects in order.
       2. If a value qualifies as graphable data (a list of numbers, a list-of-[x,y] pairs, or an image path),
          then generate its graph.
-      3. For list-of-[x,y] pairs, pair the data with the next available axis label object.
+      3. For list-of-[x,y] pairs, pair the data with the next available axis label object (with name "axis_labels").
       4. Display all graphable values (with graphs) first, then the remaining values as plain text.
     
     Args:
@@ -84,7 +84,7 @@ def generate_html_report(test_results, filename="test_results_report.html"):
         
         Cases:
           1. If data_value is graphable numeric data:
-             - For a list-of-[x,y] pairs, use provided axis labels if available, else default to "no label given".
+             - For a list-of-[x,y] pairs, use provided axis labels if available; else, default to "no label given".
              - For a simple list of numbers, use default labels "Index" and "Value".
           2. If data_value is a string that looks like an image path, verify that the file exists and embed the image.
           3. Otherwise, return the text representation of data_value.
@@ -116,7 +116,7 @@ def generate_html_report(test_results, filename="test_results_report.html"):
                 print(f"Image path not valid: {data_value}")
                 return f"<br><span class='failed'>Image path not valid: {data_value}</span>"
         
-        # Case 3: Not graphable data; display as text.
+        # Case 3: Not graphable; return text.
         else:
             return f"<br>{data_value}"
     
@@ -125,12 +125,13 @@ def generate_html_report(test_results, filename="test_results_report.html"):
         Process the list of value_objects from a sub-test.
         
         Returns two lists:
-          - graph_htmls: HTML snippets for each graphable value.
+          - graph_htmls: HTML snippets for each generated graph.
           - other_htmls: HTML snippets for non-graphable values.
         
         Flow:
           - Iterate through value_objects in order.
-          - For a value object with graphable list-of-[x,y] data, look ahead to pair it with the next axis label object.
+          - For a value object with graphable list-of-[x,y] data, look ahead for the next axis label object
+            (with name "axis_labels") to pair with it.
           - Process simple graphable data or image paths immediately.
           - Non-graphable values are collected as plain text.
         """
@@ -144,26 +145,26 @@ def generate_html_report(test_results, filename="test_results_report.html"):
                 index += 1
                 continue
 
-            value_object = value_objects[index]
-            value_name = value_object.get("name", "Value")
-            data_value = value_object.get("value", "")
+            current_value_object = value_objects[index]
+            value_name = current_value_object.get("name", "Value")
+            data_value = current_value_object.get("value", "")
             
-            # If this object is an axis label not paired, add it as text.
-            if value_name == "axis_label" and isinstance(data_value, dict):
+            # If this object is an axis label (with name "axis_labels") not paired, add as text.
+            if value_name == "axis_labels" and isinstance(data_value, dict):
                 other_htmls.append(f"<li>{value_name}: {data_value}</li>")
                 index += 1
                 continue
             
-            # If data_value qualifies as graphable (or is an image path).
+            # If data_value qualifies as graphable or is an image path.
             if is_graph_data(data_value) or (isinstance(data_value, str) and is_image_path(data_value)):
                 # For list-of-[x,y] pairs, look ahead for the next axis label object.
                 if isinstance(data_value, list) and data_value and isinstance(data_value[0], list) and len(data_value[0]) == 2:
                     paired_axis_labels = None
                     lookahead_index = index + 1
                     while lookahead_index < len(value_objects):
-                        candidate = value_objects[lookahead_index]
-                        if candidate.get("name") == "axis_label" and isinstance(candidate.get("value"), dict):
-                            paired_axis_labels = candidate.get("value")
+                        candidate_object = value_objects[lookahead_index]
+                        if candidate_object.get("name") == "axis_labels" and isinstance(candidate_object.get("value"), dict):
+                            paired_axis_labels = candidate_object.get("value")
                             used_indices.add(lookahead_index)
                             break
                         lookahead_index += 1
@@ -178,7 +179,7 @@ def generate_html_report(test_results, filename="test_results_report.html"):
                                                      x_axis_label=x_axis_label, y_axis_label=y_axis_label)
                     graph_htmls.append(f"<li>{value_name}:{graph_html}</li>")
                 else:
-                    # For simple lists of numbers or image paths.
+                    # Process simple lists of numbers or image paths.
                     graph_html = generate_graph_html(data_value, title=value_name)
                     graph_htmls.append(f"<li>{value_name}:{graph_html}</li>")
             else:
@@ -231,8 +232,8 @@ def generate_html_report(test_results, filename="test_results_report.html"):
         Return True if every test in the unit has non-empty results and all its sub-tests pass.
         """
         for test_data in tests.values():
-            results = test_data.get("results", [])
-            if not results or not all(sub_test.get("pass", False) for sub_test in results):
+            sub_test_results = test_data.get("results", [])
+            if not sub_test_results or not all(sub_test.get("pass", False) for sub_test in sub_test_results):
                 return False
         return True
 
@@ -284,7 +285,7 @@ def generate_html_report(test_results, filename="test_results_report.html"):
                 sub_test_class = "passed" if sub_test_pass else "failed"
                 html_parts.append(f"<div class='sub-test'><strong>{sub_test_name}</strong>: <span class='{sub_test_class}'>{sub_test_status}</span></div>")
     
-                # Process the values for the current sub-test.
+                # Process values for the sub-test.
                 value_objects = sub_test.get("values", [])
                 graph_html_snippets, other_html_snippets = process_sub_test_values(value_objects)
     
@@ -353,7 +354,7 @@ if __name__ == "__main__":
                             'pass': True, 
                             'values': [
                                 {'name': 'Current', 'value': [[x, random.uniform(0.0, 5.0)] for x in range(100, 10100, 100)]}, 
-                                {'name': 'axis_label', 'value': {'x-label': 'Time (s)', 'y-label': 'Current (A)'}},  
+                                {'name': 'axis_labels', 'value': {'x-label': 'Time (s)', 'y-label': 'Current (A)'}},  
                                 {'name': 'Avg Current (A)', 'value': 42}
                             ]
                         },
@@ -372,9 +373,9 @@ if __name__ == "__main__":
                             'pass': True,
                             'values': [
                                 {'name': 'Frequency', 'value': [[x, random.uniform(0.0, 100.0)] for x in range(100, 10100, 100)]},
-                                {'name': 'axis_label', 'value': {'x-label': 'Time (s)', 'y-label': 'Frequency (Hz)'}},
+                                {'name': 'axis_labels', 'value': {'x-label': 'Time (s)', 'y-label': 'Frequency (Hz)'}},
                                 {'name': 'Not Frequency','value': [[x, random.uniform(0.0, 100.0)] for x in range(0, 101)] },
-                                {'name': 'axis_label', 'value': {'x-label': 'Not Time (s)', 'y-label': 'Not Frequency (Hz)'}}
+                                {'name': 'axis_labels', 'value': {'x-label': 'Not Time (s)', 'y-label': 'Not Frequency (Hz)'}}
                             ]
                         },
                     ]
