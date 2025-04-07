@@ -1,18 +1,10 @@
 '''
-Alex Jain - March 31st, 2025
+Alex Jain - April 7th, 2025
 
 Records voltage/current values.
 Calculates results & displays them.
 
-To do:
-- Combine functions to be two functions that can be called
-- One function should be called to start joulescope and have it running
-ie run()
-- One function should be called to stop joulescope and calc/display results
-Combine joulescope_results with stop.device()
-- Check if printed results actually prints the raw data.
-
-Version: 1.5.1
+Version: 1.5.3
 '''
 
 # Import the necessary modules.
@@ -64,8 +56,45 @@ def power_cycle():
     print("Turning on USB Port 3")
     subprocess.run([ykushcmd_path, "-u", "3"], shell=True)
 
-# Function to calculate average, min/max from recorded values
-def joulescope_results(file_path):
+# Function to handle device operations
+def device_operations():
+    global device
+    # Get all Joulescope devices or fail if none are found
+    devices = joulescope.scan(config='off')
+    if not len(devices):
+        print('No Joulescope device found')
+        return
+
+    device = devices[0]  # Hack taken from Joulescope example script
+    device.open()
+    device.statistics_callback_register(statistics_callback_log, 'sensor')
+
+    # Set default parameters
+    device.parameter_set('reduction_frequency', 1)
+    device.parameter_set('sampling_frequency', 2000000)
+    device.parameter_set('i_range', 'auto')
+    device.parameter_set('v_range', '15V')
+
+    print("Device is now collecting data...")
+
+    try:
+        # Keep the device running until the stop event is set
+        while not stop_event.is_set():
+            time.sleep(1)
+    finally:
+        device.close()
+        print("Device closed.")
+
+# Function to stop the device & process the results.
+def stop_joulescope(file_path):
+    """
+    Stops the device and processes the results from the specified CSV file.
+    """
+    # Signal the stop event and wait for the thread to finish
+    stop_event.set()
+    device_thread.join()
+
+    # Process the results
     try:
         with open(file_path, "r") as csvfile:
             reader = csv.reader(csvfile)
@@ -110,12 +139,12 @@ def joulescope_results(file_path):
 
             # Format Results
             results = [
-                { 'test': 'voltage_avg', 'pass': None, 'value': {voltage_avg} },
-                { 'test': 'voltage_min', 'pass': None, 'value': {voltage_min} },
-                { 'test': 'voltage_max', 'pass': None, 'value': {voltage_max} },
-                { 'test': 'current_avg', 'pass': None, 'value': {current_avg} },
-                { 'test': 'current_min', 'pass': None, 'value': {current_min} },
-                { 'test': 'current_max', 'pass': None, 'value': {current_max} },
+                { 'test': 'voltage_avg', 'pass': None, 'value': f"{voltage_avg:.3f}" },
+                { 'test': 'voltage_min', 'pass': None, 'value': f"{voltage_min:.3f}" },
+                { 'test': 'voltage_max', 'pass': None, 'value': f"{voltage_max:.3f}" },
+                { 'test': 'current_avg', 'pass': None, 'value': f"{current_avg:.9f}" },
+                { 'test': 'current_min', 'pass': None, 'value': f"{current_min:.9f}" },
+                { 'test': 'current_max', 'pass': None, 'value': f"{current_max:.9f}" },
             ]
 
             # Print the results
@@ -125,68 +154,23 @@ def joulescope_results(file_path):
     except Exception as e:
         print(f"Error reading file: {e}")
 
-# Function to handle device operations
-def device_operations():
-    global device
-    # Get all Joulescope devices or fail if none are found
-    devices = joulescope.scan(config='off')
-    if not len(devices):
-        print('No Joulescope device found')
-        return
-
-    device = devices[0]  # Hack taken from Joulescope example script
-    device.open()
-    device.statistics_callback_register(statistics_callback_log, 'sensor')
-
-    # Set default parameters
-    device.parameter_set('reduction_frequency', 1)
-    device.parameter_set('sampling_frequency', 2000000)
-    device.parameter_set('i_range', 'auto')
-    device.parameter_set('v_range', '15V')
-
-    print("Device is now collecting data...")
-
-    try:
-        # Keep the device running until the stop event is set
-        while not stop_event.is_set():
-            time.sleep(1)
-    finally:
-        device.close()
-        print("Device closed.")
-
-# Function to stop the device
-def stop_device():
-    # Signal the stop event and wait for the thread to finish
-    stop_event.set()
-    device_thread.join()
-
 # Run (Main) Function that runs both power cycle and Joulescope functions.
 def run():
-    # Print working directory (debugging purposes)
     print(f"Current working directory: {os.getcwd()}")
 
-    # Call Power cycle function - user input to determine Yes/No.
-    print("\nPower Cycle? [Y/N]")
-    userchoice = input("Enter choice: ")
-
-    if userchoice == 'Y' or userchoice == 'y':
-        print("Power cycling device...")
-        power_cycle()
-    else:
-        print("Not power cycling device...")
-        sys.exit(1)
+    power_cycle()  # Power Cycle the Yepkit hub
 
     # Start the device operations in a separate thread
     global device_thread
     device_thread = threading.Thread(target=device_operations)
     device_thread.start()
 
-    # Wait for user input to stop the device
-    input("Press Enter to stop the device and calculate results...")
+    # Wait for the stop_event to be set
+    print("Waiting for stop event...")
+    stop_event.wait()  # Blocks until stop_event is set
 
     # Stop the device and get results
-    stop_device()
-    joulescope_results("joulescope_data.csv")
+    stop_joulescope("joulescope_data.csv")
 
 if __name__ == '__main__':
     run()
