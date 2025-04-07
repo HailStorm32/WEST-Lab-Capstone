@@ -2,7 +2,7 @@
 Alex Jain - April 7th, 2025
 
 Simple validation script to check if 
-powertest1g.py operates correctly.
+joulescopetest.py operates correctly.
 
 Version: 1.0
 '''
