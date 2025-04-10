@@ -48,6 +48,21 @@ def stub_self_check():
 def stub_start_power_monitor():
     pass
 
+def stub_get_radio_results():
+    # Simulate random radio communication results
+    return [
+        {'sub-test': 'Radio TX', 'pass': random.choice([True, False]), 'values': [{'name': 'tx_power', 'value': random.uniform(-30, 0)}]},
+        {'sub-test': 'Radio RX', 'pass': random.choice([True, False]), 'values': [{'name': 'rx_signal_strength', 'value': random.uniform(-100, -30)}]},
+        {   'sub-test': 'Signal Over Time', 
+            'pass': True, 
+            'values': [
+                {'name': 'Signal', 'value': [[x, random.uniform(0.0, 5.0)] for x in range(100, 10100, 100)]}, 
+                {'name': 'axis_labels', 'value': {'x-label': 'Time (s)', 'y-label': 'signal (dB)'}},  
+                {'name': 'Avg dB (dB)', 'value': 42}
+            ]
+        }
+    ]
+
 def stub_stop_power_monitor():
     # Simulate random power monitoring data
     return [
@@ -240,6 +255,15 @@ if __name__ == '__main__':
         elif test_name == 'Analog validation':
             # Run the test
             results_handle.extend(test_info['function'](ad_handle, pico_serial))
+
+        elif test_name == 'Radio communication':
+            # Run the test
+            test_info['function']()
+            
+            # Wait for SCuM to finish
+            wait_for_trigger(dd_handle)
+
+            results_handle.extend(stub_get_radio_results()) # TODO: Replace with actual function
 
         else:
             # Run the test
