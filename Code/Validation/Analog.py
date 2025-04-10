@@ -368,7 +368,7 @@ def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample
         return weighted_freq_avg
 
 
-def validate_analog_signals(pico_serial):
+def validate_analog_signals(device_data, pico_serial):
     '''
     Validate the analog signals
     This function validates the following signals:
@@ -376,6 +376,7 @@ def validate_analog_signals(pico_serial):
     - 1.8V reference voltage
     - Clock signals
     Parameters:
+        device_data (obj): The device data object
         pico_serial (obj): The serial object for the pico device
     Returns:
         test_results (list): List of dictionaries containing test results for each signal
@@ -385,14 +386,6 @@ def validate_analog_signals(pico_serial):
         { 'sub-test': '1.1V reference voltage', 'pass': False, 'values': [] },
         { 'sub-test': '1.8V reference voltage', 'pass': False, 'values': [] },
     ]
-
-    # Open the device
-    try:    
-        device_data = WF_SDK.device.open("analogdiscovery2")
-    except Exception as e:
-        print("Error: " + str(e))
-        return test_results # return the test results (all failed)
-
 
     # Switch scope channels to voltage references
     stub_send_command_to_pico(pico_serial) #TODO: Replace stub
@@ -476,9 +469,6 @@ def validate_analog_signals(pico_serial):
                     {'name': 'ppm', 'value': ppm}
                 ]
             })
-
-    # close the device
-    WF_SDK.device.close(device_data)
 
     return test_results
 

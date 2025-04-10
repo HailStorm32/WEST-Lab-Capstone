@@ -52,7 +52,4 @@ GIT_BINARY_PATHS = [
 ########################
 # Logic (DO NOT EDIT)
 ########################
-if AD2_FOR_DIGITAL:
-    DIGITAL_DEVICE = "analogdiscovery2"
-else:
-    DIGITAL_DEVICE = "Digital Discovery"
+#nothing here for now

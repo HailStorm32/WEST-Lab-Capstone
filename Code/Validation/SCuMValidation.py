@@ -61,6 +61,19 @@ def stub_send_command_to_pico(pico_serial=None, command=None):
 
 def stub_connect_to_pico(port=None, baudrate=115200, timeout=1):
     return 42  # Placeholder for actual connection handle
+######################################################################################
+
+
+def wait_for_trigger(device_handle):
+    '''
+    Wait for a trigger pulse on the specified pin
+    '''
+    # Wait for trigger pulse
+    WF_SDK.logic.trigger(device_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
+    WF_SDK.logic.record(device_handle, channel=TRIGGER_PIN_NUM)
+
+    # Close locic analyzer
+    WF_SDK.logic.close(device_handle)
 
 binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin'))
 
@@ -157,6 +170,25 @@ if __name__ == '__main__':
         ReportGeneration.generate_html_report(test_results)
         sys.exit(1)
 
+    # Connect to the Digital Discovery device
+    if not AD2_FOR_DIGITAL:
+        try:    
+            dd_handle = WF_SDK.device.open("Digital Discovery")
+        except Exception as e:
+            print("Error: " + str(e))
+            sys.exit(1)
+
+    # Connect to Analog Discovery 2
+    try:
+        ad_handle = WF_SDK.device.open("analogdiscovery2")
+    except Exception as e:
+        print("Error: " + str(e))
+        sys.exit(1)
+
+    if AD2_FOR_DIGITAL:
+        # Use AD2 for digital testing
+        dd_handle = ad_handle
+
     # Startup the joule scope monitoring thread
     stub_start_power_monitor() # TODO: Replace with actual function
 
@@ -192,41 +224,22 @@ if __name__ == '__main__':
         if test_info['independent']:
             continue
 
-        '''
-        Open Digital Discovery
-
-        TODO: Instantiate all device handles at the beginning and pass them in as arguments
-            This way we can avoid opening and closing the device for each test
-        '''
-        try:    
-            dd_handle = WF_SDK.device.open(DIGITAL_DEVICE)
-        except Exception as e:
-            print("Error: " + str(e))
-            sys.exit(1)
-
         print("Waiting for trigger pulse...")
-
-        # Wait for trigger pulse
-        WF_SDK.logic.trigger(dd_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
-        WF_SDK.logic.record(dd_handle, channel=TRIGGER_PIN_NUM)
+        wait_for_trigger(dd_handle)
 
         # Declare the test being run
         print(f"Running test: {test_name}")
-
-        # Close our device handle
-        WF_SDK.logic.close(dd_handle)
-        WF_SDK.device.close(dd_handle) # TODO: Remove this line once we have a better way to handle device handles
 
         # Create handle to test's results structure
         results_handle = test_results[first_unit_test_name]['tests'][test_name]['results']
 
         if test_name == 'Digital input/output':
             # Run the test
-            results_handle.extend(test_info['function'](TRIGGER_PIN_NUM))
+            results_handle.extend(test_info['function'](dd_handle, TRIGGER_PIN_NUM))
 
         elif test_name == 'Analog validation':
             # Run the test
-            results_handle.extend(test_info['function'](pico_serial))
+            results_handle.extend(test_info['function'](ad_handle, pico_serial))
 
         else:
             # Run the test
@@ -244,6 +257,13 @@ if __name__ == '__main__':
     results_handle.extend(stub_stop_power_monitor()) # TODO: Replace with actual function
 
     ReportGeneration.generate_html_report(test_results)
+
+    # Disconnect from Digilent devices
+    if AD2_FOR_DIGITAL:
+        WF_SDK.device.close(dd_handle)
+    else:
+        WF_SDK.device.close(dd_handle)
+        WF_SDK.device.close(ad_handle)
 
     # Temporary print results
     print("\nTest Results:")
