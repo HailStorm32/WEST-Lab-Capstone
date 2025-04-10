@@ -12,6 +12,8 @@ AD2_FOR_DIGITAL = False # Set to True if using Analog Discovery 2 in place of th
 
 TRIGGER_PIN_NUM = 0  # DIO pin on AD2/DD used for the trigger pin
 
+PICO_COM_PORT = "COM7"  # COM port for the PICO board for flashing and testing
+
 ########################
 # SCuM Configuration
 ########################

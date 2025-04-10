@@ -56,6 +56,12 @@ def stub_stop_power_monitor():
         {'sub-test': 'Power', 'pass': random.choice([True, False]), 'values': [{'name': 'power', 'value': random.uniform(0.01, 0.33)}]}
     ]
 
+def stub_send_command_to_pico(pico_serial=None, command=None):
+    pass
+
+def stub_connect_to_pico(port=None, baudrate=115200, timeout=1):
+    return 42  # Placeholder for actual connection handle
+
 binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin'))
 
 # List of tests to be performed
@@ -142,6 +148,15 @@ if __name__ == '__main__':
     else:
         print("Spectrum analyzer self test passed!\n")
 
+    # Connect to the PICO board
+    print("Connecting to PICO board...")
+    pico_serial = stub_connect_to_pico(port=PICO_COM_PORT) # TODO: Replace with actual function
+
+    if pico_serial is None:
+        print("Error: Unable to connect to PICO board!\n Exiting...")
+        ReportGeneration.generate_html_report(test_results)
+        sys.exit(1)
+
     # Startup the joule scope monitoring thread
     stub_start_power_monitor() # TODO: Replace with actual function
 
@@ -205,11 +220,13 @@ if __name__ == '__main__':
         # Create handle to test's results structure
         results_handle = test_results[first_unit_test_name]['tests'][test_name]['results']
 
-        # Handle the Digital input/output test differently 
-        # since it requires we pass in the trigger_dio value
         if test_name == 'Digital input/output':
             # Run the test
             results_handle.extend(test_info['function'](TRIGGER_PIN_NUM))
+
+        elif test_name == 'Analog validation':
+            # Run the test
+            results_handle.extend(test_info['function'](pico_serial))
 
         else:
             # Run the test

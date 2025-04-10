@@ -23,6 +23,9 @@ import WF_SDK
 from WF_SDK.device import check_error
 from Config import *
 
+def stub_send_command_to_pico(pico_serial=None, command=None):
+    pass
+
 ##################
 # Stuff for interfacing with the Digilent WaveForms SDK
 ##################
@@ -365,7 +368,7 @@ def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample
         return weighted_freq_avg
 
 
-def validate_analog_signals():
+def validate_analog_signals(pico_serial):
     '''
     Validate the analog signals
     This function validates the following signals:
@@ -373,7 +376,7 @@ def validate_analog_signals():
     - 1.8V reference voltage
     - Clock signals
     Parameters:
-        None
+        pico_serial (obj): The serial object for the pico device
     Returns:
         test_results (list): List of dictionaries containing test results for each signal
     '''
@@ -389,6 +392,10 @@ def validate_analog_signals():
     except Exception as e:
         print("Error: " + str(e))
         return test_results # return the test results (all failed)
+
+
+    # Switch scope channels to voltage references
+    stub_send_command_to_pico(pico_serial) #TODO: Replace stub
 
 
     #############################
@@ -427,18 +434,18 @@ def validate_analog_signals():
             {'name': 'measured_voltage', 'value': None}
         ]
 
-
     #############################
     # Clock Validation
     #############################
 
     for clock in CLOCKS_TO_TEST:
+        # Switch mux to the clock signal
+        stub_send_command_to_pico() #TODO: Replace stub
+
         print(f"Validating {clock['name']} clock signal...")
 
         if DEBUG:
             WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=clock['exp_freq_hz'], amplitude=2)
-
-        # TODO: Send signal to change MUX to clock signal
 
         # Determine the frequency of the signal
         freq = determine_signal_frequency(device_data, channel=1)
