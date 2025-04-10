@@ -182,9 +182,6 @@ def RF_self_test():
         "Bit-Error-Rate (BER):        {:.2f} %".format(ber),
         }
 
-    # Clean up/remove extraneous print statements
-    del sdr_rx
-    del sdr_tx    
     
     if(ber != 0.00):
         value = {'name': 'Bit-Error-Rate', 'value': ber}
@@ -192,7 +189,25 @@ def RF_self_test():
 
         return results
     
+    else:
+        values = {'name': 'Bit-Error-Rate (BER)', 'value': ber},
+        {'name': 'Set Transmission Frequency', 'value': set_freq},
+        {'name': 'Transmitted Peak Frequency', 'value': peak_freq_Tx},
+        {'name': 'Received Peak Frequency', 'value': peak_freq_Rx},
+        {'name': 'Absolute Frequency Offset', 'value': offset},
+        {'name': 'Set Tx Power Gain', 'value': sdr_tx.tx_hardwaregain_chan0},
+        {'name': 'Transmitted Power', 'value': tx_power},
+        {'name': 'Received Power', 'value': rx_power},
+        {'name': 'Absolute Power Offset', 'value': abs_power}
 
+        results = {'sub-test': 'Radio(RF)', 'pass': True, values: []}        
+
+        return results
+    
+    # Clean up/remove extraneous print statements
+    del sdr_rx
+    del sdr_tx    
+    
     return results
 
 
@@ -220,10 +235,6 @@ def RF_SCuM_test(path):
     df = pd.DataFrame(data)
     
     df.to_csv(path)
-    time.sleep(60)
-    
-    
-
     
     # Clean up/remove extraneous print statements
     del sdr_rx
