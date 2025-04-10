@@ -1,0 +1,14 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "e2eb2287-09fd-4633-a53e-81f9021b8393")
+	(paper "A4")
+	(title_block
+		(title "SCuM Observatory")
+		(date "2025-04-10")
+		(rev "2.1")
+		(company "West Lab")
+	)
+	(lib_symbols)
+)
