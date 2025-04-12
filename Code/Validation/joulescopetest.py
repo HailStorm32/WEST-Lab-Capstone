@@ -155,7 +155,7 @@ def stop_joulescope(file_path):
         print(f"Error reading file: {e}")
 
 # Run (Main) Function that runs both power cycle and Joulescope functions.
-def joulescope_run():
+def joulescope_start():
     print(f"Current working directory: {os.getcwd()}")
 
     power_cycle()  # Power Cycle the Yepkit hub
