@@ -10,7 +10,7 @@ Version: 1.0
 ## Import the file.
 import time
 import threading
-from joulescopetest import run, stop_event
+from joulescopetest import joulescope_start, stop_event
 
 def set_stop_event_after_delay(delay):
     """
@@ -31,7 +31,7 @@ def test_joulescope():
         delay_thread.start()
 
         # Call the run function
-        run()
+        joulescope_start()
 
         # Wait for the delay thread to finish
         delay_thread.join()
