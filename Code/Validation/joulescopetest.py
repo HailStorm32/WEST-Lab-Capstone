@@ -165,12 +165,8 @@ def joulescope_start():
     device_thread = threading.Thread(target=device_operations)
     device_thread.start()
 
-    # Wait for the stop_event to be set
-    print("Waiting for stop event...")
-    stop_event.wait()  # Blocks until stop_event is set
-
-    # Stop the device and get results
-    stop_joulescope("joulescope_data.csv")
+    # Print that Joulescope started in another thread.
+    print("Joulescope started...")
 
 if __name__ == '__main__':
     run()
