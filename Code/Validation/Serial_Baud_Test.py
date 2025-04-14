@@ -46,7 +46,7 @@ def test_baud_rate(port, baud_rate):
         return False
     
 def test_baud_rate_read_only(port, baud_rate):
-    msg = b"Hello World!"
+    msg = b"Hello World!" #local serial msg
     try:
         with serial.Serial(port, baud_rate, timeout=1) as ser:
             time.sleep(0.1)  # Allow time for the port to settle
@@ -71,7 +71,7 @@ def find_best_baud_rate(port):
 
     test_results = []
     for baud in COMMON_BAUD_RATES:
-        success = test_baud_rate_read_only(port, baud)
+        success = test_baud_rate(port, baud) #change this function original test or read only
         test_results.append({ 'test': f'{baud}', 'pass': success })
         print(f"{baud} {'True' if success else 'False'}")
 
