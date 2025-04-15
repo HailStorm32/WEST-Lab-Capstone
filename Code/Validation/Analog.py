@@ -388,7 +388,8 @@ def validate_analog_signals(device_data, pico_serial):
     ]
 
     # Switch scope channels to voltage references
-    stub_send_command_to_pico(pico_serial) #TODO: Replace stub
+    stub_send_command_to_pico(pico_serial, "1_19") #Scope 1 to 1.1V reference voltage
+    stub_send_command_to_pico(pico_serial, "0_19") #Scope 2 to 1.8V reference voltage
 
 
     #############################
@@ -433,7 +434,7 @@ def validate_analog_signals(device_data, pico_serial):
 
     for clock in CLOCKS_TO_TEST:
         # Switch mux to the clock signal
-        stub_send_command_to_pico() #TODO: Replace stub
+        stub_send_command_to_pico(pico_serial, clock['mux-command']) 
 
         print(f"Validating {clock['name']} clock signal...")
 
