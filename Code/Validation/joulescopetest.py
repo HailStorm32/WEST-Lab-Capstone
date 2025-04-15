@@ -63,7 +63,7 @@ def device_operations():
     devices = joulescope.scan(config='off')
     if not len(devices):
         print('No Joulescope device found')
-        return
+        sys.exit(1)
 
     device = devices[0]  # Hack taken from Joulescope example script
     device.open()
