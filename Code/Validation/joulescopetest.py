@@ -1,10 +1,10 @@
 '''
-Alex Jain - April 7th, 2025
+Alex Jain - April 14th, 2025
 
 Records voltage/current values.
 Calculates results & displays them.
 
-Version: 1.5.3
+Version: 1.5.4
 '''
 
 # Import the necessary modules.
@@ -137,14 +137,41 @@ def stop_joulescope(file_path):
             current_avg = current_sum / count
             voltage_avg = voltage_sum / count
 
+            # Define the voltage threshold
+            voltage_threshold = 1.1
+
             # Format Results
             results = [
-                { 'test': 'voltage_avg', 'pass': None, 'value': f"{voltage_avg:.3f}" },
-                { 'test': 'voltage_min', 'pass': None, 'value': f"{voltage_min:.3f}" },
-                { 'test': 'voltage_max', 'pass': None, 'value': f"{voltage_max:.3f}" },
-                { 'test': 'current_avg', 'pass': None, 'value': f"{current_avg:.9f}" },
-                { 'test': 'current_min', 'pass': None, 'value': f"{current_min:.9f}" },
-                { 'test': 'current_max', 'pass': None, 'value': f"{current_max:.9f}" },
+                {
+                    'test': 'voltage_avg',
+                    'pass': voltage_avg <= voltage_threshold,
+                    'value': f"{voltage_avg:.3f} V"
+                },
+                {
+                    'test': 'voltage_min',
+                    'pass': voltage_min <= voltage_threshold,
+                    'value': f"{voltage_min:.3f} V"
+                },
+                {
+                    'test': 'voltage_max',
+                    'pass': voltage_max <= voltage_threshold,
+                    'value': f"{voltage_max:.3f} V"
+                },
+                {
+                    'test': 'current_avg',
+                    'pass': None,  # No threshold defined for current
+                    'value': f"{current_avg:.9f} A"
+                },
+                {
+                    'test': 'current_min',
+                    'pass': None,  # No threshold defined for current
+                    'value': f"{current_min:.9f} A"
+                },
+                {
+                    'test': 'current_max',
+                    'pass': None,  # No threshold defined for current
+                    'value': f"{current_max:.9f} A"
+                },
             ]
 
             # Print the results
@@ -169,4 +196,4 @@ def joulescope_start():
     print("Joulescope started...")
 
 if __name__ == '__main__':
-    run()
+    joulescope_start()
