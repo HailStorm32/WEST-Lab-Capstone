@@ -20,6 +20,7 @@ from Config import *
 from Digital import run_logic_analysis
 from Utilities import ReportGeneration
 from scumProgram import scum_program
+from joulescopetest import joulescope_start, stop_joulescope
 
 def clear_terminal():
     '''
@@ -101,7 +102,7 @@ tests = {
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
     'Serial communication':   { 'function': stub_function_call,      'independent': False}, 
-    'Power Consumption':      { 'function': None,                    'independent': True}, 
+    'Power Consumption':      { 'function': stop_joulescope,          'independent': True}, 
 }
 
 # Create test results structure
@@ -205,7 +206,7 @@ if __name__ == '__main__':
         dd_handle = ad_handle
 
     # Startup the joule scope monitoring thread
-    stub_start_power_monitor() # TODO: Replace with actual function
+    joulescope_start()
 
     # Upload the test program to the SCuM chip
     print("Uploading test program to SCuM chip...")
@@ -278,8 +279,11 @@ if __name__ == '__main__':
     # Get handle to Power Consumption's results
     results_handle = test_results[first_unit_test_name]['tests']['Power Consumption']['results']
     
-    results_handle.extend(stub_stop_power_monitor()) # TODO: Replace with actual function
+    # Stop the joule scope monitoring and get the results
+    results_handle.extend(tests['Power Consumption']['function']())
 
+    # Generate the HTML report
+    print("Generating HTML report...")
     ReportGeneration.generate_html_report(test_results)
 
     # Disconnect from Digilent devices
