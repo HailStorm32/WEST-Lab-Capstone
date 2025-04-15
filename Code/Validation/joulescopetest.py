@@ -47,7 +47,7 @@ def power_cycle():
     ykushcmd_path = "C:\\Program Files (x86)\\YEPKIT LDA\\ykushcmd\\ykushcmd.exe"
     if not os.path.exists(ykushcmd_path):
         print(f"ykushcmd.exe not found: {ykushcmd_path}")
-        return
+        sys.exit(1)
     
     # Power Cycle USB Downstream Port 3 (Nordic/SCuM).
     print("Turning off USB Port 3")
