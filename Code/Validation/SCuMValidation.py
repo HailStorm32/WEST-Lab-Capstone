@@ -72,9 +72,6 @@ def stub_stop_power_monitor():
         {'sub-test': 'Power', 'pass': random.choice([True, False]), 'values': [{'name': 'power', 'value': random.uniform(0.01, 0.33)}]}
     ]
 
-def stub_send_command_to_pico(pico_serial=None, command=None):
-    pass
-
 def stub_connect_to_pico(port=None, baudrate=115200, timeout=1):
     return 42  # Placeholder for actual connection handle
 ######################################################################################
