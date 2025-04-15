@@ -77,14 +77,6 @@ def device_operations():
 
     print("Device is now collecting data...")
 
-    try:
-        # Keep the device running until the stop event is set
-        while not stop_event.is_set():
-            time.sleep(1)
-    finally:
-        device.close()
-        print("Device closed.")
-
 # Function to stop the device & process the results.
 def stop_joulescope(file_path):
     """
