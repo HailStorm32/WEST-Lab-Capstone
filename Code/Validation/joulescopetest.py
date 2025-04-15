@@ -75,7 +75,7 @@ def device_operations():
     device.parameter_set('i_range', 'auto')
     device.parameter_set('v_range', '15V')
 
-    print("Device is now collecting data...")
+    print("Joulescope is now collecting data...")
 
 # Function to stop the device & process the results.
 def stop_joulescope(file_path):
