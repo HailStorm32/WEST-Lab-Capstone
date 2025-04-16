@@ -19,6 +19,7 @@ from Analog import validate_analog_signals
 from Config import *
 from Digital import run_logic_analysis
 from Utilities import ReportGeneration
+from Utilities.picoControl import connect_to_pico
 from scumProgram import scum_program
 from joulescopetest import joulescope_start, stop_joulescope
 
@@ -71,9 +72,6 @@ def stub_stop_power_monitor():
         {'sub-test': 'Current', 'pass': random.choice([True, False]), 'values': [{'name': 'current', 'value': random.uniform(0.01, 0.1)}]},
         {'sub-test': 'Power', 'pass': random.choice([True, False]), 'values': [{'name': 'power', 'value': random.uniform(0.01, 0.33)}]}
     ]
-
-def stub_connect_to_pico(port=None, baudrate=115200, timeout=1):
-    return 42  # Placeholder for actual connection handle
 ######################################################################################
 
 
@@ -99,7 +97,7 @@ tests = {
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
     'Serial communication':   { 'function': stub_function_call,      'independent': False}, 
-    'Power Consumption':      { 'function': stop_joulescope,          'independent': True}, 
+    'Power Consumption':      { 'function': stop_joulescope,         'independent': True}, 
 }
 
 # Create test results structure
@@ -176,7 +174,7 @@ if __name__ == '__main__':
 
     # Connect to the PICO board
     print("Connecting to PICO board...")
-    pico_serial = stub_connect_to_pico(port=PICO_COM_PORT) # TODO: Replace with actual function
+    pico_serial = connect_to_pico(port=PICO_COM_PORT)
 
     if pico_serial is None:
         print("Error: Unable to connect to PICO board!\n Exiting...")

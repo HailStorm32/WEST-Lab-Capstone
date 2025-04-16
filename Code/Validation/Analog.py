@@ -21,10 +21,8 @@ from ctypes import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 import WF_SDK
 from WF_SDK.device import check_error
+from Utilities.picoControl import send_command_to_pico
 from Config import *
-
-def stub_send_command_to_pico(pico_serial=None, command=None):
-    pass
 
 ##################
 # Stuff for interfacing with the Digilent WaveForms SDK
@@ -388,8 +386,8 @@ def validate_analog_signals(device_data, pico_serial):
     ]
 
     # Switch scope channels to voltage references
-    stub_send_command_to_pico(pico_serial, "1_19") #Scope 1 to 1.1V reference voltage
-    stub_send_command_to_pico(pico_serial, "0_19") #Scope 2 to 1.8V reference voltage
+    send_command_to_pico(pico_serial, "1_19") #Scope 1 to 1.1V reference voltage
+    send_command_to_pico(pico_serial, "0_19") #Scope 2 to 1.8V reference voltage
 
 
     #############################
@@ -434,7 +432,7 @@ def validate_analog_signals(device_data, pico_serial):
 
     for clock in CLOCKS_TO_TEST:
         # Switch mux to the clock signal
-        stub_send_command_to_pico(pico_serial, clock['mux-command']) 
+        send_command_to_pico(pico_serial, clock['mux-command']) 
 
         print(f"Validating {clock['name']} clock signal...")
 
