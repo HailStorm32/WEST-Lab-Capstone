@@ -1,10 +1,10 @@
 '''
-Alex Jain - April 14th, 2025
+Alex Jain - April 16th, 2025
 
 Records voltage/current values.
 Calculates results & displays them.
 
-Version: 1.5.4
+Version: 1.5.7
 '''
 
 # Import the necessary modules.
@@ -47,35 +47,46 @@ def power_cycle():
     ykushcmd_path = "C:\\Program Files (x86)\\YEPKIT LDA\\ykushcmd\\ykushcmd.exe"
     if not os.path.exists(ykushcmd_path):
         print(f"ykushcmd.exe not found: {ykushcmd_path}")
-        sys.exit(1)
+        return None # Return None to propagate error(s) to caller.
     
-    # Power Cycle USB Downstream Port 3 (Nordic/SCuM).
-    print("Turning off USB Port 3")
-    subprocess.run([ykushcmd_path, "-d", "3"], shell=True)
-    time.sleep(5)
-    print("Turning on USB Port 3")
-    subprocess.run([ykushcmd_path, "-u", "3"], shell=True)
-
-# Function to handle device operations
+    try:
+        # Power Cycle USB Downstream Port 1 (Nordic/SCuM).
+        print("Turning off USB Port 1")
+        subprocess.run([ykushcmd_path, "-d", "1"], shell=True)
+        time.sleep(5) # Blocking call to ensure it properly power cycles.
+        print("Turning on USB Port 1")
+        subprocess.run([ykushcmd_path, "-u", "1"], shell=True)
+    except Exception as e:
+        print(f"Error during power cycle: {e}")
+        return None # Return None to propagate error(s) to caller.
+    
+    return True # Return True to indicate power cycle success.
+    
+# Function to handle joulescope device operations.
 def device_operations():
     global device
     # Get all Joulescope devices or fail if none are found
     devices = joulescope.scan(config='off')
     if not len(devices):
         print('No Joulescope device found')
-        sys.exit(1)
+        return None # Return None to propagate errors to caller.
+    
+    try:
+        device = devices[0] # Hack from Joulescope example script.
+        device.open()
+        device.statistics_callback_register(statistics_callback_log, 'sensor')
 
-    device = devices[0]  # Hack taken from Joulescope example script
-    device.open()
-    device.statistics_callback_register(statistics_callback_log, 'sensor')
+        # Set default parameters
+        device.parameter_set('reduction_frequency', 1)
+        device.parameter_set('sampling_frequency', 2000000)
+        device.parameter_set('i_range', 'auto')
+        device.parameter_set('v_range', '15V')
 
-    # Set default parameters
-    device.parameter_set('reduction_frequency', 1)
-    device.parameter_set('sampling_frequency', 2000000)
-    device.parameter_set('i_range', 'auto')
-    device.parameter_set('v_range', '15V')
-
-    print("Joulescope is now collecting data...")
+        print("Joulescope set up and collecting data...")
+        return True # Return True to indicate device operation success.
+    except Exception as e:
+        print(f"Error during device operations: {e}")
+        return None # Return None to propagate error(s) to caller.
 
 # Function to stop the device & process the results.
 def stop_joulescope(file_path):
@@ -123,7 +134,7 @@ def stop_joulescope(file_path):
 
             if count == 0:
                 print("No valid data found in the file.")
-                return
+                return None # Return None to propagate error(s) to caller.
 
             # Calculate averages
             current_avg = current_sum / count
@@ -166,18 +177,24 @@ def stop_joulescope(file_path):
                 },
             ]
 
-            # Print the results
-            for result in results:
-                print(result)
-
+            return results # Return the results on success.
+        
     except Exception as e:
-        print(f"Error reading file: {e}")
+            print(f"Error reading file: {e}")
+            return [
+                {
+                    'Test': 'Joulescope Error',
+                    'Pass': False,
+                    'Value': str(e)
+                }
+            ] # Return if error on failure.
 
 # Run (Main) Function that runs both power cycle and Joulescope functions.
 def joulescope_start():
     print(f"Current working directory: {os.getcwd()}")
 
-    power_cycle()  # Power Cycle the Yepkit hub
+    if power_cycle() is None:
+        return False # Return false if power cycle has failed.
 
     # Start the device operations in a separate thread
     global device_thread
@@ -186,6 +203,7 @@ def joulescope_start():
 
     # Print that Joulescope started in another thread.
     print("Joulescope started...")
+    return True # Return True to indicate success.
 
 if __name__ == '__main__':
     joulescope_start()
