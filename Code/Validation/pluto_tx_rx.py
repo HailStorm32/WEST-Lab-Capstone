@@ -1,9 +1,11 @@
 import numpy as np
 import adi 
 import matplotlib.pyplot as plt
-import csv
 import time
 import pandas as pd
+import datetime 
+import os
+
 
 # Variable declarations
 sr = 1e6 # Sample rate
@@ -12,12 +14,15 @@ samples = 1000
 num_symbols = 1000
 samples_per_symbol = 16
 
-filepath = "C:/Users/19719/OneDrive/Desktop/scum_test.csv"     #file location for CSV??
+
+# General overall test result storage folder
+filepath = "C:/Users/19719/OneDrive/Desktop/scum_test_results/"
+
 
 def RF_self_test():
     # Setup Rx Pluto 
     sdr_rx = adi.Pluto("ip:192.168.2.2")
-    #sdr_rx.gain_control_mode_chan0 = "fast_attack" #for Automatic Gain Control
+    # sdr_rx.gain_control_mode_chan0 = "fast_attack" #for Automatic Gain Control
     sdr_rx.gain_control_mode_chan0 = 'manual'
     sdr_rx.rx_hardwaregain_chan0 = 70.0
     sdr_rx.rx_lo = int(cw)
@@ -30,11 +35,11 @@ def RF_self_test():
     sdr_tx.sample_rate = int(sr)
     sdr_tx.tx_rf_bandwidth = int(sr)
     sdr_tx.tx_lo = int(cw)
-    sdr_tx.tx_hardwaregain_chan0 = 0#Control pattern to simplify determining the bit error rate
+    sdr_tx.tx_hardwaregain_chan0 = 0# Control pattern to simplify determining the bit error rate
     pattern = np.array([0, 0, 0, 0, 1, 1, 1, 1])
     bits = np.tile(pattern, num_symbols // len(pattern))
 
-    #Binary FSK generation
+    # Binary FSK generation
     delta = 50e3
     freqs_per_symbol = np.where(bits == 0, -delta, delta)
     freqs = np.repeat(freqs_per_symbol, samples_per_symbol)
@@ -75,7 +80,7 @@ def RF_self_test():
     corr = np.correlate(rx_samples, sample, mode='full')
     peak_idx = np.argmax(np.abs(corr))
     
-    #Bit error rate
+    # Bit error rate
     # The delay in samples is given by the peak index offset relative to no delay
     delay = peak_idx - (len(sample) - 1)
     if delay < 0:
@@ -137,7 +142,9 @@ def RF_self_test():
     # Display the plot
     plt.show()
     '''
+    
     # Compute FFT of the received signal
+    set_freq = 2405000000
     fft_rx = np.fft.fftshift(np.fft.fft(rx_samples))
     psd_rx = 10 * np.log10(np.abs(fft_rx)**2)
     freq_axis = np.linspace(-sr/2, sr/2, len(psd_rx))
@@ -149,13 +156,11 @@ def RF_self_test():
     # Tx/Rx Single Tone Offset
     offset = np.abs(peak_freq_Tx - peak_freq_Rx)
     
-    #Power
+    # Power
     tx_power = 10 * np.log10(np.mean(np.abs(sample)**2)) - 20
     rx_power = 10 * np.log10(np.mean(np.abs(rx_samples)**2))
     abs_power = np.abs(tx_power - rx_power)
     
-    # Print results
-    set_freq = 2405000000
     '''print("")
     print("Set Transmission Frequency:  {:.2f} Hz".format(set_freq))
     print("Transmitted Peak Frequency:  {:.2f} Hz".format(peak_freq_Tx))
@@ -168,7 +173,6 @@ def RF_self_test():
     print("Received Power:              {:.2f} dBm".format(rx_power))
     print("")
     print("Absolute Power Offset:       {:.2f} dBm".format(abs_power))
-    '''
     
     results = {
         "Set Transmission Frequency:  {:.2f} Hz\n".format(set_freq),
@@ -181,11 +185,11 @@ def RF_self_test():
         "Absolute Power Offset:       {:.2f} dBm".format(abs_power),
         "Bit-Error-Rate (BER):        {:.2f} %".format(ber),
         }
-
+    '''
     
     if(ber != 0.00):
         value = {'name': 'Bit-Error-Rate', 'value': ber}
-        results = {'sub-test': 'Radio(RF)', 'pass': False, value: []}
+        results = {'sub-test': 'Radio(RF)', 'pass': False, 'values': value}
 
         return results
     
@@ -210,42 +214,70 @@ def RF_self_test():
     
     return results
 
-
-
-
-
-
-
-
-#TBD    
+   
 def RF_SCuM_test(path):
     # Setup Rx Pluto 
     sdr_rx = adi.Pluto("ip:192.168.2.2")
-    sdr_rx.gain_control_mode_chan0 = "fast_attack" #for Automatic Gain Control
+    sdr_rx.gain_control_mode_chan0 = "fast_attack" # for Automatic Gain Control
     sdr_rx.rx_hardwaregain_chan0 = 70.0
     sdr_rx.rx_lo = int(cw)
     sdr_rx.sample_rate = int(2e6)
     sdr_rx.rx_rf_bandwidth = int(sr)
     sdr_rx.rx_buffer_size = num_symbols * samples_per_symbol * 32
 
+    # Clear any potential data in the buffer
     for i in range (0, 10):
         raw_data = sdr_rx.rx()
 
+    # Put data into a datafile
+    #
+    #
     data = sdr_rx.rx()
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(data)    
+    # May need to address data recording here if buffer is getting too full
+    #
+    #
+
     
-    df.to_csv(path)
+    # Create timestamped data folder
+    now = str(datetime.datetime.now())
+    data_path = path + now
+    data_path = os.path.normpath(data_path)
+    #print(data_path)
     
-    # Clean up/remove extraneous print statements
+    # Write data to timestamped data folder
+    csv_path = data_path + "/results.csv"
+    csv_path = os.path.normpath(csv_path)
+    #print(csv_path)
+    df.to_csv(csv_path)
+
+    # Use DF to create PSD .png file type
+    image_path = data_path + "/PSD.png"
+    image_path = os.path.normpath(image_path)
+    
+    signal = df.iloc[:, 1].values 
+    fs = sdr_rx.sample_rate 
+    
+    plt.figure(figsize=(8,4))
+    plt.psd(signal, NFFT=1024, Fs=fs)
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('PSD [dB/Hz]')
+    plt.title('PSD of SCuM')
+    plt.tight_layout()
+    
+    plt.savefig(image_path)
+    plt.close()
+    
+    # Return filepath to .png file
+    return image_path
+
+
+def end_test():
+    # Kill Pluto Rx
     del sdr_rx
+    
 
-
-
-
-
-
-
-#Running the tests
+# Running the tests
 #results = RF_self_test()
-#print(results)
-#RF_SCuM_test(filepath)
+image_path = RF_SCuM_test(filepath)
+print(image_path)
