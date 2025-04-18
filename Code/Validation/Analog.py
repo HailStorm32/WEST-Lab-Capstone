@@ -21,6 +21,7 @@ from ctypes import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 import WF_SDK
 from WF_SDK.device import check_error
+from Utilities.picoControl import send_command_to_pico
 from Config import *
 
 ##################
@@ -365,7 +366,7 @@ def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample
         return weighted_freq_avg
 
 
-def validate_analog_signals():
+def validate_analog_signals(device_data, pico_serial):
     '''
     Validate the analog signals
     This function validates the following signals:
@@ -373,22 +374,20 @@ def validate_analog_signals():
     - 1.8V reference voltage
     - Clock signals
     Parameters:
-        None
+        device_data (obj): The device data object
+        pico_serial (obj): The serial object for the pico device
     Returns:
         test_results (list): List of dictionaries containing test results for each signal
     '''
     # Create structure to store test results
     test_results = [
-        { 'test': '1.1V reference voltage', 'pass': False, 'values': [] },
-        { 'test': '1.8V reference voltage', 'pass': False, 'values': [] },
+        { 'sub-test': '1.1V reference voltage', 'pass': False, 'values': [] },
+        { 'sub-test': '1.8V reference voltage', 'pass': False, 'values': [] },
     ]
 
-    # Open the device
-    try:    
-        device_data = WF_SDK.device.open("analogdiscovery2")
-    except Exception as e:
-        print("Error: " + str(e))
-        return test_results # return the test results (all failed)
+    # Switch scope channels to voltage references
+    send_command_to_pico(pico_serial, "1_19") #Scope 1 to 1.1V reference voltage
+    send_command_to_pico(pico_serial, "0_19") #Scope 2 to 1.8V reference voltage
 
 
     #############################
@@ -427,18 +426,18 @@ def validate_analog_signals():
             {'name': 'measured_voltage', 'value': None}
         ]
 
-
     #############################
     # Clock Validation
     #############################
 
     for clock in CLOCKS_TO_TEST:
+        # Switch mux to the clock signal
+        send_command_to_pico(pico_serial, clock['mux-command']) 
+
         print(f"Validating {clock['name']} clock signal...")
 
         if DEBUG:
             WF_SDK.wavegen.generate(device_data, channel=1, function=WF_SDK.wavegen.function.square, offset=0, frequency=clock['exp_freq_hz'], amplitude=2)
-
-        # TODO: Send signal to change MUX to clock signal
 
         # Determine the frequency of the signal
         freq = determine_signal_frequency(device_data, channel=1)
@@ -451,7 +450,7 @@ def validate_analog_signals():
             print(f"{clock['name']} clock signal test: PASS at {freq} Hz ({ppm:.3f} ppm)")
 
             test_results.append({
-                'test': f"{clock['name']} clock signal",
+                'sub-test': f"{clock['name']} clock signal",
                 'pass': True,
                 'values': [
                     {'name': 'measured_frequency', 'value': freq},
@@ -462,16 +461,13 @@ def validate_analog_signals():
             print(f"{clock['name']} clock signal test: FAIL at {freq} Hz ({ppm:.3f} ppm)")
 
             test_results.append({
-                'test': f"{clock['name']} clock signal",
+                'sub-test': f"{clock['name']} clock signal",
                 'pass': False,
                 'values': [
                     {'name': 'measured_frequency', 'value': freq},
                     {'name': 'ppm', 'value': ppm}
                 ]
             })
-
-    # close the device
-    WF_SDK.device.close(device_data)
 
     return test_results
 

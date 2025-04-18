@@ -34,6 +34,8 @@ You will need to install the following programs
  - [Windows Driver for Adalm-Pluto SDR](https://wiki.analog.com/university/tools/pluto/drivers/windows)
    	 > The observatory is currently setup to operate under Windows OS. Future work may be done to adapt to other operatings systems.
      	 NOTE: When using multiple Adalm-Pluto SDRs, the IP addresses of each device must be unique, and are modifiable through the device configuration files. (https://wiki.analog.com/university/tools/pluto/users/customizing)
+- [Yepkit Executable](https://www.yepkit.com/products/ykush)
+	> NOTE: You need to install the Windows version, it will automatically install to 'C:\Program Files (x86)\YEPKIT LDA'
 - [insert other programs]
 
 ### Code Environment

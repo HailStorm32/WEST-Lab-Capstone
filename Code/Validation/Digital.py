@@ -4,7 +4,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__Ve
 
 from WF_SDK import device, logic, pattern, error  # Import instruments
 from time import sleep  # Needed for delays
-from Config import DIGITAL_DEVICE  # Import the device name
 
 CONSECUTIVE_ONES_REQUIRED = 10  # Minimum consecutive '1's required for passing
 
@@ -30,19 +29,18 @@ def has_consecutive_ones(buffer, required_count):
     return False  # Fail if no sequence meets the requirement
 
 
-def run_logic_analysis(trigger_channel=0):
+def run_logic_analysis(device_data, trigger_channel=0):
     """
     Runs the logic analysis process, setting up the logic analyzer, 
     triggering, recording, and analyzing the captured data.
 
     Parameters:
+        device_data (object): The device data object for the logic analyzer.
         trigger_channel (int): The channel used for triggering, which will be excluded from analysis.
 
     Returns:
         tests (list): List of dictionaries containing test results for each non-trigger pin.
     """
-    # Connect to the device
-    device_data = device.open(device=DIGITAL_DEVICE)
 
     # Initialize the logic analyzer with default settings
     logic.open(device_data, buffer_size=4096)
@@ -61,7 +59,7 @@ def run_logic_analysis(trigger_channel=0):
             continue  # Skip the trigger channel (do not add it to tests)
 
         test_result = {
-            'test': f'pin {ch}',  # Ensure correct pin numbering
+            'sub-test': f'pin {ch}',  # Ensure correct pin numbering
             'pass': has_consecutive_ones(all_buffers[ch], CONSECUTIVE_ONES_REQUIRED)
         }
         tests.append(test_result)
@@ -69,15 +67,12 @@ def run_logic_analysis(trigger_channel=0):
     # Print test results
     for test in tests:
         status = "Passed" if test["pass"] else "Failed"
-        print(f"{test['test']} {status}")
+        print(f"{test['sub-test']} {status}")
 
     # Reset the logic analyzer
     logic.close(device_data)
 
     # Reset the pattern generator
     pattern.close(device_data)
-
-    # Close the connection
-    device.close(device_data)
 
     return tests  # Return the test results
