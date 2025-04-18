@@ -2,6 +2,7 @@ env/
 UserScripts/
 __pycache__/
 GitTestingRepos/
+ResultBackups/
 .vscode/
 Analog Discovery 2.txt
 *.html
