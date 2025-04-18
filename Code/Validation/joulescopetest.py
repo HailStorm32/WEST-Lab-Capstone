@@ -22,7 +22,6 @@ Version: 1.6.2
 '''
 
 # Import the necessary modules.
-import sys
 import os
 import subprocess
 import time
