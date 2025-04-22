@@ -70,7 +70,4 @@ def run_logic_analysis(device_data, trigger_channel=0):
     # Reset the logic analyzer
     logic.close(device_data)
 
-    # Reset the pattern generator
-    pattern.close(device_data)
-
     return tests  # Return the test results
