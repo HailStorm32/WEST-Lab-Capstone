@@ -79,21 +79,29 @@ def wait_for_trigger(device_handle):
     '''
     Wait for a trigger pulse on the specified pin
     '''
+    WF_SDK.logic.open(device_handle)
+
+    sleep(.5)
+
     # Wait for trigger pulse
     WF_SDK.logic.trigger(device_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
     WF_SDK.logic.record(device_handle, channel=TRIGGER_PIN_NUM)
 
-    # Close locic analyzer
+    # Close logic analyzer
     WF_SDK.logic.close(device_handle)
 
-binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin'))
+# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/testing123.bin'))
+# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/all_test.bin'))
+binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/new_tests.bin'))
+# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/pin0-3_test.bin'))
+# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/DD_GPIO_ONLY.bin'))
 
 # List of tests to be performed
 # Independent tests are run outside the main loop
 tests = {
     'Program upload':         { 'function': scum_program,            'independent': True},
     'Radio Self Test':        { 'function': stub_self_check,         'independent': True},
-    'Radio communication':    { 'function': stub_function_call,      'independent': False}, 
+    # 'Radio communication':    { 'function': stub_function_call,      'independent': False}, #commented out, radio scum code causing issues with triggers??
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
     'Serial communication':   { 'function': stub_function_call,      'independent': False}, 
@@ -226,7 +234,7 @@ if __name__ == '__main__':
 
     # Wait for power up sequence to complete
     print("Waiting for SCuM chip to power up...")
-    sleep(2)
+    sleep(5)
 
     # Run the tests
     for test_name, test_info in tests.items():
