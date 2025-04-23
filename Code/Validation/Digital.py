@@ -26,11 +26,11 @@ sys.path.append(constants_path)
 from dwfconstants import *
 
 # Configure VIO to support low logic threshold (~0.6V) for detecting 0.8V signals
-def configure_vio_voltage(voltage_level=1.2):
+def configure_vio_voltage(device_data, voltage_level=1.2):
     try:
         print(f"[VIO Config] Setting VIO to {voltage_level}V")
-        hdwf = c_int()
-        dwf.FDwfDeviceOpen(c_int(-1), byref(hdwf))
+        hdwf = device_data.handle
+        #dwf.FDwfDeviceOpen(c_int(-1), byref(hdwf))
 
         if hdwf.value == 0:
             print("[VIO Config] Failed to open device for VIO configuration")
@@ -41,7 +41,7 @@ def configure_vio_voltage(voltage_level=1.2):
         dwf.FDwfAnalogIOEnableSet(hdwf, c_int(True))
         dwf.FDwfAnalogIOConfigure(hdwf)
         print("[VIO Config] VIO output enabled successfully")
-        dwf.FDwfDeviceClose(hdwf)
+        #dwf.FDwfDeviceClose(hdwf)
     except Exception as e:
         print(f"[VIO Config] Warning: Could not set VIO voltage: {e}")
 
@@ -83,10 +83,10 @@ def run_logic_analysis(device_data, trigger_channel=0):
         tests (list): List of dictionaries containing test results for each non-trigger pin.
     """
 
-    configure_vio_voltage(voltage_level=1.2)
+    configure_vio_voltage(device_data, voltage_level=1.2)
     
     # Initialize the logic analyzer with default settings
-    logic.open(device_data, buffer_size=4096)
+    logic.open(device_data, buffer_size=10000)
 
     # **Record data for each DIO channel separately**
     all_buffers = [logic.record(device_data, channel=i) for i in range(16)]
