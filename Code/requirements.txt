@@ -3,3 +3,4 @@ matplotlib==3.10.0
 pyserial==3.5
 pylibiio==0.25
 pyadi_iio==0.0.19
+joulescope==1.3.0

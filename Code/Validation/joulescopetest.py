@@ -1,14 +1,27 @@
 '''
-Alex Jain - April 14th, 2025
+Alex Jain - April 18th, 2025
 
 Records voltage/current values.
 Calculates results & displays them.
 
-Version: 1.5.4
+DEFAULT_CSV_PATH NOTICE:
+By default if main does:
+statistics_callback_log(stats) &
+stop_joulescope(), then default path is used.
+Default in stop is delete_file=True, save_backup=True.
+
+If specifying custom path, main needs to specify as:
+statistics_callback_log(stats, file_path="custom_path.csv") &
+stop_joulescope(file_path="custom_path.csv",delete_file=True/False, save_backup=True/False).
+
+Added function: save_backup()
+This function should save a backup of the file in the ResultBackups directory 
+under the specified category.
+
+Version: 1.6.2
 '''
 
 # Import the necessary modules.
-import sys
 import os
 import subprocess
 import time
@@ -20,6 +33,9 @@ import threading
 global output_type
 device = None  # Store device instance
 stop_event = threading.Event()  # Event to signal stopping the device
+
+# Default path for the Joulescope CSV file
+DEFAULT_CSV_PATH = "joulescope_data.csv"
 
 # Manages & Callback statistics - outputs into a CSV file
 def statistics_callback_log(stats):
@@ -36,51 +52,64 @@ def statistics_callback_log(stats):
 
     try:
         # Writing to CSV file
-        with open("joulescope_data.csv", "a", newline="") as csvfile:
+        with open(DEFAULT_CSV_PATH, "a", newline="") as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(values)
     except Exception as e:
         print(f"Error writing to file: {e}")
+        return None # Return None to propagate error(s) to caller.
 
 # Power Cycle Function - Yepkit
 def power_cycle():
     ykushcmd_path = "C:\\Program Files (x86)\\YEPKIT LDA\\ykushcmd\\ykushcmd.exe"
     if not os.path.exists(ykushcmd_path):
         print(f"ykushcmd.exe not found: {ykushcmd_path}")
-        sys.exit(1)
+        return None # Return None to propagate error(s) to caller.
     
-    # Power Cycle USB Downstream Port 3 (Nordic/SCuM).
-    print("Turning off USB Port 3")
-    subprocess.run([ykushcmd_path, "-d", "3"], shell=True)
-    time.sleep(5)
-    print("Turning on USB Port 3")
-    subprocess.run([ykushcmd_path, "-u", "3"], shell=True)
-
-# Function to handle device operations
+    try:
+        # Power Cycle USB Downstream Port 1 (Nordic/SCuM).
+        print("Turning off USB Port 1")
+        subprocess.run([ykushcmd_path, "-d", "1"], shell=True)
+        time.sleep(5) # Blocking call to ensure it properly power cycles.
+        print("Turning on USB Port 1")
+        subprocess.run([ykushcmd_path, "-u", "1"], shell=True)
+    except Exception as e:
+        print(f"Error during power cycle: {e}")
+        return None # Return None to propagate error(s) to caller.
+    
+    return True # Return True to indicate power cycle success.
+    
+# Function to handle joulescope device operations.
 def device_operations():
     global device
     # Get all Joulescope devices or fail if none are found
     devices = joulescope.scan(config='off')
     if not len(devices):
         print('No Joulescope device found')
-        sys.exit(1)
+        return None # Return None to propagate errors to caller.
+    
+    try:
+        device = devices[0] # Hack from Joulescope example script.
+        device.open()
+        device.statistics_callback_register(statistics_callback_log, 'sensor')
 
-    device = devices[0]  # Hack taken from Joulescope example script
-    device.open()
-    device.statistics_callback_register(statistics_callback_log, 'sensor')
+        # Set default parameters
+        device.parameter_set('reduction_frequency', 1)
+        device.parameter_set('sampling_frequency', 2000000)
+        device.parameter_set('i_range', 'auto')
+        device.parameter_set('v_range', '15V')
 
-    # Set default parameters
-    device.parameter_set('reduction_frequency', 1)
-    device.parameter_set('sampling_frequency', 2000000)
-    device.parameter_set('i_range', 'auto')
-    device.parameter_set('v_range', '15V')
-
-    print("Joulescope is now collecting data...")
+        print("Joulescope set up and collecting data...")
+        return True # Return True to indicate device operation success.
+    except Exception as e:
+        print(f"Error during device operations: {e}")
+        return None # Return None to propagate error(s) to caller.
 
 # Function to stop the device & process the results.
-def stop_joulescope(file_path):
+def stop_joulescope(file_path=DEFAULT_CSV_PATH, delete_file=True, save_backup_flag=True):
     """
     Stops the device and processes the results from the specified CSV file.
+    Optionally saves a backup and deletes the original file.
     """
     # Signal the stop event and wait for the thread to finish
     stop_event.set()
@@ -123,7 +152,7 @@ def stop_joulescope(file_path):
 
             if count == 0:
                 print("No valid data found in the file.")
-                return
+                return None  # Return None if no valid data is found
 
             # Calculate averages
             current_avg = current_sum / count
@@ -166,18 +195,38 @@ def stop_joulescope(file_path):
                 },
             ]
 
-            # Print the results
-            for result in results:
-                print(result)
+            # Save a backup of the file if the flag is set
+            if save_backup_flag:
+                save_backup(file_path, category="joulescope")
+
+            return results  # Return the results on success
 
     except Exception as e:
         print(f"Error reading file: {e}")
+        return [
+            {
+                'Test': 'Joulescope Error',
+                'Pass': False,
+                'Value': str(e)
+            }
+        ]  # Return error structure on failure
+
+    finally:
+        # Delete the file if the delete_file flag is True
+        if delete_file:
+            try:
+                os.remove(file_path)
+                print(f"File {file_path} deleted.")
+            except Exception as e:
+                print(f"Error deleting file: {e}")
+                return None # Return None to propagate error(s) to caller.
 
 # Run (Main) Function that runs both power cycle and Joulescope functions.
 def joulescope_start():
     print(f"Current working directory: {os.getcwd()}")
 
-    power_cycle()  # Power Cycle the Yepkit hub
+    if power_cycle() is None:
+        return False # Return false if power cycle has failed.
 
     # Start the device operations in a separate thread
     global device_thread
@@ -186,6 +235,40 @@ def joulescope_start():
 
     # Print that Joulescope started in another thread.
     print("Joulescope started...")
+    return True # Return True to indicate success.
+
+# Function to save backups in the ResultBackups directory
+def save_backup(file_path, category="joulescope"):
+    """
+    Save a backup of the file in the ResultBackups directory under the specified category.
+    """
+    # Define the base ResultBackups directory
+    base_dir = "ResultBackups"
+
+    # Check if the ResultBackups directory exists
+    if not os.path.exists(base_dir):
+        print(f"Error: {base_dir} directory does not exist. Backup not saved.")
+        return None  # Return None to propagate error(s) to caller.
+
+    # Create the category subdirectory if it doesn't exist
+    category_dir = os.path.join(base_dir, category)
+    if not os.path.exists(category_dir):
+        os.makedirs(category_dir)  # Allowed to create subdirectories
+        print(f"Created category directory: {category_dir}")
+
+    # Define the backup file path
+    backup_file_path = os.path.join(category_dir, os.path.basename(file_path))
+
+    try:
+        # Copy the file to the backup location
+        with open(file_path, "r") as original_file:
+            with open(backup_file_path, "w") as backup_file:
+                backup_file.write(original_file.read())
+        print(f"Backup saved to: {backup_file_path}")
+        return backup_file_path  # Return the backup file path on success
+    except Exception as e:
+        print(f"Error saving backup: {e}")
+        return None  # Return None to propagate error(s) to caller.
 
 if __name__ == '__main__':
     joulescope_start()

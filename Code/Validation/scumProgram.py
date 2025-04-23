@@ -91,11 +91,11 @@ def scum_program(binary_image):
         nRF_ser.close()
     print("\rBye...")
 
-    return {
-        'test': 'Program upload',
+    return [{
+        'sub-test': 'Program upload',
         'pass': True,
-        'value': []
-    }
+        'values': []
+    }]
 
 
 

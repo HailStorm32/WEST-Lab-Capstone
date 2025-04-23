@@ -1,8 +1,8 @@
 env/
 UserScripts/
 __pycache__/
-DoxygenOutput/
 GitTestingRepos/
+ResultBackups/
 .vscode/
 Analog Discovery 2.txt
 *.html

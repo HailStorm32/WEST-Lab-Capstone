@@ -19,6 +19,7 @@ from Analog import validate_analog_signals
 from Config import *
 from Digital import run_logic_analysis
 from Utilities import ReportGeneration
+from Utilities.picoControl import connect_to_pico
 from scumProgram import scum_program
 from joulescopetest import joulescope_start, stop_joulescope
 
@@ -71,9 +72,6 @@ def stub_stop_power_monitor():
         {'sub-test': 'Current', 'pass': random.choice([True, False]), 'values': [{'name': 'current', 'value': random.uniform(0.01, 0.1)}]},
         {'sub-test': 'Power', 'pass': random.choice([True, False]), 'values': [{'name': 'power', 'value': random.uniform(0.01, 0.33)}]}
     ]
-
-def stub_connect_to_pico(port=None, baudrate=115200, timeout=1):
-    return 42  # Placeholder for actual connection handle
 ######################################################################################
 
 
@@ -81,25 +79,33 @@ def wait_for_trigger(device_handle):
     '''
     Wait for a trigger pulse on the specified pin
     '''
+    WF_SDK.logic.open(device_handle)
+
+    sleep(.5)
+
     # Wait for trigger pulse
     WF_SDK.logic.trigger(device_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
     WF_SDK.logic.record(device_handle, channel=TRIGGER_PIN_NUM)
 
-    # Close locic analyzer
+    # Close logic analyzer
     WF_SDK.logic.close(device_handle)
 
-binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/SCuM_test.bin'))
+# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/testing123.bin'))
+# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/all_test.bin'))
+binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/new_tests.bin'))
+# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/pin0-3_test.bin'))
+# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/DD_GPIO_ONLY.bin'))
 
 # List of tests to be performed
 # Independent tests are run outside the main loop
 tests = {
     'Program upload':         { 'function': scum_program,            'independent': True},
     'Radio Self Test':        { 'function': stub_self_check,         'independent': True},
-    'Radio communication':    { 'function': stub_function_call,      'independent': False}, 
+    # 'Radio communication':    { 'function': stub_function_call,      'independent': False}, #commented out, radio scum code causing issues with triggers??
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
     'Serial communication':   { 'function': stub_function_call,      'independent': False}, 
-    'Power Consumption':      { 'function': stop_joulescope,          'independent': True}, 
+    'Power Consumption':      { 'function': stop_joulescope,         'independent': True}, 
 }
 
 # Create test results structure
@@ -176,7 +182,7 @@ if __name__ == '__main__':
 
     # Connect to the PICO board
     print("Connecting to PICO board...")
-    pico_serial = stub_connect_to_pico(port=PICO_COM_PORT) # TODO: Replace with actual function
+    pico_serial = connect_to_pico(port=PICO_COM_PORT)
 
     if pico_serial is None:
         print("Error: Unable to connect to PICO board!\n Exiting...")
@@ -228,7 +234,7 @@ if __name__ == '__main__':
 
     # Wait for power up sequence to complete
     print("Waiting for SCuM chip to power up...")
-    sleep(2)
+    sleep(5)
 
     # Run the tests
     for test_name, test_info in tests.items():
