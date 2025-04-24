@@ -81,7 +81,7 @@ def wait_for_trigger(device_handle):
     '''
     WF_SDK.logic.open(device_handle)
 
-    sleep(.5)
+    #sleep(.5)
 
     # Wait for trigger pulse
     WF_SDK.logic.trigger(device_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
@@ -89,10 +89,11 @@ def wait_for_trigger(device_handle):
 
     # Close logic analyzer
     WF_SDK.logic.close(device_handle)
+    #sleep(.5)
 
 # binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/testing123.bin'))
 # binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/all_test.bin'))
-binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/new_tests.bin'))
+binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/123.bin'))
 # binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/pin0-3_test.bin'))
 # binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/DD_GPIO_ONLY.bin'))
 
@@ -234,7 +235,7 @@ if __name__ == '__main__':
 
     # Wait for power up sequence to complete
     print("Waiting for SCuM chip to power up...")
-    sleep(5)
+    #sleep(5)
 
     # Run the tests
     for test_name, test_info in tests.items():
@@ -245,7 +246,7 @@ if __name__ == '__main__':
 
         print("Waiting for trigger pulse...")
         wait_for_trigger(dd_handle)
-
+        sleep(1)
         # Declare the test being run
         print(f"Running test: {test_name}")
 

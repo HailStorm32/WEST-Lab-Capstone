@@ -86,14 +86,13 @@ def run_logic_analysis(device_data, trigger_channel=0):
     configure_vio_voltage(device_data, voltage_level=1.2)
     
     # Initialize the logic analyzer with default settings
-    logic.open(device_data, buffer_size=10000)
+    logic.open(device_data, buffer_size=20000)
 
     # **Record data for each DIO channel separately**
     all_buffers = [logic.record(device_data, channel=i) for i in range(16)]
 
     # Create a list to store test results, ensuring the correct pin numbering
     tests = []
-
     # Scan each channel's buffer and check for passing condition
     for ch in range(16):
         if ch == trigger_channel:

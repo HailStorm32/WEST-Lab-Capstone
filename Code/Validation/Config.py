@@ -12,13 +12,13 @@ AD2_FOR_DIGITAL = False # Set to True if using Analog Discovery 2 in place of th
 
 TRIGGER_PIN_NUM = 1  # DIO pin on AD2/DD used for the trigger pin
 
-PICO_COM_PORT = "COM10"  # COM port for the PICO board for flashing and testing
+PICO_COM_PORT = "COM31"  # COM port for the PICO board for flashing and testing
 
 ########################
 # SCuM Configuration
 ########################
 
-SCUM_NRF_COM_PORT = "COM8"  # COM port for nRF board for SCuM "flashing"
+SCUM_NRF_COM_PORT = "COM10"  # COM port for nRF board for SCuM "flashing"
 
 ########################
 # Analog Test Configuration
