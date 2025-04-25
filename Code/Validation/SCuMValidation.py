@@ -19,10 +19,11 @@ from Analog import validate_analog_signals
 from Config import *
 from Digital import run_logic_analysis
 from Utilities import ReportGeneration
-from Utilities.picoControl import connect_to_pico
+from Utilities.picoControl import connect_to_pico, send_command_to_pico
 from scumProgram import scum_program
 from joulescopetest import joulescope_start, stop_joulescope
 from Serial_Baud_Test import find_best_baud_rate
+
 
 def clear_terminal():
     '''
@@ -237,8 +238,11 @@ if __name__ == '__main__':
         
 
     # Wait for power up sequence to complete
-    print("Waiting for SCuM chip to power up...")
-    #sleep(5)
+    # print("Waiting for SCuM chip to power up...")
+    # #sleep(5)
+
+    # Reset mux to set fix conflict with pin 13 for digital testing
+    send_command_to_pico(pico_serial, "2_0")
 
     # Run the tests
     for test_name, test_info in tests.items():
