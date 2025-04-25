@@ -97,8 +97,6 @@ def run_logic_analysis(device_data, trigger_channel=0):
     tests = []
     # Scan each channel's buffer and check for passing condition
     for ch in range(16):
-        if ch == trigger_channel:
-            continue  # Skip the trigger channel (do not add it to tests)
 
         test_result = {
             'sub-test': f'pin {ch}',  # Ensure correct pin numbering
