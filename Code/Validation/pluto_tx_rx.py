@@ -10,9 +10,9 @@ import os
 # Variable declarations
 sr = 1e6 # Sample rate
 cw = 2.405e9 # Center frequency
-samples = 1000
-num_symbols = 1000
-samples_per_symbol = 16
+samples = 100
+num_symbols = 100
+samples_per_symbol = 2
 
 
 # General overall test result storage folder
@@ -22,31 +22,34 @@ filepath = "C:/Users/19719/OneDrive/Desktop/scum_test_results/"
 def RF_self_test():
     # Setup Rx Pluto 
     sdr_rx = adi.Pluto("ip:192.168.2.2")
-    # sdr_rx.gain_control_mode_chan0 = "fast_attack" #for Automatic Gain Control
-    sdr_rx.gain_control_mode_chan0 = 'manual'
-    sdr_rx.rx_hardwaregain_chan0 = 70.0
+    sdr_rx.gain_control_mode_chan0 = "fast_attack" #for Automatic Gain Control
     sdr_rx.rx_lo = int(cw)
     sdr_rx.sample_rate = int(sr)
     sdr_rx.rx_rf_bandwidth = int(sr)
-    sdr_rx.rx_buffer_size = num_symbols * samples_per_symbol * 32
+    sdr_rx.rx_buffer_size = num_symbols * samples_per_symbol * 64
 
     # Setup Tx Pluto
     sdr_tx = adi.Pluto("ip:192.168.2.3")
     sdr_tx.sample_rate = int(sr)
     sdr_tx.tx_rf_bandwidth = int(sr)
     sdr_tx.tx_lo = int(cw)
-    sdr_tx.tx_hardwaregain_chan0 = 0# Control pattern to simplify determining the bit error rate
-    pattern = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+    sdr_tx.tx_hardwaregain_chan0 = -25   
+    pattern = np.array([0, 0, 1, 1]) # Control pattern to simplify determining the bit error rate
     bits = np.tile(pattern, num_symbols // len(pattern))
 
     # Binary FSK generation
-    delta = 50e3
+    delta = 100e3
     freqs_per_symbol = np.where(bits == 0, -delta, delta)
     freqs = np.repeat(freqs_per_symbol, samples_per_symbol)
     phase = 2 * np.pi * np.cumsum(freqs) / sr
     sample = np.exp(1j * phase)
     sample *= 2**14
     
+
+
+
+
+
     # FFT of the transmitted signal and PSD calculated
     fft_sample = np.fft.fftshift(np.fft.fft(sample))
     psd = np.abs(fft_sample)**2
@@ -56,6 +59,9 @@ def RF_self_test():
     peak_index = np.argmax(psd)
     peak_freq_baseband = f_axis[peak_index]
     peak_freq_Tx = peak_freq_baseband + cw
+
+
+
 
     # Start the transmitter
     sdr_tx.tx_cyclic_buffer = True # Enable cyclic buffers
@@ -90,7 +96,8 @@ def RF_self_test():
     rx_aligned = rx_samples[delay:delay+len(sample)]
     
     # Demodulation: Process the received signal symbol by symbol
-    estimated_bits = []
+    estimated_bits = np.zeros(num_symbols)
+    
     for i in range(num_symbols):
         block = rx_aligned[i*samples_per_symbol:(i+1)*samples_per_symbol]
         # Get the instantaneous phase of the symbol block
@@ -104,45 +111,17 @@ def RF_self_test():
         # Convert the average phase difference to an estimated frequency (Hz)
         f_est = avg_phase_diff * sr / (2 * np.pi)
         # Decision threshold: if the estimated frequency is greater than 0, decide '1'; otherwise, '0'
-        estimated_bits.append(1 if f_est > 0 else 0)
-    estimated_bits = np.array(estimated_bits)
-    
+        
+        if f_est > 0:
+            estimated_bits[i] = 1
+        else:
+            estimated_bits[i] = 0
+
+
     # Calculate Bit Error Rate (BER)
     bit_errors = np.sum(estimated_bits != bits)
     ber = bit_errors / num_symbols * 100
 
-    '''
-    # Create a figure and three subplots (stacked vertically)
-    fig, axs = plt.subplots(4, 1, figsize=(10, 8), sharex=True)
-
-    # Plot the sample waveform on the first subplot
-    axs[0].plot(bits[0:100])
-    axs[0].set_title('Transmitted Bits')
-    axs[0].set_ylabel('Amplitude')
-
-    # Plot the sample waveform on the first subplot
-    axs[1].plot(np.real(sample[0:100]))
-    axs[1].set_title('Sample Waveform - Real Components')
-    axs[1].set_ylabel('Amplitude')
-
-    # Plot the sample waveform on the first subplot
-    axs[2].plot(np.imag(sample[0:100]))
-    axs[2].set_title('Sample Waveform - Imaginary Components')
-    axs[2].set_ylabel('Amplitude')
-
-    # Plot the estimated bits on the third subplot
-    axs[3].plot(estimated_bits[0:100])
-    axs[3].set_title('Estimated Bits')
-    axs[3].set_ylabel('Bit Value')
-    axs[3].set_xlabel('Sample Index')
-
-    # Adjust layout so titles and labels don't overlap
-    plt.tight_layout()
-
-    # Display the plot
-    plt.show()
-    '''
-    
     # Compute FFT of the received signal
     set_freq = 2405000000
     fft_rx = np.fft.fftshift(np.fft.fft(rx_samples))
@@ -157,41 +136,16 @@ def RF_self_test():
     offset = np.abs(peak_freq_Tx - peak_freq_Rx)
     
     # Power
-    tx_power = 10 * np.log10(np.mean(np.abs(sample)**2)) - 20
-    rx_power = 10 * np.log10(np.mean(np.abs(rx_samples)**2))
+    tx_power = 10 * np.log10(np.mean(np.abs(sample)**2))
+    rx_power = 10 * np.log10(np.mean(np.abs(rx_samples)**2)) + 30 + np.abs(sdr_tx.tx_hardwaregain_chan0)
     abs_power = np.abs(tx_power - rx_power)
     
-    '''print("")
-    print("Set Transmission Frequency:  {:.2f} Hz".format(set_freq))
-    print("Transmitted Peak Frequency:  {:.2f} Hz".format(peak_freq_Tx))
-    print("Received Peak Frequency:     {:.2f} Hz".format(peak_freq_Rx))
-    print("")
-    print("Absolute Frequency Offset:   {:.2f} Hz".format(offset))
-    print("")
-    print("Set Tx Power Gain:           {:.2f} dBm".format(sdr_tx.tx_hardwaregain_chan0))
-    print("Transmitted Power:           {:.2f} dBm".format(tx_power))
-    print("Received Power:              {:.2f} dBm".format(rx_power))
-    print("")
-    print("Absolute Power Offset:       {:.2f} dBm".format(abs_power))
-    
-    results = {
-        "Set Transmission Frequency:  {:.2f} Hz\n".format(set_freq),
-        "Transmitted Peak Frequency:  {:.2f} Hz".format(peak_freq_Tx),
-        "Received Peak Frequency:     {:.2f} Hz".format(peak_freq_Rx),
-        "Absolute Frequency Offset:   {:.2f} Hz".format(offset),
-        "Set Tx Power Gain:           {:.2f} dBm".format(sdr_tx.tx_hardwaregain_chan0),
-        "Transmitted Power:           {:.2f} dBm".format(tx_power),
-        "Received Power:              {:.2f} dBm".format(rx_power),
-        "Absolute Power Offset:       {:.2f} dBm".format(abs_power),
-        "Bit-Error-Rate (BER):        {:.2f} %".format(ber),
-        }
-    '''
     
     if(ber != 0.00):
         value = {'name': 'Bit-Error-Rate', 'value': ber}
         results = {'sub-test': 'Radio(RF)', 'pass': False, 'values': value}
-
-        return results
+        print(value)
+        #return results
     
     else:
         values = {'name': 'Bit-Error-Rate (BER)', 'value': ber},
@@ -204,15 +158,54 @@ def RF_self_test():
         {'name': 'Received Power', 'value': rx_power},
         {'name': 'Absolute Power Offset', 'value': abs_power}
 
-        results = {'sub-test': 'Radio(RF)', 'pass': True, values: []}        
-
-        return results
+        #results = {'sub-test': 'Radio(RF)', 'pass': True, values: []}        
+        print(values)
+        #return results
     
+    '''
+    # Demo code of print statements and plots
+
+    # Create a figure and three subplots (stacked vertically)
+    fig, axs = plt.subplots(2, 1, figsize=(10, 4), sharex=True)
+    
+    # Plot the sample waveform on the first subplot
+    axs[0].plot(bits[0:100])
+    axs[0].set_title('Transmitted Bits')
+    axs[0].set_ylabel('Amplitude')
+    
+    # Plot the estimated bits on the third subplot
+    axs[1].plot(estimated_bits[0:100])
+    axs[1].set_title('Estimated Bits')
+    axs[1].set_ylabel('Bit Value')
+    axs[1].set_xlabel('Sample Index')
+
+    # Adjust layout so titles and labels don't overlap
+    plt.tight_layout()
+
+    # Display the plot
+    plt.show()
+    '''
+    print("")
+    print("Set Transmission Frequency:  {:.2f} Hz".format(set_freq))
+    print("Transmitted Peak Frequency:  {:.2f} Hz".format(peak_freq_Tx))
+    print("Received Peak Frequency:     {:.2f} Hz".format(peak_freq_Rx))
+    print("")
+    print("Absolute Frequency Offset:   {:.2f} Hz".format(offset))
+    print("")
+    print("Set Tx Power:                {:.2f} dB".format(sdr_tx.tx_hardwaregain_chan0))
+    print("Transmitted PSD:             {:.2f} ".format(tx_power))
+    print("Received PSD:                {:.2f} ".format(rx_power))
+    print("")
+    print("Absolute Power Offset:       {:.2f} dBm".format(abs_power))
+    print("")
+    print("Bit-Error-Rate (BER):        {:.2f} %".format(ber)) 
+    
+
     # Clean up/remove extraneous print statements
     del sdr_rx
     del sdr_tx    
     
-    return results
+    #return results
 
    
 def RF_SCuM_test(path):
@@ -279,5 +272,6 @@ def end_test():
 
 # Running the tests
 #results = RF_self_test()
-image_path = RF_SCuM_test(filepath)
-print(image_path)
+RF_self_test()
+#image_path = RF_SCuM_test(filepath)
+#print(results)
