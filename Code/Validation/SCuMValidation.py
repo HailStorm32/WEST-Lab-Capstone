@@ -94,7 +94,7 @@ def wait_for_trigger(device_handle):
 
 # binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/testing123.bin'))
 # binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/all_test.bin'))
-binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/123.bin'))
+binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/valScript_NOradio.bin'))
 # binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/pin0-3_test.bin'))
 # binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/DD_GPIO_ONLY.bin'))
 
@@ -210,6 +210,8 @@ if __name__ == '__main__':
         # Use AD2 for digital testing
         dd_handle = ad_handle
 
+    print(dd_handle.name)
+    print(ad_handle.name)
     # Startup the joule scope monitoring thread
     joulescope_start()
 
