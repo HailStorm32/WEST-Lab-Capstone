@@ -1,6 +1,7 @@
 import serial
 import serial.tools.list_ports
 import time
+from Config import SCUM_SERIAL_COM_PORT
 
 # List of common baud rates to test
 COMMON_BAUD_RATES = [
@@ -61,7 +62,7 @@ def test_baud_rate_read_only(port, baud_rate):
         print(f"Error testing baud rate {baud_rate}: {e}")
         return None
 
-def find_best_baud_rate(port):
+def find_best_baud_rate(port=SCUM_SERIAL_COM_PORT):
     """ Scan through baud rates and find a working one. """
     port = find_serial_port(port)
     if not port:

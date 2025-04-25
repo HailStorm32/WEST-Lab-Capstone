@@ -20,6 +20,8 @@ PICO_COM_PORT = "COM31"  # COM port for the PICO board for flashing and testing
 
 SCUM_NRF_COM_PORT = "COM10"  # COM port for nRF board for SCuM "flashing"
 
+SCUM_SERIAL_COM_PORT = "COM7"  # COM port that the SCuM board is connected to for serial communication
+
 ########################
 # Analog Test Configuration
 ########################

@@ -22,6 +22,7 @@ from Utilities import ReportGeneration
 from Utilities.picoControl import connect_to_pico
 from scumProgram import scum_program
 from joulescopetest import joulescope_start, stop_joulescope
+from Serial_Baud_Test import find_best_baud_rate
 
 def clear_terminal():
     '''
@@ -105,7 +106,7 @@ tests = {
     # 'Radio communication':    { 'function': stub_function_call,      'independent': False}, #commented out, radio scum code causing issues with triggers??
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
-    'Serial communication':   { 'function': stub_function_call,      'independent': False}, 
+    'Serial communication':   { 'function': find_best_baud_rate,     'independent': False}, 
     'Power Consumption':      { 'function': stop_joulescope,         'independent': True}, 
 }
 
