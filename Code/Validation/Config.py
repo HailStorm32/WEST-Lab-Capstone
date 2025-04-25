@@ -12,15 +12,15 @@ AD2_FOR_DIGITAL = False # Set to True if using Analog Discovery 2 in place of th
 
 TRIGGER_PIN_NUM = 1  # DIO pin on AD2/DD used for the trigger pin
 
-PICO_COM_PORT = "COM31"  # COM port for the PICO board for flashing and testing
+PICO_COM_PORT = "COM10"  # COM port for the PICO board for flashing and testing
 
 ########################
 # SCuM Configuration
 ########################
 
-SCUM_NRF_COM_PORT = "COM10"  # COM port for nRF board for SCuM "flashing"
+SCUM_NRF_COM_PORT = "COM8"  # COM port for nRF board for SCuM "flashing"
 
-SCUM_SERIAL_COM_PORT = "COM7"  # COM port that the SCuM board is connected to for serial communication
+SCUM_SERIAL_COM_PORT = "COM11"  # COM port that the SCuM board is connected to for serial communication
 
 ########################
 # Analog Test Configuration
@@ -46,6 +46,7 @@ PPM = ((exp_freq_hz - measured_freq_hz) / exp_freq_hz) * 1_000_000
 #########################
 
 PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V = [1.0, 1.2]  # Acceptable range (in volts) for the power supply voltage (inclusive)
+PWR_USE_ACCEPTABLE_CURRENT_RANGE_A = [0.0001, 0.1]  # Acceptable range (in Amps) for the power supply current (inclusive)
 
 ########################
 # Git Validation

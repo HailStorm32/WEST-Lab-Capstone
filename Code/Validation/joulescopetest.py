@@ -28,7 +28,7 @@ import time
 import joulescope
 import csv
 import threading
-from Config import PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V
+from Config import PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V, PWR_USE_ACCEPTABLE_CURRENT_RANGE_A
 
 # Global Variables
 global output_type
@@ -160,9 +160,13 @@ def stop_joulescope(file_path=DEFAULT_CSV_PATH, delete_file=True, save_backup_fl
             current_avg = current_sum / count
             voltage_avg = voltage_sum / count
 
-            # Define the voltage threshold
+            # Get voltage threshold
             voltage_threshold_min = PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V[0]
             voltage_threshold_max = PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V[1]
+
+            # Get current threshold
+            current_threshold_min = PWR_USE_ACCEPTABLE_CURRENT_RANGE_A[0]
+            current_threshold_max = PWR_USE_ACCEPTABLE_CURRENT_RANGE_A[1]
 
             # Format Results
             results = [
@@ -183,18 +187,18 @@ def stop_joulescope(file_path=DEFAULT_CSV_PATH, delete_file=True, save_backup_fl
                 },
                 {
                     'sub-test': 'current_avg',
-                    'pass': True,  # No threshold defined for current
-                    'values': [{'name': "Current Average (A)", 'value': current_avg}]
+                    'pass': (current_avg <= current_threshold_max) and (current_avg >= current_threshold_min),
+                    'values': [{'name': "Current Average (mA)", 'value': current_avg * 1000}]
                 },
                 {
                     'sub-test': 'current_min',
-                    'pass': True,  # No threshold defined for current
-                    'values': [{'name': "Current Minimum (A)", 'value': current_min}]
+                    'pass': (current_min <= current_threshold_max) and (current_min >= current_threshold_min),
+                    'values': [{'name': "Current Minimum (mA)", 'value': current_min * 1000}]
                 },
                 {
                     'sub-test': 'current_max',
-                    'pass': True,  # No threshold defined for current
-                    'values': [{'name': "Current Maximum (A)", 'value': current_max}]
+                    'pass': (current_max <= current_threshold_max) and (current_max >= current_threshold_min),
+                    'values': [{'name': "Current Maximum (mA)", 'value': current_max * 1000}]
                 },
             ]
 
