@@ -144,8 +144,8 @@ def RF_self_test():
     if(ber != 0.00):
         value = {'name': 'Bit-Error-Rate', 'value': ber}
         results = {'sub-test': 'Radio(RF)', 'pass': False, 'values': value}
-        print(value)
-        #return results
+        #print(value)
+        return results
     
     else:
         values = {'name': 'Bit-Error-Rate (BER)', 'value': ber},
@@ -159,8 +159,8 @@ def RF_self_test():
         {'name': 'Absolute Power Offset', 'value': abs_power}
 
         #results = {'sub-test': 'Radio(RF)', 'pass': True, values: []}        
-        print(values)
-        #return results
+        #print(values)
+        return results
     
     '''
     # Demo code of print statements and plots
@@ -184,7 +184,7 @@ def RF_self_test():
 
     # Display the plot
     plt.show()
-    '''
+    
     print("")
     print("Set Transmission Frequency:  {:.2f} Hz".format(set_freq))
     print("Transmitted Peak Frequency:  {:.2f} Hz".format(peak_freq_Tx))
@@ -199,7 +199,7 @@ def RF_self_test():
     print("Absolute Power Offset:       {:.2f} dBm".format(abs_power))
     print("")
     print("Bit-Error-Rate (BER):        {:.2f} %".format(ber)) 
-    
+    '''
 
     # Clean up/remove extraneous print statements
     del sdr_rx
@@ -272,6 +272,6 @@ def end_test():
 
 # Running the tests
 #results = RF_self_test()
-RF_self_test()
+#RF_self_test()
 #image_path = RF_SCuM_test(filepath)
 #print(results)
