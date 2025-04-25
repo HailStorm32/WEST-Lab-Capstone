@@ -401,13 +401,13 @@ def validate_analog_signals(device_data, pico_serial):
         print(f"1.1V reference voltage test: {'PASS' if result[1] else 'FAIL'} at {result[0]}V")
         test_results[0]['pass'] = result[1]
         test_results[0]['values'] = [
-            {'name': 'measured_voltage', 'value': result[0]}
+            {'name': 'measured_voltage (V)', 'value': result[0]}
         ]
     else:
         print("1.1V reference voltage: FAIL (unable to measure)")
         test_results[0]['pass'] = False
         test_results[0]['values'] = [
-            {'name': 'measured_voltage', 'value': None}
+            {'name': 'measured_voltage (V)', 'value': None}
         ]
     
     # Validate the 1.8V reference voltage
@@ -417,13 +417,13 @@ def validate_analog_signals(device_data, pico_serial):
         print(f"1.8V reference voltage test: {'PASS' if result[1] else 'FAIL'} at {result[0]}V")
         test_results[1]['pass'] = result[1]
         test_results[1]['values'] = [
-            {'name': 'measured_voltage', 'value': result[0]}
+            {'name': 'measured_voltage (V)', 'value': result[0]}
         ]
     else:
         print("1.8V reference voltage: FAIL (unable to measure)")
         test_results[1]['pass'] = False
         test_results[1]['values'] = [
-            {'name': 'measured_voltage', 'value': None}
+            {'name': 'measured_voltage (V)', 'value': None}
         ]
 
     #############################
@@ -453,7 +453,7 @@ def validate_analog_signals(device_data, pico_serial):
                 'sub-test': f"{clock['name']} clock signal",
                 'pass': True,
                 'values': [
-                    {'name': 'measured_frequency', 'value': freq},
+                    {'name': 'measured_frequency (Hz)', 'value': freq},
                     {'name': 'ppm', 'value': ppm}
                 ]
             })
@@ -464,7 +464,7 @@ def validate_analog_signals(device_data, pico_serial):
                 'sub-test': f"{clock['name']} clock signal",
                 'pass': False,
                 'values': [
-                    {'name': 'measured_frequency', 'value': freq},
+                    {'name': 'measured_frequency (Hz)', 'value': freq},
                     {'name': 'ppm', 'value': ppm}
                 ]
             })
