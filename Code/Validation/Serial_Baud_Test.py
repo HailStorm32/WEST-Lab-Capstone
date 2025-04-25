@@ -7,8 +7,8 @@ COMMON_BAUD_RATES = [
    300, 9200, 19200, 38400, 57600, 115200, 230400, 460800, 921600
 ]
 
-TEST_MESSAGE = b"Hello World!"  # Test message to send
-PORT = "COM5"
+TEST_MESSAGE = b"A"  # Test message to send
+PORT = "COM5" # COM PORT of UART converter
 
 def find_serial_port(port):
     """ Check if the given serial port is valid. """
@@ -72,7 +72,7 @@ def find_best_baud_rate(port):
     test_results = []
     for baud in COMMON_BAUD_RATES:
         success = test_baud_rate(port, baud) #change this function original test or read only
-        test_results.append({ 'test': f'{baud}', 'pass': success })
+        test_results.append({ 'sub-test': f'{baud} bps', 'pass': success, 'values': [] })
         print(f"{baud} {'True' if success else 'False'}")
 
     return test_results
