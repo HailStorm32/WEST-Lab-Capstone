@@ -41,6 +41,12 @@ CLOCKS_TO_TEST = [    # List of clocks to test
 PPM = ((exp_freq_hz - measured_freq_hz) / exp_freq_hz) * 1_000_000
 ''' 
 
+#########################
+# Joulescope Configuration
+#########################
+
+PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V = [1.0, 1.2]  # Acceptable range (in volts) for the power supply voltage (inclusive)
+
 ########################
 # Git Validation
 ########################

@@ -28,6 +28,7 @@ import time
 import joulescope
 import csv
 import threading
+from Config import PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V
 
 # Global Variables
 global output_type
@@ -73,6 +74,7 @@ def power_cycle():
         time.sleep(5) # Blocking call to ensure it properly power cycles.
         print("Turning on USB Port 1")
         subprocess.run([ykushcmd_path, "-u", "1"], shell=True)
+        time.sleep(5) # Blocking call to ensure it properly power cycles.
     except Exception as e:
         print(f"Error during power cycle: {e}")
         return None # Return None to propagate error(s) to caller.
@@ -159,39 +161,40 @@ def stop_joulescope(file_path=DEFAULT_CSV_PATH, delete_file=True, save_backup_fl
             voltage_avg = voltage_sum / count
 
             # Define the voltage threshold
-            voltage_threshold = 1.1
+            voltage_threshold_min = PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V[0]
+            voltage_threshold_max = PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V[1]
 
             # Format Results
             results = [
                 {
-                    'test': 'voltage_avg',
-                    'pass': voltage_avg <= voltage_threshold,
-                    'value': f"{voltage_avg:.3f} V"
+                    'sub-test': 'voltage_avg',
+                    'pass': (voltage_avg <= voltage_threshold_max) and (voltage_avg >= voltage_threshold_min),
+                    'values': [{'name': "Voltage Average (V)", 'value': voltage_avg}]
                 },
                 {
-                    'test': 'voltage_min',
-                    'pass': voltage_min <= voltage_threshold,
-                    'value': f"{voltage_min:.3f} V"
+                    'sub-test': 'voltage_min',
+                    'pass': (voltage_avg <= voltage_threshold_max) and (voltage_avg >= voltage_threshold_min),
+                    'values': [{'name': "Voltage Minimum (V)", 'value': voltage_min}]
                 },
                 {
-                    'test': 'voltage_max',
-                    'pass': voltage_max <= voltage_threshold,
-                    'value': f"{voltage_max:.3f} V"
+                    'sub-test': 'voltage_max',
+                    'pass': (voltage_avg <= voltage_threshold_max) and (voltage_avg >= voltage_threshold_min),
+                    'values': [{'name': "Voltage Maximum (V)", 'value': voltage_max}]
                 },
                 {
-                    'test': 'current_avg',
-                    'pass': None,  # No threshold defined for current
-                    'value': f"{current_avg:.9f} A"
+                    'sub-test': 'current_avg',
+                    'pass': True,  # No threshold defined for current
+                    'values': [{'name': "Current Average (A)", 'value': current_avg}]
                 },
                 {
-                    'test': 'current_min',
-                    'pass': None,  # No threshold defined for current
-                    'value': f"{current_min:.9f} A"
+                    'sub-test': 'current_min',
+                    'pass': True,  # No threshold defined for current
+                    'values': [{'name': "Current Minimum (A)", 'value': current_min}]
                 },
                 {
-                    'test': 'current_max',
-                    'pass': None,  # No threshold defined for current
-                    'value': f"{current_max:.9f} A"
+                    'sub-test': 'current_max',
+                    'pass': True,  # No threshold defined for current
+                    'values': [{'name': "Current Maximum (A)", 'value': current_max}]
                 },
             ]
 
