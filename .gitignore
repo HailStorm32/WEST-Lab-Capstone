@@ -6,3 +6,4 @@ ResultBackups/
 .vscode/
 Analog Discovery 2.txt
 *.html
+Config.py
