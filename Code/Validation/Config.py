@@ -1,7 +1,6 @@
 '''
 This file contains the configuration settings for the validation tests.
 '''
-import sys
 import os
 
 ########################
@@ -35,7 +34,6 @@ ACCEPTABLE_VOLTAGE_RANGE_1_8V = [1.7, 1.9]  # Acceptable range (in volts) for th
 CLOCKS_TO_TEST = [    # List of clocks to test     
     {'name': "HFCLK",   'exp_freq_hz': 20000000,    'tolerance_ppm': 1000, 'mux-command': '1_5'},
     {'name': "LFCLK",   'exp_freq_hz': 20000000,    'tolerance_ppm': 1000, 'mux-command': '1_15'}
-    # {'name': "RC",      'exp_freq_hz': 10,          'tolerance_ppm': 5}
     ]
 '''
 PPM = ((exp_freq_hz - measured_freq_hz) / exp_freq_hz) * 1_000_000
