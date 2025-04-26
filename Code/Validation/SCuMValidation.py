@@ -40,17 +40,8 @@ def clear_terminal():
 # These functions are placeholders for the actual functions that will be implemented elsewhere
 # Will be removed once the actual functions are implemented
 ###################
-def stub_program_upload(arg1):
-    return [{'sub-test': 'Program upload', 'pass': True, 'values': []}]  # Placeholder for actual program upload results
-
-def stub_function_call():
-    return [{'sub-test': 'Random test', 'pass': random.choice([True, False]), 'values': [{'name': 'random_value', 'value': random.randint(0, 100)}]}]
-
 def stub_self_check():
     return [{'sub-test': 'Radio self test', 'pass': True, 'values': []}]  # Placeholder for actual self-check results
-
-def stub_start_power_monitor():
-    pass
 
 def stub_get_radio_results():
     # Simulate random radio communication results
@@ -66,14 +57,6 @@ def stub_get_radio_results():
             ]
         }
     ]
-
-def stub_stop_power_monitor():
-    # Simulate random power monitoring data
-    return [
-        {'sub-test': 'Voltage', 'pass': random.choice([True, False]), 'values': [{'name': 'voltage', 'value': random.uniform(1.0, 3.3)}]},
-        {'sub-test': 'Current', 'pass': random.choice([True, False]), 'values': [{'name': 'current', 'value': random.uniform(0.01, 0.1)}]},
-        {'sub-test': 'Power', 'pass': random.choice([True, False]), 'values': [{'name': 'power', 'value': random.uniform(0.01, 0.33)}]}
-    ]
 ######################################################################################
 
 
@@ -83,21 +66,14 @@ def wait_for_trigger(device_handle):
     '''
     WF_SDK.logic.open(device_handle)
 
-    #sleep(.5)
-
     # Wait for trigger pulse
     WF_SDK.logic.trigger(device_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
     WF_SDK.logic.record(device_handle, channel=TRIGGER_PIN_NUM)
 
     # Close logic analyzer
     WF_SDK.logic.close(device_handle)
-    #sleep(.5)
 
-# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/testing123.bin'))
-# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/all_test.bin'))
 binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/valScript_NOradio.bin'))
-# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/pin0-3_test.bin'))
-# binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/DD_GPIO_ONLY.bin'))
 
 # List of tests to be performed
 # Independent tests are run outside the main loop
@@ -112,7 +88,7 @@ tests = {
 }
 
 # Create test results structure
-test_results = {}  # List to store test results
+test_results = {}
 
 # We only need one test unit for SCuM validation, so we will use 'SCuM-Validation' as the key
 test_results['SCuM-Validation'] = {'tests': {}} 
@@ -211,8 +187,6 @@ if __name__ == '__main__':
         # Use AD2 for digital testing
         dd_handle = ad_handle
 
-    print(dd_handle.name)
-    print(ad_handle.name)
     # Startup the joule scope monitoring thread
     joulescope_start()
 
@@ -281,9 +255,6 @@ if __name__ == '__main__':
             # Run the test
             results_handle.extend(test_info['function']())
 
-        #TODO: remove delay 
-        # sleep(1)
-
     # Stop the joule scope monitoring and get the results
     print("Getting joule scope monitoring results...")
 
@@ -304,29 +275,4 @@ if __name__ == '__main__':
         WF_SDK.device.close(dd_handle)
         WF_SDK.device.close(ad_handle)
 
-    # Temporary print results
-    print("\nTest Results:")
-    print("=" * 40)
-
-    for unit_test, unit_data in test_results.items():
-        print(f"Unit Test: {unit_test}")
-        print("-" * 40)
-
-        for test_name, test_data in unit_data['tests'].items():
-            print(f"  Test Name: {test_name}")
-            print("  Results:")
-            
-            if not test_data['results']:
-                print("    No results available.")
-            else:
-                for result in test_data['results']:
-                    print("    Sub-Test:")
-                    print(f"      - Sub-Test Name: {result.get('sub-test', 'N/A')}")
-                    print(f"      - Pass: {'Yes' if result.get('pass') else 'No'}")
-                    print("      - Values:")
-                    for value in result.get('values', []):
-                        print(f"        * {value['name']}: {value['value']}")
-            print("-" * 40)
-
-    print("=" * 40)
-
+    print("\n\nTest Completed!\n")
