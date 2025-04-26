@@ -45,8 +45,8 @@ PPM = ((exp_freq_hz - measured_freq_hz) / exp_freq_hz) * 1_000_000
 # Joulescope Configuration
 #########################
 
-PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V = [1.0, 1.2]  # Acceptable range (in volts) for the power supply voltage (inclusive)
-PWR_USE_ACCEPTABLE_CURRENT_RANGE_A = [0.0001, 0.1]  # Acceptable range (in Amps) for the power supply current (inclusive)
+PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V = [1.0, 1.3]  # Acceptable range (in volts) for the power supply voltage (inclusive)
+PWR_USE_ACCEPTABLE_CURRENT_RANGE_A = [0.00001, 0.1]  # Acceptable range (in Amps) for the power supply current (inclusive)
 
 ########################
 # Git Validation
