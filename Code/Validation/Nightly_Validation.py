@@ -92,6 +92,8 @@ if __name__ == "__main__":
     if not os.path.exists(os.path.join(os.path.dirname(__file__), '..', 'ResultBackups')):
         print("Error: The directory 'ResultBackups' does not exist. Please run the setup script to initialize the environment.")
         os.exit(1)
+    elif not os.path.exists(os.path.join(os.path.dirname(__file__), '../ResultBackups/Nightly-Validation')):
+        os.makedirs(os.path.join(os.path.dirname(__file__), '../ResultBackups/Nightly-Validation'))
 
     last_commit_hash = None  # Variable to store the last commit hash checked
     test_results = {}  # List to store test results
@@ -212,7 +214,22 @@ if __name__ == "__main__":
                         print("No new commits detected.")
 
             if changes_found:
-                ReportGeneration.generate_html_report(test_results)
+                results_location = os.path.join(os.path.dirname(__file__), '..', 'ResultBackups\\Nightly-Validation', 'Nightly-Validation_Results.html')
+                ReportGeneration.generate_html_report(test_results, results_location)
+
+                ret = ReportGeneration.email_report(
+                    SMTP_SERVER,
+                    SMTP_PORT,
+                    SMTP_USERNAME,
+                    SMTP_PASSWORD,
+                    SMTP_SENDER_EMAIL,
+                    USERS_TO_EMAIL,
+                    WKHTMLTOPDF_PATH
+                )
+                if ret:
+                    print("Email sent successfully.")
+                else:
+                    print("Failed to send email.")
 
         # Sleep for a while before checking again
         time.sleep(60) 

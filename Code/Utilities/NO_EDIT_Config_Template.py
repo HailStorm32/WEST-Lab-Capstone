@@ -49,6 +49,17 @@ PWR_USE_ACCEPTABLE_CURRENT_RANGE_A = [0.00001, 0.1]  # Acceptable range (in Amps
 ########################
 # Git Validation
 ########################
+SMTP_SERVER = "smtp.gmail.com"  # SMTP server for sending email notifications
+SMTP_PORT = 465  # SMTP port for sending email notifications
+SMTP_USERNAME = "email@example.com"  # Username for the SMTP email account
+SMTP_PASSWORD = "password_here"  # Password for the SMTP email account
+SMTP_SENDER_EMAIL = "email@example.com"  # Sender email address for email notifications
+
+WKHTMLTOPDF_PATH = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"  # Path to the wkhtmltopdf executable for PDF generation
+
+USERS_TO_EMAIL = [  # List of email addresses to send result reports to
+    "user@example.com"
+]
 
 GIT_DIRECTORY = os.path.join(os.path.dirname(__file__), '../GitTestingRepos/openwsn-fw/')  # Directory where the Git repository is located
 

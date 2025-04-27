@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
 from datetime import datetime, timezone
+import smtplib
+from email.message import EmailMessage
+import pdfkit
+import mimetypes
 
 def generate_html_report(test_results, filename="test_results_report.html"):
     """
@@ -22,7 +26,13 @@ def generate_html_report(test_results, filename="test_results_report.html"):
     Returns:
         None
     """
+    # Append the current timestamp to the filename
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    filename = filename.replace(".html", f"_{timestamp}.html")
     
+    global report_path
+    report_path = filename
+
     # ============================
     # Helper Functions
     # ============================
@@ -304,11 +314,51 @@ def generate_html_report(test_results, filename="test_results_report.html"):
     html_parts.append("</html>")
     
     # Write the complete HTML to the output file.
-    with open(filename, "w", encoding="utf-8") as output_file:
+    with open(report_path, "w", encoding="utf-8") as output_file:
         output_file.write("\n".join(html_parts))
-    print(f"✅ HTML report saved to '{filename}'")
+    print(f"✅ HTML report saved to '{report_path}'")
 
+def email_report(smtp_server, smtp_port, smtp_username, smtp_password, smtp_sender_email, users_to_email, wkhtmltopdf_path):
+    msg = EmailMessage()
+    msg['Subject'] = 'SCuM Nightly Validation Report'
+    msg['From'] = smtp_sender_email
+    msg['To'] = ','.join(users_to_email).strip()
+    msg.set_content('The SCuM nightly validation report is attached.')
 
+    # Ensure the report exists
+    if not os.path.exists(report_path):
+        print(f"Error: Report file '{report_path}' does not exist.")
+        return False
+
+    # Specify the path to the wkhtmltopdf executable
+    config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+
+    # Convert the HTML report to PDF
+    html_report_path = report_path
+    timestamp = '_'.join(report_path.split('_')[-2:]).replace('.html', '')
+    pdf_report_path = os.path.join(os.path.dirname(report_path), f'report_{timestamp}.pdf')
+    pdfkit.from_file(html_report_path, pdf_report_path, configuration=config)
+
+    # Attach the PDF report to the email
+    mime_type, _ = mimetypes.guess_type(pdf_report_path)
+    maintype, subtype = mime_type.split('/')
+    msg.add_attachment(open(pdf_report_path, 'rb').read(), maintype=maintype, subtype=subtype, filename=os.path.basename(pdf_report_path))
+
+    # Attach the HTML report to the email
+    mime_type, _ = mimetypes.guess_type(html_report_path)
+    maintype, subtype = mime_type.split('/')
+    msg.add_attachment(open(html_report_path, 'rb').read(), maintype=maintype, subtype=subtype, filename=os.path.basename(html_report_path))
+
+    # Send the email
+    try:
+        with smtplib.SMTP_SSL(smtp_server, smtp_port) as smtp:
+            smtp.login(smtp_username, smtp_password)
+            smtp.send_message(msg)
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
+
+    return True
 
 
 ##########

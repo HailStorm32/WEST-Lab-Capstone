@@ -142,7 +142,11 @@ if __name__ == '__main__':
     if not os.path.exists(os.path.join(os.path.dirname(__file__), '../ResultBackups')):
         print("Error: The directory 'ResultBackups' does not exist. Please run the setup script to initialize the environment.")
         os.exit(1)
+    elif not os.path.exists(os.path.join(os.path.dirname(__file__), '../ResultBackups/SCuM-Validation')):
+        os.makedirs(os.path.join(os.path.dirname(__file__), '../ResultBackups/SCuM-Validation'))
 
+    results_location = os.path.join(os.path.dirname(__file__), '..', 'ResultBackups\\SCuM-Validation', 'SCuM-Validation_Results.html')
+    
     clear_terminal()
 
     # Get the name of the first unit test
@@ -158,7 +162,7 @@ if __name__ == '__main__':
     if len(results_handle) == 0 or not results_handle[0]['pass']:
         print("Spectrum analyzer self test failed!\n Exiting...")
 
-        ReportGeneration.generate_html_report(test_results)
+        ReportGeneration.generate_html_report(test_results, results_location)
         sys.exit(1)
     else:
         print("Spectrum analyzer self test passed!\n")
@@ -169,7 +173,7 @@ if __name__ == '__main__':
 
     if pico_serial is None:
         print("Error: Unable to connect to PICO board!\n Exiting...")
-        ReportGeneration.generate_html_report(test_results)
+        ReportGeneration.generate_html_report(test_results, results_location)
         sys.exit(1)
 
     # Connect to the Digital Discovery device
@@ -211,7 +215,7 @@ if __name__ == '__main__':
                                         ]
                                 }]
         
-        ReportGeneration.generate_html_report(test_results)
+        ReportGeneration.generate_html_report(test_results, results_location)
         sys.exit(1)
         
 
@@ -270,7 +274,7 @@ if __name__ == '__main__':
 
     # Generate the HTML report
     print("Generating HTML report...")
-    ReportGeneration.generate_html_report(test_results)
+    ReportGeneration.generate_html_report(test_results, results_location)
 
     # Disconnect from Digilent devices
     if AD2_FOR_DIGITAL:
