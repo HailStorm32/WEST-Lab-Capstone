@@ -88,6 +88,11 @@ tests = {
 
 if __name__ == "__main__":
 
+    # Ensure the ResultsBackups directory exists
+    if not os.path.exists(os.path.join(os.path.dirname(__file__), '..', 'ResultsBackups')):
+        print("Error: The directory 'ResultsBackups' does not exist. Please run the setup script to initialize the environment.")
+        os.exit(1)
+
     last_commit_hash = None  # Variable to store the last commit hash checked
     test_results = {}  # List to store test results
 

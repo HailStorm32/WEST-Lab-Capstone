@@ -139,6 +139,10 @@ value list is formatted as:
 # Main
 #########################################################
 if __name__ == '__main__':
+    if not os.path.exists(os.path.join(os.path.dirname(__file__), '..', 'ResultsBackups')):
+        print("Error: The directory 'ResultsBackups' does not exist. Please run the setup script to initialize the environment.")
+        os.exit(1)
+
     clear_terminal()
 
     # Get the name of the first unit test
