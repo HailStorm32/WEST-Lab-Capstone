@@ -15,14 +15,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__Ve
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
 
 import WF_SDK
-from Analog import validate_analog_signals
-from Config import *
-from Digital import run_logic_analysis
-from Utilities import ReportGeneration
-from Utilities.picoControl import connect_to_pico, send_command_to_pico
-from scumProgram import scum_program
-from joulescopetest import joulescope_start, stop_joulescope
-from Serial_Baud_Test import find_best_baud_rate
+from Validation.Tests.analog_test import validate_analog_signals
+from config import *
+from Validation.Tests.digital_test import run_logic_analysis
+from Utilities import report_generation
+from Utilities.PicoControl.pico_control import connect_to_pico, send_command_to_pico
+from Utilities.scum_program import scum_program
+from Validation.Tests.power_test import joulescope_start, stop_joulescope
+from Validation.Tests.serial_baud_test import find_best_baud_rate
 
 
 def clear_terminal():
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     if len(results_handle) == 0 or not results_handle[0]['pass']:
         print("Spectrum analyzer self test failed!\n Exiting...")
 
-        ReportGeneration.generate_html_report(test_results, results_location)
+        report_generation.generate_html_report(test_results, results_location)
         sys.exit(1)
     else:
         print("Spectrum analyzer self test passed!\n")
@@ -173,7 +173,7 @@ if __name__ == '__main__':
 
     if pico_serial is None:
         print("Error: Unable to connect to PICO board!\n Exiting...")
-        ReportGeneration.generate_html_report(test_results, results_location)
+        report_generation.generate_html_report(test_results, results_location)
         sys.exit(1)
 
     # Connect to the Digital Discovery device
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     # Upload the test program to the SCuM chip
     print("Uploading test program to SCuM chip...")
     try:
-        test_results[first_unit_test_name]['tests']['Program upload']['results'] = tests['Program upload']['function'](binary_path)
+        test_results[first_unit_test_name]['tests']['Program upload']['results'] = tests['Program upload']['function'](SCUM_NRF_COM_PORT, binary_path)
     
     except Exception as e:
         print(f"Error flashing SCuM chip for {binary_path}:\n {e}")
@@ -215,7 +215,7 @@ if __name__ == '__main__':
                                         ]
                                 }]
         
-        ReportGeneration.generate_html_report(test_results, results_location)
+        report_generation.generate_html_report(test_results, results_location)
         sys.exit(1)
         
 
@@ -274,7 +274,7 @@ if __name__ == '__main__':
 
     # Generate the HTML report
     print("Generating HTML report...")
-    ReportGeneration.generate_html_report(test_results, results_location)
+    report_generation.generate_html_report(test_results, results_location)
 
     # Disconnect from Digilent devices
     if AD2_FOR_DIGITAL:

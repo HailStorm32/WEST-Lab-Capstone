@@ -12,10 +12,10 @@ import time
 from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
 
-from Analog import validate_analog_signals
-from Config import *
-from Utilities import ReportGeneration
-from scumProgram import scum_program
+from Validation.Tests.analog_test import validate_analog_signals
+from config import *
+from Utilities import report_generation
+from Utilities.scum_program import scum_program
 
 def get_commit_hash():
     """
@@ -215,9 +215,9 @@ if __name__ == "__main__":
 
             if changes_found:
                 results_location = os.path.join(os.path.dirname(__file__), '..', 'ResultBackups\\Nightly-Validation', 'Nightly-Validation_Results.html')
-                ReportGeneration.generate_html_report(test_results, results_location)
+                report_generation.generate_html_report(test_results, results_location)
 
-                ret = ReportGeneration.email_report(
+                ret = report_generation.email_report(
                     SMTP_SERVER,
                     SMTP_PORT,
                     SMTP_USERNAME,

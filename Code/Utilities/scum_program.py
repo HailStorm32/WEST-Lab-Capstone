@@ -1,13 +1,8 @@
 import serial
 import random
-import argparse
 import signal
 import sys
-import time
-import os
 import datetime
-
-from Config import SCUM_NRF_COM_PORT
 
 def get_current_time():
   """
@@ -16,14 +11,6 @@ def get_current_time():
   now = datetime.datetime.now()
   formatted_time = now.strftime("%H:%M:%S")
   return formatted_time
-
-
-# User Defined Parameters ****************************************
-
-# Com port of nRF board 
-nRF_port=SCUM_NRF_COM_PORT 
-
-# End User Defined Parameters ************************************
 
 # Serial connections
 nRF_ser = None
@@ -37,7 +24,9 @@ def signal_handler(signal, frame):
     print("\rBye...")
     exit(0)
 
-def scum_program(binary_image):
+def scum_program(nrf_com_port, binary_image):
+
+    nRF_port = nrf_com_port
 
     # Register the signal handler
     signal.signal(signal.SIGINT, signal_handler)

@@ -11,7 +11,7 @@ REM    4) Upgrades pip to avoid version-related issues.
 REM    5) Creates an untracked folder named "UserScripts" for user scripts.
 REM    6) Creates an untracked folder named "ResultBackups" for result backups.
 REM    7) Creates the git verification repositories folder.
-REM    8) Copies the config template to Validation\Config.py if it doesn't exist.
+REM    8) Copies the config template to Validation\config.py if it doesn't exist.
 REM ----------------------------------------------------------------------------
 
 echo Checking for Python virtual environment...
@@ -65,10 +65,10 @@ IF NOT EXIST "GitTestingRepos" (
 
 REM Copy the config template and rename it to config.py
 IF NOT EXIST "Validation\Config.py" (
-    echo Copying NO_EDIT_Config_Template.py to Config.py...
-    copy /Y Utilities\NO_EDIT_Config_Template.py Validation\Config.py
+    echo Copying NO_EDIT_Config_Template.py to config.py...
+    copy /Y Utilities\NO_EDIT_Config_Template.py Validation\config.py
 ) else (
-    echo Config.py already exits. Skipping copy.
+    echo config.py already exits. Skipping copy.
 )
 
 echo setup complete

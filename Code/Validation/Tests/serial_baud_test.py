@@ -1,7 +1,7 @@
 import serial
 import serial.tools.list_ports
 import time
-from Config import SCUM_SERIAL_COM_PORT
+from config import SCUM_SERIAL_COM_PORT
 
 # List of common baud rates to test
 COMMON_BAUD_RATES = [

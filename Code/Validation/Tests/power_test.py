@@ -28,7 +28,7 @@ import time
 import joulescope
 import csv
 import threading
-from Config import PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V, PWR_USE_ACCEPTABLE_CURRENT_RANGE_A
+from config import PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V, PWR_USE_ACCEPTABLE_CURRENT_RANGE_A
 
 # Global Variables
 global output_type

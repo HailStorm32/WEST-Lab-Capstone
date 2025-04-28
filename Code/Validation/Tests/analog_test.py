@@ -21,8 +21,8 @@ from ctypes import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 import WF_SDK
 from WF_SDK.device import check_error
-from Utilities.picoControl import send_command_to_pico
-from Config import *
+from Utilities.PicoControl.pico_control import send_command_to_pico
+from config import *
 
 ##################
 # Stuff for interfacing with the Digilent WaveForms SDK
