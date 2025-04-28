@@ -23,6 +23,7 @@ from Utilities.PicoControl.pico_control import connect_to_pico, send_command_to_
 from Utilities.scum_program import scum_program
 from Validation.Tests.power_test import joulescope_start, stop_joulescope
 from Validation.Tests.serial_baud_test import find_best_baud_rate
+from Validation.Tests.RF_tx_rx_tests import RF_tx_rx_test, end_test, RF_self_test
 
 
 def clear_terminal():
@@ -79,7 +80,7 @@ binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/
 # Independent tests are run outside the main loop
 tests = {
     'Program upload':         { 'function': scum_program,            'independent': True},
-    'Radio Self Test':        { 'function': stub_self_check,         'independent': True},
+    'Radio Self Test':        { 'function': RF_self_test,            'independent': True},
     # 'Radio communication':    { 'function': stub_function_call,      'independent': False}, #commented out, radio scum code causing issues with triggers??
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
