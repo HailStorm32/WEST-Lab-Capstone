@@ -158,7 +158,7 @@ def RF_self_test():
         {'name': 'Received Power', 'value': rx_power},
         {'name': 'Absolute Power Offset', 'value': abs_power}
 
-        #results = {'sub-test': 'Radio(RF)', 'pass': True, values: []}        
+        results = {'sub-test': 'Radio(RF)', 'pass': True, values: []}        
         #print(values)
         return results
     
