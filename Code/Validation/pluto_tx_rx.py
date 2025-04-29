@@ -7,12 +7,14 @@ import datetime
 import os
 
 
-# Variable declarations
+# Global Variable declarations
 sr = 1e6 # Sample rate
 cw = 2.405e9 # Center frequency
 samples = 100
 num_symbols = 100
 samples_per_symbol = 2
+
+timestamped_path = []
 
 
 # General overall test result storage folder
@@ -223,6 +225,7 @@ def RF_SCuM_test(path):
     # Create timestamped data folder
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     data_path = path + now
+    timestamped_path = data_path
     data_path = os.path.normpath(data_path)
     os.makedirs(data_path)
 
@@ -252,15 +255,16 @@ def RF_SCuM_test(path):
     # Return filepath to .png file
     #return image_path
     
-    return data_path
+    #return data_path
     
     # Kill Pluto Rx
     del sdr_rx
 
 
 
-def end_test(data_path):
+def end_test():
     # CSV path
+    data_path = timestamped_path
     csv_path = data_path + "/results.csv"    
     
     # Image path
