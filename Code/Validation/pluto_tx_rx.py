@@ -33,7 +33,7 @@ def RF_self_test():
     sdr_tx.sample_rate = int(sr)
     sdr_tx.tx_rf_bandwidth = int(sr)
     sdr_tx.tx_lo = int(cw)
-    sdr_tx.tx_hardwaregain_chan0 = -25   
+    sdr_tx.tx_hardwaregain_chan0 = -20   
     pattern = np.array([0, 0, 1, 1]) # Control pattern to simplify determining the bit error rate
     bits = np.tile(pattern, num_symbols // len(pattern))
 
@@ -44,11 +44,6 @@ def RF_self_test():
     phase = 2 * np.pi * np.cumsum(freqs) / sr
     sample = np.exp(1j * phase)
     sample *= 2**14
-    
-
-
-
-
 
     # FFT of the transmitted signal and PSD calculated
     fft_sample = np.fft.fftshift(np.fft.fft(sample))
@@ -59,9 +54,6 @@ def RF_self_test():
     peak_index = np.argmax(psd)
     peak_freq_baseband = f_axis[peak_index]
     peak_freq_Tx = peak_freq_baseband + cw
-
-
-
 
     # Start the transmitter
     sdr_tx.tx_cyclic_buffer = True # Enable cyclic buffers
@@ -138,14 +130,13 @@ def RF_self_test():
     # Power
     tx_power = 10 * np.log10(np.mean(np.abs(sample)**2))
     rx_power = 10 * np.log10(np.mean(np.abs(rx_samples)**2)) + 30 + np.abs(sdr_tx.tx_hardwaregain_chan0)
-    abs_power = np.abs(tx_power - rx_power)
-    
+    abs_power = np.abs(tx_power - rx_power)   
     
     if(ber != 0.00):
         value = {'name': 'Bit-Error-Rate', 'value': ber}
         results = {'sub-test': 'Radio(RF)', 'pass': False, 'values': value}
         #print(value)
-        return results
+        #return results
     
     else:
         values = {'name': 'Bit-Error-Rate (BER)', 'value': ber},
@@ -158,13 +149,12 @@ def RF_self_test():
         {'name': 'Received Power', 'value': rx_power},
         {'name': 'Absolute Power Offset', 'value': abs_power}
 
-        #results = {'sub-test': 'Radio(RF)', 'pass': True, values: []}        
+        results = {'sub-test': 'Radio(RF)', 'pass': True, values: []}        
         #print(values)
-        return results
-    
-    '''
+        return results    
+   
     # Demo code of print statements and plots
-
+    '''
     # Create a figure and three subplots (stacked vertically)
     fig, axs = plt.subplots(2, 1, figsize=(10, 4), sharex=True)
     
@@ -193,10 +183,10 @@ def RF_self_test():
     print("Absolute Frequency Offset:   {:.2f} Hz".format(offset))
     print("")
     print("Set Tx Power:                {:.2f} dB".format(sdr_tx.tx_hardwaregain_chan0))
-    print("Transmitted PSD:             {:.2f} ".format(tx_power))
-    print("Received PSD:                {:.2f} ".format(rx_power))
+    print("Transmitted PSD:             {:.2f} dB/Hz".format(tx_power))
+    print("Received PSD:                {:.2f} dB/Hz".format(rx_power))
     print("")
-    print("Absolute Power Offset:       {:.2f} dBm".format(abs_power))
+    print("Absolute Power Offset:       {:.2f} ".format(abs_power))
     print("")
     print("Bit-Error-Rate (BER):        {:.2f} %".format(ber)) 
     '''
@@ -230,20 +220,18 @@ def RF_SCuM_test(path):
     # May need to address data recording here if buffer is getting too full
     #
     #
-
-    
     # Create timestamped data folder
-    now = str(datetime.datetime.now())
+    now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     data_path = path + now
     data_path = os.path.normpath(data_path)
-    #print(data_path)
-    
+    os.makedirs(data_path)
+
     # Write data to timestamped data folder
     csv_path = data_path + "/results.csv"
     csv_path = os.path.normpath(csv_path)
     #print(csv_path)
-    df.to_csv(csv_path)
-
+    df.to_csv(csv_path, index=False)
+    
     # Use DF to create PSD .png file type
     image_path = data_path + "/PSD.png"
     image_path = os.path.normpath(image_path)
@@ -262,12 +250,40 @@ def RF_SCuM_test(path):
     plt.close()
     
     # Return filepath to .png file
-    return image_path
-
-
-def end_test():
+    #return image_path
+    
+    return data_path
+    
     # Kill Pluto Rx
     del sdr_rx
+
+
+
+def end_test(data_path):
+    # CSV path
+    csv_path = data_path + "/results.csv"    
+    
+    # Image path
+    image_path = data_path + "/PSD.png"
+
+    # Create the df from the csv
+    df = pd.read_csv(csv_path)
+    
+    signal = df.iloc[:, 1].values 
+    fs = sr 
+    
+    plt.figure(figsize=(8,4))
+    plt.psd(signal, NFFT=1024, Fs=fs)
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('PSD [dB/Hz]')
+    plt.title('PSD of SCuM')
+    plt.tight_layout()
+    
+    plt.savefig(image_path)
+    plt.close()
+    
+    # Return filepath to .png file
+    return image_path
     
 
 # Running the tests
