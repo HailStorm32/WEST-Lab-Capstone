@@ -5,3 +5,4 @@ pylibiio==0.25
 pyadi_iio==0.0.19
 joulescope==1.3.0
 pdfkit==1.0.0
+pandas==2.2.3
