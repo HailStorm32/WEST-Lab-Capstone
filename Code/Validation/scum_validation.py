@@ -36,31 +36,6 @@ def clear_terminal():
     else:  # For Unix-based systems
         os.system('clear')
 
-###################
-# Stub functions
-# These functions are placeholders for the actual functions that will be implemented elsewhere
-# Will be removed once the actual functions are implemented
-###################
-def stub_self_check():
-    return [{'sub-test': 'Radio self test', 'pass': True, 'values': []}]  # Placeholder for actual self-check results
-
-def stub_get_radio_results():
-    # Simulate random radio communication results
-    return [
-        {'sub-test': 'Radio TX', 'pass': random.choice([True, False]), 'values': [{'name': 'tx_power', 'value': random.uniform(-30, 0)}]},
-        {'sub-test': 'Radio RX', 'pass': random.choice([True, False]), 'values': [{'name': 'rx_signal_strength', 'value': random.uniform(-100, -30)}]},
-        {   'sub-test': 'Signal Over Time', 
-            'pass': True, 
-            'values': [
-                {'name': 'Signal', 'value': [[x, random.uniform(0.0, 5.0)] for x in range(100, 10100, 100)]}, 
-                {'name': 'axis_labels', 'value': {'x-label': 'Time (s)', 'y-label': 'signal (dB)'}},  
-                {'name': 'Avg dB (dB)', 'value': 42}
-            ]
-        }
-    ]
-######################################################################################
-
-
 def wait_for_trigger(device_handle):
     '''
     Wait for a trigger pulse on the specified pin
@@ -81,7 +56,7 @@ binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/
 tests = {
     'Program upload':         { 'function': scum_program,            'independent': True},
     'Radio Self Test':        { 'function': RF_self_test,            'independent': True},
-    # 'Radio communication':    { 'function': stub_function_call,      'independent': False}, #commented out, radio scum code causing issues with triggers??
+    # 'Radio communication':    { 'function': RF_SCuM_test,      'independent': False}, #commented out, radio scum code causing issues with triggers??
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
     'Serial communication':   { 'function': find_best_baud_rate,     'independent': False}, 
@@ -158,7 +133,7 @@ if __name__ == '__main__':
 
     # Run self test for spectrum analyzer
     print("Running self test for spectrum analyzer...")
-    results_handle.extend(stub_self_check()) # TODO: Replace with spectrum analyzer self test function
+    results_handle.extend(tests['Radio Self Test']['function']())
 
     if len(results_handle) == 0 or not results_handle[0]['pass']:
         print("Spectrum analyzer self test failed!\n Exiting...")
@@ -258,7 +233,7 @@ if __name__ == '__main__':
             # Wait for SCuM to finish
             wait_for_trigger(dd_handle)
 
-            results_handle.extend(stub_get_radio_results()) # TODO: Replace with actual function
+            results_handle.extend(end_test())
 
         else:
             # Run the test
