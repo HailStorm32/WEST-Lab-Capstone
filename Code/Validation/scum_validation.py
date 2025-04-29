@@ -23,7 +23,7 @@ from Utilities.PicoControl.pico_control import connect_to_pico, send_command_to_
 from Utilities.scum_program import scum_program
 from Validation.Tests.power_test import joulescope_start, stop_joulescope
 from Validation.Tests.serial_baud_test import find_best_baud_rate
-from Validation.Tests.RF_tx_rx_tests import RF_tx_rx_test, end_test, RF_self_test
+from Validation.Tests.RF_tx_rx_tests import RF_SCuM_test, end_test, RF_self_test
 
 
 def clear_terminal():
