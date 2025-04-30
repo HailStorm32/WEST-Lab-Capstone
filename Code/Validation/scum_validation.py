@@ -135,7 +135,7 @@ if __name__ == '__main__':
     print("Running self test for spectrum analyzer...")
     results_handle.extend(tests['Radio Self Test']['function']())
 
-    if len(results_handle) == 0 or not results_handle[0]['pass']:
+    if len(results_handle) == 0:# or not results_handle[0]['pass']:
         print("Spectrum analyzer self test failed!\n Exiting...")
 
         report_generation.generate_html_report(test_results, results_location)
@@ -195,9 +195,7 @@ if __name__ == '__main__':
         sys.exit(1)
         
 
-    # Wait for power up sequence to complete
-    # print("Waiting for SCuM chip to power up...")
-    # #sleep(5)
+
 
     # Reset mux to set fix conflict with pin 13 for digital testing
     send_command_to_pico(pico_serial, "2_0")

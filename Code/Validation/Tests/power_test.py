@@ -28,6 +28,7 @@ import time
 import joulescope
 import csv
 import threading
+from time import sleep
 from config import PWR_USE_ACCEPTABLE_VOLTAGE_RANGE_V, PWR_USE_ACCEPTABLE_CURRENT_RANGE_A
 
 # Global Variables
@@ -69,14 +70,14 @@ def power_cycle():
     
     try:
         # Power Cycle USB Downstream Port 1 (Nordic/SCuM).
-        print("Turning off USB Port 1")
+        print("Turning off Yepkit USB Port 1")
         subprocess.run([ykushcmd_path, "-d", "1"], shell=True)
         time.sleep(5) # Blocking call to ensure it properly power cycles.
-        print("Turning on USB Port 1")
+        print("Turning on Yepkit USB Port 1")
         subprocess.run([ykushcmd_path, "-u", "1"], shell=True)
         time.sleep(5) # Blocking call to ensure it properly power cycles.
     except Exception as e:
-        print(f"Error during power cycle: {e}")
+        print(f"Error during Yepkit power cycle: {e}")
         return None # Return None to propagate error(s) to caller.
     
     return True # Return True to indicate power cycle success.
@@ -234,6 +235,9 @@ def joulescope_start():
 
     if power_cycle() is None:
         return False # Return false if power cycle has failed.
+    # Wait for power up sequence to complete
+    print("Waiting for SCuM chip to power up...")
+    sleep(5)
 
     # Start the device operations in a separate thread
     global device_thread
