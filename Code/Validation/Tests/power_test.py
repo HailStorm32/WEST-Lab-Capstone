@@ -72,10 +72,10 @@ def power_cycle():
         # Power Cycle USB Downstream Port 1 (Nordic/SCuM).
         print("Turning off Yepkit USB Port 1")
         subprocess.run([ykushcmd_path, "-d", "1"], shell=True)
-        time.sleep(5) # Blocking call to ensure it properly power cycles.
+        time.sleep(1) # Blocking call to ensure it properly power cycles.
         print("Turning on Yepkit USB Port 1")
         subprocess.run([ykushcmd_path, "-u", "1"], shell=True)
-        time.sleep(5) # Blocking call to ensure it properly power cycles.
+        time.sleep(10) # Blocking call to ensure it properly power cycles.
     except Exception as e:
         print(f"Error during Yepkit power cycle: {e}")
         return None # Return None to propagate error(s) to caller.
@@ -237,7 +237,7 @@ def joulescope_start():
         return False # Return false if power cycle has failed.
     # Wait for power up sequence to complete
     print("Waiting for SCuM chip to power up...")
-    sleep(5)
+
 
     # Start the device operations in a separate thread
     global device_thread

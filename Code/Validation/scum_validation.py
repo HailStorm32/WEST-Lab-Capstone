@@ -56,7 +56,7 @@ binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/
 tests = {
     'Program upload':         { 'function': scum_program,            'independent': True},
     'Radio Self Test':        { 'function': RF_self_test,            'independent': True},
-    # 'Radio communication':    { 'function': RF_SCuM_test,      'independent': False}, #commented out, radio scum code causing issues with triggers??
+    #'Radio communication':    { 'function': RF_SCuM_test,      'independent': False}, #commented out, radio scum code causing issues with triggers??
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
     'Serial communication':   { 'function': find_best_baud_rate,     'independent': False}, 
@@ -198,7 +198,7 @@ if __name__ == '__main__':
 
 
     # Reset mux to set fix conflict with pin 13 for digital testing
-    send_command_to_pico(pico_serial, "2_0")
+    send_command_to_pico(pico_serial, "2_4")
 
     # Run the tests
     for test_name, test_info in tests.items():
