@@ -35,6 +35,10 @@ void initialize_all_gpio(void) {
         gpio_set_dir(gpio_num, GPIO_OUT); // Set all GPIO pins as output
         gpio_put(gpio_num, false);       // Set all GPIO pins to low initially
     }
+    // EN is active low to set high an init
+    gpio_put(scope1_EN, 1);
+    gpio_put(scope2_EN, 1);
+    gpio_put(wavegen2_EN, 1);
 }
 
 // Function to control a GPIO pin (set or clear)
