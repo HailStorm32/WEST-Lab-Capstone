@@ -1,4 +1,4 @@
-10456021087876
+12201053367332
 3rdPrty_Footprints
 2269901
 226990-1-1
@@ -59233,6 +59233,13 @@ heatsink
 0
 0
 0
+Imports
+DIP8_208-4_CTS
+
+208-4 
+0
+8
+8
 Inductor_SMD
 L_6.3x6.3_H3
 Choke, SMD, 6.3x6.3mm 3mm height
