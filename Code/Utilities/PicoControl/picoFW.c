@@ -5,7 +5,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-        
+
+int scope1_EN = 6; // GPIO pin for Scope1 enable
+int scope2_EN = 7; // GPIO pin for Scope2 enable
+int wavegen2_EN = 8; // GPIO pin for Wavegen2 enable
+
+int scope1_S0 = 20; // GPIO pin for Scope1 S0
+int scope1_S1 = 21; // GPIO pin for Scope1 S1
+int scope1_S2 = 22; // GPIO pin for Scope1 S2
+int scope1_S3 = 26; // GPIO pin for Scope1 S3
+int scope1_S4 = 27; // GPIO pin for Scope1 S4
+
+int scope2_S0 = 19; // GPIO pin for Scope2 S0
+int scope2_S1 = 18; // GPIO pin for Scope2 S1
+int scope2_S2 = 17; // GPIO pin for Scope2 S2
+int scope2_S3 = 16; // GPIO pin for Scope2 S3
+int scope2_S4 = 9; // GPIO pin for Scope2 S4
+
+int wavegen2_S0 = 14; // GPIO pin for Wavegen2 S0
+int wavegen2_S1 = 13; // GPIO pin for Wavegen2 S1
+int wavegen2_S2 = 12; // GPIO pin for Wavegen2 S2
+int wavegen2_S3 = 11; // GPIO pin for Wavegen2 S3
+int wavegen2_S4 = 10; // GPIO pin for Wavegen2 S4
+
 // Function to initialize all GPIO pins
 void initialize_all_gpio(void) {
     for (uint gpio_num = 0; gpio_num <= 29; gpio_num++) {
@@ -90,43 +112,108 @@ int muxToPicoMap[3][32] = {
 
 // Function to handle parsed commands
 void handle_parsed_command(ParsedCommand command) {
-    bool value2Bits[5] = {false};
-    for (int i = 0; i < 5; i++) 
-    {
-        value2Bits[i] = (muxToPicoMap[command.value1][command.value2] >> i) & 1; // Extract the bits
-    }
-//muxToPicoMap[command.value1][command.value2]
+    
+    // Check if the command is valid
+    if ((command.value1 <= 2 || command.value2 <= 3) && (command.value1 >= 0 || command.value2 >= 0)) {
+        if (command.value2 == 32) // Check for enable
+        {
+            //printf("Enable command: %u\n", command.value2);
+            switch (command.value1) 
+            { // Index to the mux
+                case 0:
+                    pico_gpio_control(scope1_EN, 1);
 
+                    break;
+                case 1:
+                    pico_gpio_control(scope2_EN, 1);
 
-    switch (command.value1) 
-    { // Index to the mux
-        case 0:
-            pico_gpio_control(20, value2Bits[0]);
-            pico_gpio_control(21, value2Bits[1]);
-            pico_gpio_control(22, value2Bits[2]);
-            pico_gpio_control(26, value2Bits[3]);
-            pico_gpio_control(27, value2Bits[4]);
-            break;
-        case 1:
-            pico_gpio_control(19, value2Bits[0]);
-            pico_gpio_control(18, value2Bits[1]);
-            pico_gpio_control(17, value2Bits[2]);
-            pico_gpio_control(16, value2Bits[3]);
-            pico_gpio_control(9,  value2Bits[4]);
-            break;
-        case 2:
-            pico_gpio_control(14, value2Bits[0]);
-            pico_gpio_control(13, value2Bits[1]);
-            pico_gpio_control(12, value2Bits[2]);
-            pico_gpio_control(11, value2Bits[3]);
-            pico_gpio_control(10, value2Bits[4]);
-            break;
-        default:
-            // pass
-            break;
+                    break;
+                case 2:
+                    pico_gpio_control(wavegen2_EN, 1);
+
+                    break;
+                default:
+                    // pass
+                    break;
+            }
+        } 
+        else if (command.value2 == 33) // Check for disable
+        {
+            //printf("Disable command: %u\n", command.value2);
+            switch (command.value1) 
+            { // Index to the mux
+                case 0:
+                    pico_gpio_control(scope1_EN, 0);
+
+                    break;
+                case 1:
+                    pico_gpio_control(scope2_EN, 0);
+
+                    break;
+                case 2:
+                    pico_gpio_control(wavegen2_EN, 0);
+
+                    break;
+                default:
+                    // pass
+                    break;
+            } 
+        }
+        else // must be GPIO
+        {
+            bool value2Bits[5] = {false};
+            for (int i = 0; i < 5; i++) 
+            {
+                value2Bits[i] = (muxToPicoMap[command.value1][command.value2] >> i) & 1; // Extract the bits
+            }
+        
+            switch (command.value1) 
+            { // Index to the mux
+                case 0:
+                    pico_gpio_control(scope1_EN, 1);
+        
+                    pico_gpio_control(scope1_S0, value2Bits[0]);
+                    pico_gpio_control(scope1_S1, value2Bits[1]);
+                    pico_gpio_control(scope1_S2, value2Bits[2]);
+                    pico_gpio_control(scope1_S3, value2Bits[3]);
+                    pico_gpio_control(scope1_S4, value2Bits[4]);
+                    
+                    pico_gpio_control(scope1_EN, 0);
+                    break;
+                    case 1:
+                    pico_gpio_control(scope2_EN, 1);
+                    
+                    pico_gpio_control(scope2_S0, value2Bits[0]);
+                    pico_gpio_control(scope2_S1, value2Bits[1]);
+                    pico_gpio_control(scope2_S2, value2Bits[2]);
+                    pico_gpio_control(scope2_S3, value2Bits[3]);
+                    pico_gpio_control(scope2_S4,  value2Bits[4]);
+                    
+                    pico_gpio_control(scope2_EN, 0);
+                    break;
+                    case 2:
+                    pico_gpio_control(wavegen2_EN, 1);
+                    
+                    pico_gpio_control(wavegen2_S0, value2Bits[0]);
+                    pico_gpio_control(wavegen2_S1, value2Bits[1]);
+                    pico_gpio_control(wavegen2_S2, value2Bits[2]);
+                    pico_gpio_control(wavegen2_S3, value2Bits[3]);
+                    pico_gpio_control(wavegen2_S4, value2Bits[4]);
+        
+                    pico_gpio_control(wavegen2_EN, 0);
+                    break;
+                default:
+                    // pass
+                    break;
+            }
+        }
+        //printf("Invalid command: %u_%u\n", command.value1, command.value2);
+        // Pass and dont update the GPIO
+        return;
     }
-    printf("%u_%u maps to %d\n", command.value1, command.value2, muxToPicoMap[command.value1][command.value2]);
-    fflush(stdout);
+    // Check for EN commmands
+    //printf("%u_%u maps to %d\n", command.value1, command.value2, muxToPicoMap[command.value1][command.value2]);
+    //fflush(stdout);
 }
 
 int main() {
@@ -166,5 +253,4 @@ int main() {
         handle_parsed_command(parsed);
     }
 }
-
 
