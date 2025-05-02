@@ -135,10 +135,10 @@ def RF_self_test():
     abs_power = np.abs(tx_power - rx_power)   
     
     if(ber != 0.00):
-        value = {'name': 'Bit-Error-Rate', 'value': ber}
-        results = {'sub-test': 'Radio(RF)', 'pass': False, 'values': value}
+        value = [{'name': 'Bit-Error-Rate', 'value': ber}]
+        results = [{'sub-test': 'Radio(RF)', 'pass': False, 'values': value}]
         #print(value)
-        #return results
+        return results
     
     else:
         values =[ {'name': 'Bit-Error-Rate (BER)', 'value': ber},
