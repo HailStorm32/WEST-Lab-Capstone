@@ -8,7 +8,6 @@ The following tests are performed:
 - Radio communication
 '''
 import os
-import random  # For simulating power consumption data (remove once actual data is available)
 import sys
 from time import sleep
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
@@ -56,7 +55,7 @@ binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/
 tests = {
     'Radio Self Test':        { 'function': RF_self_test,            'independent': True},
     'Program upload':         { 'function': scum_program,            'independent': True},
-    'Radio communication':    { 'function': RF_SCuM_test,            'independent': False}, #commented out, radio scum code causing issues with triggers??
+    'Radio communication':    { 'function': RF_SCuM_test,            'independent': False},
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
     'Serial communication':   { 'function': find_best_baud_rate,     'independent': False}, 
@@ -72,44 +71,6 @@ test_results['SCuM-Validation'] = {'tests': {}}
 for test in tests:
     test_results['SCuM-Validation']['tests'][test] = {'results': []}
 
-'''
-test_results format:
-{
-    'unit_test': {
-        'tests': {
-            'test_name':  {'results': []},
-            'test_name2': {'results': []},
-        }
-    },
-    # Add more unit tests as needed
-}
-
-results list is formatted as:
-[
-    { 'sub-test': 'pin 1', 'pass': False, values: [] },
-    { 'sub-test': 'pin 2', 'pass': False, values: [] },
-    # Add more sub tests as needed
-
-]
-
-value list is formatted as:
-[   
-    # Example of one off values
-    {'name': 'value_name1', 'value': 0},
-    {'name': 'value_name2', 'value': 55.3},
-
-    # Example of a list value (to be used for graphs)
-    {'name': 'value_name3', 'value': [1.2, 2.3, 3.4]},  # Example of a list value
-    
-    # Example of a 2D list value (to be used for graphs)
-    # Must also contain a dictionary with x and y axis labels
-    {'name': 'value_name4', 'value': [[1,3], [1,2]}]},  # Example of a 2D list value
-    {'name': 'axis_labels', 'value': {'x-label': 'x axis name', 'y-label': 'y axis name'}},  # Example of a dictionary value
-
-    # Example of a path to a graph image
-    {'name': 'value_name5', 'value': "path/to/graph.png"},  # Example of path to a graph image
-]
-'''
 
 #########################################################
 # Main
@@ -237,7 +198,6 @@ if __name__ == '__main__':
             # Wait for SCuM to finish
             wait_for_trigger(dd_handle)
             
-
         else:
             # Run the test
             results_handle.extend(test_info['function']())
