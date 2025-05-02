@@ -136,7 +136,7 @@ if __name__ == '__main__':
     
     results_handle.extend(tests['Radio Self Test']['function']())
 
-    if len(results_handle) == 0:# or not results_handle[0]['pass']:
+    if len(results_handle) == 0 or not results_handle[0]['pass']:
         print("Spectrum analyzer self test failed!\n Exiting...")
 
         report_generation.generate_html_report(test_results, results_location)
