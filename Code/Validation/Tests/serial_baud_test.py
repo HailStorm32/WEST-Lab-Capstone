@@ -71,10 +71,21 @@ def find_best_baud_rate(port=SCUM_SERIAL_COM_PORT):
     print(f"Testing serial device on {port}...\n")
 
     test_results = []
+    values = []
+    baud_found = False
     for baud in COMMON_BAUD_RATES:
-        success = test_baud_rate(port, baud) #change this function original test or read only
-        test_results.append({ 'sub-test': f'{baud} bps', 'pass': success, 'values': [] })
-        print(f"{baud} {'True' if success else 'False'}")
+        baud_found = test_baud_rate(port, baud) #change this function original test or read only
+
+        print(f"{baud} {'True' if baud_found else 'False'}")
+
+        if baud_found:
+            values.append({'name': "Successful Baud Rate (bps)", 'value': baud})
+            print(f"Baud rate {baud} is working.")
+            break
+
+    values.append({'name': "Tested Rates (bps)", 'value': ",".join(map(str, COMMON_BAUD_RATES))})
+
+    test_results.append({ 'sub-test': 'Find Valid Baud rate', 'pass': baud_found, 'values': values })
 
     return test_results
 
