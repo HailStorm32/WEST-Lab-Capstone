@@ -69,6 +69,7 @@ def power_cycle():
         return None # Return None to propagate error(s) to caller.
     
     try:
+        subprocess.run([ykushcmd_path, "--reset"],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         # Power Cycle USB Downstream Port 1 (Nordic/SCuM).
         print("Turning off Yepkit USB Port 1")
         subprocess.run([ykushcmd_path, "-d", "1"], shell=True)
