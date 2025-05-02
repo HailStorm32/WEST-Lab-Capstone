@@ -319,6 +319,24 @@ def generate_html_report(test_results, filename="test_results_report.html"):
     print(f"✅ HTML report saved to '{report_path}'")
 
 def email_report(smtp_server, smtp_port, smtp_username, smtp_password, smtp_sender_email, users_to_email, wkhtmltopdf_path):
+    """
+    Send the SCuM nightly validation report via email.
+
+    This function converts the generated HTML report to a PDF file, attaches both the HTML and PDF reports to an email,
+    and sends the email to the specified recipients.
+
+    Args:
+        smtp_server (str): SMTP server address.
+        smtp_port (int): SMTP server port.
+        smtp_username (str): SMTP username for authentication.
+        smtp_password (str): SMTP password for authentication.
+        smtp_sender_email (str): Sender's email address.
+        users_to_email (list): List of recipient email addresses.
+        wkhtmltopdf_path (str): Path to the wkhtmltopdf executable.
+
+    Returns:
+        bool: True if the email was sent successfully, False otherwise.
+    """
     msg = EmailMessage()
     msg['Subject'] = 'SCuM Nightly Validation Report'
     msg['From'] = smtp_sender_email
