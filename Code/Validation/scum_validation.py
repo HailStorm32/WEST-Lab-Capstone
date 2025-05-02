@@ -40,23 +40,23 @@ def wait_for_trigger(device_handle):
     '''
     Wait for a trigger pulse on the specified pin
     '''
-    WF_SDK.logic.open(device_handle)
+    WF_SDK.logic.open(device_handle, buffer_size=10000)
 
     # Wait for trigger pulse
     WF_SDK.logic.trigger(device_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
-    WF_SDK.logic.record(device_handle, channel=TRIGGER_PIN_NUM)
+    WF_SDK.logic.record(device_handle, channel=TRIGGER_PIN_NUM, )
 
     # Close logic analyzer
     WF_SDK.logic.close(device_handle)
 
-binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/valScript_NOradio.bin'))
+binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/valScript.bin'))
 
 # List of tests to be performed
 # Independent tests are run outside the main loop
 tests = {
-    'Program upload':         { 'function': scum_program,            'independent': True},
     'Radio Self Test':        { 'function': RF_self_test,            'independent': True},
-    #'Radio communication':    { 'function': RF_SCuM_test,      'independent': False}, #commented out, radio scum code causing issues with triggers??
+    'Program upload':         { 'function': scum_program,            'independent': True},
+    'Radio communication':    { 'function': RF_SCuM_test,            'independent': False}, #commented out, radio scum code causing issues with triggers??
     'Digital input/output':   { 'function': run_logic_analysis,      'independent': False}, 
     'Analog validation':      { 'function': validate_analog_signals, 'independent': False}, 
     'Serial communication':   { 'function': find_best_baud_rate,     'independent': False}, 
@@ -133,6 +133,7 @@ if __name__ == '__main__':
 
     # Run self test for spectrum analyzer
     print("Running self test for spectrum analyzer...")
+    
     results_handle.extend(tests['Radio Self Test']['function']())
 
     if len(results_handle) == 0:# or not results_handle[0]['pass']:
@@ -195,10 +196,7 @@ if __name__ == '__main__':
         sys.exit(1)
         
 
-
-
-    # Reset mux to set fix conflict with pin 13 for digital testing
-    send_command_to_pico(pico_serial, "2_4")
+    sleep(0.25)
 
     # Run the tests
     for test_name, test_info in tests.items():
@@ -217,21 +215,28 @@ if __name__ == '__main__':
         results_handle = test_results[first_unit_test_name]['tests'][test_name]['results']
 
         if test_name == 'Digital input/output':
+            # Disable all MUX for digital testing
+            send_command_to_pico(pico_serial, "0_32")
+            send_command_to_pico(pico_serial, "1_32")
+            send_command_to_pico(pico_serial, "2_32")
             # Run the test
             results_handle.extend(test_info['function'](dd_handle, TRIGGER_PIN_NUM))
-
+            # Enable all MUX
+            send_command_to_pico(pico_serial, "0_33")
+            send_command_to_pico(pico_serial, "1_33")
+            send_command_to_pico(pico_serial, "2_33")
         elif test_name == 'Analog validation':
             # Run the test
             results_handle.extend(test_info['function'](ad_handle, pico_serial))
 
         elif test_name == 'Radio communication':
             # Run the test
-            test_info['function']()
+            print(os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source')))
+            results_handle.extend(test_info['function'](os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source'))))
             
             # Wait for SCuM to finish
             wait_for_trigger(dd_handle)
-
-            results_handle.extend(end_test())
+            
 
         else:
             # Run the test
@@ -245,6 +250,7 @@ if __name__ == '__main__':
     
     # Stop the joule scope monitoring and get the results
     results_handle.extend(tests['Power Consumption']['function']())
+
 
     # Generate the HTML report
     print("Generating HTML report...")

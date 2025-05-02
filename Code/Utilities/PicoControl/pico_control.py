@@ -49,16 +49,15 @@ def send_command_to_pico(pico_serial, command):
             # Send command with carriage return and newline
             pico_serial.write(command.encode('ascii') + b'\n')
             pico_serial.flush()  # Ensure the command is sent immediately
-            print(f"Command sent: {command}")
-            time.sleep(0.5)  # Wait for the command to be processed
+            print(f"Pico command sent: {command}")
 
             # Read response (if any)
-            response = pico_serial.readline().decode('ascii').strip()
+            #response = pico_serial.readline().decode('ascii').strip()
             #print(f"Response: {response}")
         except serial.SerialException as e:
-            print(f"Failed to send command: {e}")
+            print(f"Failed to send pico command: {e}")
     else:
-        print("Serial connection is not open.")
+        print("Pico Serial connection is not open.")
 
 # The following functions are used only for development and testing purposes
 def send_all_commands(pico_serial):
@@ -117,4 +116,4 @@ if __name__ == "__main__":
     finally:
         if pico and pico.is_open:
             pico.close()
-            print("Serial connection closed.")
+            print("Pico Serial connection closed.")

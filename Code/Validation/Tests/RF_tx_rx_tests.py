@@ -141,7 +141,7 @@ def RF_self_test():
         #return results
     
     else:
-        values = {'name': 'Bit-Error-Rate (BER)', 'value': ber},
+        values =[ {'name': 'Bit-Error-Rate (BER)', 'value': ber},
         {'name': 'Set Transmission Frequency', 'value': set_freq},
         {'name': 'Transmitted Peak Frequency', 'value': peak_freq_Tx},
         {'name': 'Received Peak Frequency', 'value': peak_freq_Rx},
@@ -149,9 +149,9 @@ def RF_self_test():
         {'name': 'Set Tx Power Gain', 'value': sdr_tx.tx_hardwaregain_chan0},
         {'name': 'Transmitted Power', 'value': tx_power},
         {'name': 'Received Power', 'value': rx_power},
-        {'name': 'Absolute Power Offset', 'value': abs_power}
+        {'name': 'Absolute Power Offset', 'value': abs_power}]
 
-        results = {'sub-test': 'Radio(RF)', 'pass': True, 'values': []}        
+        results = [{'sub-test': 'Radio(RF)', 'pass': True, 'values': values}]       
         #print(values)
         return results    
    
@@ -203,63 +203,65 @@ def RF_self_test():
 def RF_SCuM_test(path):
     # Setup Rx Pluto 
     sdr_rx = adi.Pluto("ip:192.168.2.2")
-    sdr_rx.gain_control_mode_chan0 = "fast_attack" # for Automatic Gain Control
+    sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
     sdr_rx.rx_hardwaregain_chan0 = 70.0
     sdr_rx.rx_lo = int(cw)
     sdr_rx.sample_rate = int(2e6)
     sdr_rx.rx_rf_bandwidth = int(sr)
-    sdr_rx.rx_buffer_size = num_symbols * samples_per_symbol * 32
+    sdr_rx.rx_buffer_size = int(2e6)
 
     # Clear any potential data in the buffer
-    for i in range (0, 10):
+    for i in range(0, 10):
         raw_data = sdr_rx.rx()
 
-    # Put data into a datafile
-    #
-    #
+    # Receive data
     data = sdr_rx.rx()
-    df = pd.DataFrame(data)    
-    # May need to address data recording here if buffer is getting too full
-    #
-    #
+    if data.size == 0:
+        print("Warning: Received empty data from sdr_rx.rx()")
+        return [{'sub-test': 'RF Test', 'pass': False, 'values': [{'name': 'Error', 'value': 'No data received'}]}]
+
+    # Reshape data if necessary
+    if len(data.shape) == 1:
+        data = data.reshape(-1, 1)  # Convert to 2D array with one column
+
+    # Create DataFrame
+    df = pd.DataFrame(data)
+
+    # Ensure the DataFrame has at least one column
+    if df.shape[1] < 1:
+        print("Warning: DataFrame has no columns")
+        return [{'sub-test': 'RF Test', 'pass': False, 'values': [{'name': 'Error', 'value': 'Invalid data structure'}]}]
+
+    # Access the first column of the DataFrame
+    signal = df.iloc[:, 0].values
+
     # Create timestamped data folder
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    data_path = path + now
-    timestamped_path = data_path
-    data_path = os.path.normpath(data_path)
-    os.makedirs(data_path)
+    data_path = os.path.join(path, now)
+    os.makedirs(data_path, exist_ok=True)
 
     # Write data to timestamped data folder
-    csv_path = data_path + "/results.csv"
-    csv_path = os.path.normpath(csv_path)
-    #print(csv_path)
+    csv_path = os.path.join(data_path, "results.csv")
     df.to_csv(csv_path, index=False)
-    
-    # Use DF to create PSD .png file type
-    image_path = data_path + "/PSD.png"
-    image_path = os.path.normpath(image_path)
-    
-    signal = df.iloc[:, 1].values 
-    fs = sdr_rx.sample_rate 
-    
-    plt.figure(figsize=(8,4))
+
+    # Use DataFrame to create PSD .png file
+    image_path = os.path.join(data_path, "PSD.png")
+    fs = sdr_rx.sample_rate
+
+    plt.figure(figsize=(8, 4))
     plt.psd(signal, NFFT=1024, Fs=fs)
     plt.xlabel('Frequency [Hz]')
     plt.ylabel('PSD [dB/Hz]')
     plt.title('PSD of SCuM')
     plt.tight_layout()
-    
     plt.savefig(image_path)
     plt.close()
-    
-    # Return filepath to .png file
-    #return image_path
-    
-    #return data_path
-    
+
     # Kill Pluto Rx
     del sdr_rx
 
+    # Return results
+    return [{'sub-test': 'RF Test', 'pass': True, 'values': [{'name': 'PSD Image', 'value': image_path}]}]
 
 
 def end_test():
