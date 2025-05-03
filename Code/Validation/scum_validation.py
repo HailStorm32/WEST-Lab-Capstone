@@ -22,7 +22,7 @@ from Utilities.PicoControl.pico_control import connect_to_pico, send_command_to_
 from Utilities.scum_program import scum_program
 from Validation.Tests.power_test import joulescope_start, stop_joulescope
 from Validation.Tests.serial_baud_test import find_best_baud_rate
-from Validation.Tests.RF_tx_rx_tests import RF_SCuM_test, end_test, RF_self_test
+from Validation.Tests.RF_tx_rx_tests import RF_SCuM_test, RF_end_test, RF_self_test
 
 
 def clear_terminal():
@@ -192,11 +192,13 @@ if __name__ == '__main__':
 
         elif test_name == 'Radio communication':
             # Run the test
-            print(os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source')))
-            results_handle.extend(test_info['function'](os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source'))))
+            test_info['function']()
             
             # Wait for SCuM to finish
+            print("Waiting for SCuM to finish sweep, this will take a few minutes...")
             wait_for_trigger(dd_handle)
+
+            results_handle.extend(RF_end_test())
             
         else:
             # Run the test

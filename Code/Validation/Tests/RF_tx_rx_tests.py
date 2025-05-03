@@ -14,12 +14,8 @@ samples = 100
 num_symbols = 100
 samples_per_symbol = 2
 
-timestamped_path = []
-
-
 # General overall test result storage folder
-filepath = "C:/Users/19719/OneDrive/Desktop/scum_test_results/"
-
+default_results_path = os.path.join(os.path.dirname(__file__), '..\\..', 'ResultBackups\\PlutoResults')
 
 def RF_self_test():
     # Setup Rx Pluto 
@@ -133,6 +129,10 @@ def RF_self_test():
     tx_power = 10 * np.log10(np.mean(np.abs(sample)**2))
     rx_power = 10 * np.log10(np.mean(np.abs(rx_samples)**2)) + 30 + np.abs(sdr_tx.tx_hardwaregain_chan0)
     abs_power = np.abs(tx_power - rx_power)   
+
+    # Clean up/remove extraneous print statements
+    del sdr_rx
+    del sdr_tx    
     
     if(ber != 0.00):
         value = [{'name': 'Bit-Error-Rate', 'value': ber}]
@@ -192,16 +192,22 @@ def RF_self_test():
     print("")
     print("Bit-Error-Rate (BER):        {:.2f} %".format(ber)) 
     '''
-
-    # Clean up/remove extraneous print statements
-    del sdr_rx
-    del sdr_tx    
     
     #return results
 
    
-def RF_SCuM_test(path):
+def RF_SCuM_test():
+    # Ensure the ResultsBackups directory exists
+    if not os.path.exists(os.path.join(os.path.dirname(__file__), '..\\..', 'ResultBackups')):
+        print("Error: The directory 'ResultBackups' does not exist. Please run the setup script to initialize the environment.")
+        os.exit(1)
+
+    # Create folder were all the timestamped data will be stored
+    elif not os.path.exists(default_results_path):
+        os.makedirs(default_results_path)
+
     # Setup Rx Pluto 
+    global sdr_rx
     sdr_rx = adi.Pluto("ip:192.168.2.2")
     sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
     sdr_rx.rx_hardwaregain_chan0 = 70.0
@@ -232,21 +238,30 @@ def RF_SCuM_test(path):
         print("Warning: DataFrame has no columns")
         return [{'sub-test': 'RF Test', 'pass': False, 'values': [{'name': 'Error', 'value': 'Invalid data structure'}]}]
 
+    # This is made global just to be able to access it in the RF_end_test function
+    # This should be removed once you can read out the signal from the csv file in the RF_end_test function
+    global signal
     # Access the first column of the DataFrame
     signal = df.iloc[:, 0].values
 
     # Create timestamped data folder
+    global timestamped_path
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    data_path = os.path.join(path, now)
-    os.makedirs(data_path, exist_ok=True)
+    timestamped_path = os.path.join(default_results_path, now)
+    os.makedirs(timestamped_path, exist_ok=True)
 
     # Write data to timestamped data folder
-    csv_path = os.path.join(data_path, "results.csv")
+    csv_path = os.path.join(timestamped_path, "results.csv")
     df.to_csv(csv_path, index=False)
+    pass
 
+    
+def RF_end_test():
     # Use DataFrame to create PSD .png file
-    image_path = os.path.join(data_path, "PSD.png")
+    image_path = os.path.join(timestamped_path, "PSD.png")
     fs = sdr_rx.sample_rate
+
+    #TODO: Parse the CSV file to get the signal data
 
     plt.figure(figsize=(8, 4))
     plt.psd(signal, NFFT=1024, Fs=fs)
@@ -262,35 +277,6 @@ def RF_SCuM_test(path):
 
     # Return results
     return [{'sub-test': 'RF Test', 'pass': True, 'values': [{'name': 'PSD Image', 'value': image_path}]}]
-
-
-def end_test():
-    # CSV path
-    data_path = timestamped_path
-    csv_path = data_path + "/results.csv"    
-    
-    # Image path
-    image_path = data_path + "/PSD.png"
-
-    # Create the df from the csv
-    df = pd.read_csv(csv_path)
-    
-    signal = df.iloc[:, 1].values 
-    fs = sr 
-    
-    plt.figure(figsize=(8,4))
-    plt.psd(signal, NFFT=1024, Fs=fs)
-    plt.xlabel('Frequency [Hz]')
-    plt.ylabel('PSD [dB/Hz]')
-    plt.title('PSD of SCuM')
-    plt.tight_layout()
-    
-    plt.savefig(image_path)
-    plt.close()
-    
-    # Return filepath to .png file
-    return image_path
-    
 
 # Running the tests
 #results = RF_self_test()
