@@ -32,8 +32,8 @@ ACCEPTABLE_VOLTAGE_RANGE_1_1V = [1.0, 1.2]  # Acceptable range (in volts) for th
 ACCEPTABLE_VOLTAGE_RANGE_1_8V = [1.7, 1.9]  # Acceptable range (in volts) for the 1.8V reference voltage
 
 CLOCKS_TO_TEST = [    # List of clocks to test     
-    {'name': "HFCLK",   'exp_freq_hz': 20000000,    'tolerance_ppm': 1000, 'mux-command': '1_5'},
-    {'name': "LFCLK",   'exp_freq_hz': 20000000,    'tolerance_ppm': 1000, 'mux-command': '1_15'}
+    {'name': "HFCLK",   'exp_freq_hz': 20000000,    'tolerance_ppm': 40, 'mux-command': '1_5'},
+    {'name': "LFCLK",   'exp_freq_hz': 20000000,    'tolerance_ppm': 40, 'mux-command': '1_15'}
     ]
 '''
 PPM = ((exp_freq_hz - measured_freq_hz) / exp_freq_hz) * 1_000_000
