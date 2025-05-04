@@ -365,6 +365,24 @@ def determine_signal_frequency(device_data, channel=1, n_measurements=10, sample
     else:
         return weighted_freq_avg
 
+def convert_frequency_to_unit(freq):
+    """
+    Convert frequency to appropriate unit (Hz, kHz, MHz, GHz) with 4 significant figures.
+
+    Parameters:
+        freq (float): Frequency in Hz
+
+    Returns:
+        list: [str, float]: The appropriate unit and the frequency in Hz
+    """
+    if freq >= 1e9:
+        return ["GHz", round(freq / 1e9, 4)]
+    elif freq >= 1e6:
+        return ["MHz", round(freq / 1e6, 4)]
+    elif freq >= 1e3:
+        return ["kHz", round(freq / 1e3, 4)]
+    else:
+        return ["Hz", round(freq, 4)]
 
 def validate_analog_signals(device_data, pico_serial):
     '''
@@ -401,7 +419,7 @@ def validate_analog_signals(device_data, pico_serial):
         print(f"1.1V reference voltage test: {'PASS' if result[1] else 'FAIL'} at {result[0]}V")
         test_results[0]['pass'] = result[1]
         test_results[0]['values'] = [
-            {'name': 'measured_voltage (V)', 'value': result[0]}
+            {'name': 'measured_voltage (V)', 'value': round(result[0], 4)}
         ]
     else:
         print("1.1V reference voltage: FAIL (unable to measure)")
@@ -417,7 +435,7 @@ def validate_analog_signals(device_data, pico_serial):
         print(f"1.8V reference voltage test: {'PASS' if result[1] else 'FAIL'} at {result[0]}V")
         test_results[1]['pass'] = result[1]
         test_results[1]['values'] = [
-            {'name': 'measured_voltage (V)', 'value': result[0]}
+            {'name': 'measured_voltage (V)', 'value': round(result[0], 4)}
         ]
     else:
         print("1.8V reference voltage: FAIL (unable to measure)")
@@ -445,27 +463,29 @@ def validate_analog_signals(device_data, pico_serial):
         # Determine PPM
         ppm = ((freq - clock['exp_freq_hz']) / clock['exp_freq_hz']) * 1e6
 
+        unit, freq = convert_frequency_to_unit(freq)
+
         # Validate PPM and store the result
         if abs(ppm) <= clock['tolerance_ppm']:
-            print(f"{clock['name']} clock signal test: PASS at {freq} Hz ({ppm:.3f} ppm)")
+            print(f"{clock['name']} clock signal test: PASS at {freq} {unit} ({ppm:.3f} ppm)")
 
             test_results.append({
                 'sub-test': f"{clock['name']} clock signal",
                 'pass': True,
                 'values': [
-                    {'name': 'measured_frequency (Hz)', 'value': freq},
-                    {'name': 'ppm', 'value': ppm}
+                    {'name': f'measured_frequency ({unit})', 'value': freq},
+                    {'name': 'ppm', 'value': round(ppm, 4)}
                 ]
             })
         else:
-            print(f"{clock['name']} clock signal test: FAIL at {freq} Hz ({ppm:.3f} ppm)")
+            print(f"{clock['name']} clock signal test: FAIL at {freq} {unit} ({ppm:.3f} ppm)")
 
             test_results.append({
                 'sub-test': f"{clock['name']} clock signal",
                 'pass': False,
                 'values': [
-                    {'name': 'measured_frequency (Hz)', 'value': freq},
-                    {'name': 'ppm', 'value': ppm}
+                    {'name': f'measured_frequency ({unit})', 'value': freq},
+                    {'name': 'ppm', 'value': round(ppm, 4)}
                 ]
             })
 
@@ -523,8 +543,12 @@ def test_frequency_measurement_accuracy(device_data):
                 'percent_difference': percent_difference
             })
 
+            unit, freq = convert_frequency_to_unit(freq)
+            unit2, measured_freq = convert_frequency_to_unit(measured_freq)
+            unit3, delta = convert_frequency_to_unit(delta)
+
             # Print the result
-            print(f"Expected: {freq} Hz, Measured: {measured_freq} Hz, Delta: {delta} Hz, Percent Difference: {percent_difference:.3f}%")
+            print(f"Expected: {freq} {unit}, Measured: {measured_freq} {unit2}, Delta: {delta} {unit3}, Percent Difference: {percent_difference:.3f}%")
 
     # Save the results to a CSV file
     with open('frequency_measurement_accuracy_results.csv', mode='w', newline='') as file:
