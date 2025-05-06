@@ -19,7 +19,15 @@ default_results_path = os.path.join(os.path.dirname(__file__), '..\\..', 'Result
 
 def RF_self_test():
     # Setup Rx Pluto 
-    sdr_rx = adi.Pluto("ip:192.168.2.2")
+    try:
+        sdr_rx = adi.Pluto("ip:192.168.2.2")
+    except OSError as e:
+        print(f"Error: {e}. Please ensure the Pluto SDR is connected and accessible.\n\nIf this is the first boot of the SDR, please wait a few minutes for it to initialize and try again.")
+        return [{'sub-test': 'Radio(RF)', 'pass': False, 'values': [{'name': 'Error', 'value': str(e)}]}]
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return [{'sub-test': 'Radio(RF)', 'pass': False, 'values': [{'name': 'Error', 'value': str(e)}]}]
+
     sdr_rx.gain_control_mode_chan0 = "fast_attack" #for Automatic Gain Control
     sdr_rx.rx_lo = int(cw)
     sdr_rx.sample_rate = int(sr)
@@ -27,7 +35,15 @@ def RF_self_test():
     sdr_rx.rx_buffer_size = num_symbols * samples_per_symbol * 64
 
     # Setup Tx Pluto
-    sdr_tx = adi.Pluto("ip:192.168.2.3")
+    try:
+        sdr_tx = adi.Pluto("ip:192.168.2.3")
+    except OSError as e:
+        print(f"Error: {e}. Please ensure the Pluto SDR is connected and accessible.\n\nIf this is the first boot of the SDR, please wait a few minutes for it to initialize and try again.")
+        return [{'sub-test': 'Radio(RF)', 'pass': False, 'values': [{'name': 'Error', 'value': str(e)}]}]
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return [{'sub-test': 'Radio(RF)', 'pass': False, 'values': [{'name': 'Error', 'value': str(e)}]}]
+    
     sdr_tx.sample_rate = int(sr)
     sdr_tx.tx_rf_bandwidth = int(sr)
     sdr_tx.tx_lo = int(cw)
@@ -209,13 +225,22 @@ def RF_SCuM_test():
         os.makedirs(default_results_path)
 
     # Setup Rx Pluto 
-    sdr_rx = adi.Pluto("ip:192.168.2.2")
+    try:
+        sdr_rx = adi.Pluto("ip:192.168.2.2")
+    except OSError as e:
+        print(f"Error: {e}. Please ensure the Pluto SDR is connected and accessible.\n\nIf this is the first boot of the SDR, please wait a few minutes for it to initialize and try again.")
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return False
+    
     sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
     sdr_rx.rx_hardwaregain_chan0 = 70.0
     sdr_rx.rx_lo = int(cw)
     sdr_rx.sample_rate = int(2e6)
     sdr_rx.rx_rf_bandwidth = int(sr)
     sdr_rx.rx_buffer_size = int(2e6)
+    
     global fs 
     fs = sdr_rx.sample_rate
 
@@ -227,7 +252,7 @@ def RF_SCuM_test():
     data = sdr_rx.rx()
     if data.size == 0:
         print("Warning: Received empty data from sdr_rx.rx()")
-        return [{'sub-test': 'RF Test', 'pass': False, 'values': [{'name': 'Error', 'value': 'No data received'}]}]
+        return False
 
     # Reshape data if necessary
     if len(data.shape) == 1:
@@ -239,7 +264,7 @@ def RF_SCuM_test():
     # Ensure the DataFrame has at least one column
     if df.shape[1] < 1:
         print("Warning: DataFrame has no columns")
-        return [{'sub-test': 'RF Test', 'pass': False, 'values': [{'name': 'Error', 'value': 'Invalid data structure'}]}]
+        return False
 
     # This is made global just to be able to access it in the RF_end_test function
     # This should be removed once you can read out the signal from the csv file in the RF_end_test function
@@ -260,6 +285,8 @@ def RF_SCuM_test():
     # Kill Pluto Rx
     del sdr_rx
 
+    return True
+
     
 def RF_end_test():
     # Use DataFrame to create PSD .png file
@@ -275,8 +302,6 @@ def RF_end_test():
     plt.tight_layout()
     plt.savefig(image_path)
     plt.close()
-
-    
 
     # Return results
     return [{'sub-test': 'RF Test', 'pass': True, 'values': [{'name': 'PSD Image', 'value': image_path}]}]

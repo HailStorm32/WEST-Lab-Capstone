@@ -191,14 +191,26 @@ if __name__ == '__main__':
             results_handle.extend(test_info['function'](ad_handle, pico_serial))
 
         elif test_name == 'Radio communication':
-            # Run the test
-            test_info['function']()
+            # Start the test
+            success = test_info['function']()
             
-            # Wait for SCuM to finish
-            print("Waiting for SCuM to finish sweep, this will take a few minutes...")
-            wait_for_trigger(dd_handle)
+            if success:
+                # Wait for SCuM to finish
+                print("Waiting for SCuM to finish sweep, this will take a few minutes...")
+                wait_for_trigger(dd_handle)
 
-            results_handle.extend(RF_end_test())
+                # End and get the results
+                results_handle.extend(RF_end_test())
+            
+            else:
+                print("Error: Radio communication test failed!")
+                results_handle.append({
+                    'sub-test': 'RF Test',
+                    'pass': False,
+                    'values': [
+                        {'name': 'error', 'value': "Radio communication test failed!"}
+                    ]
+                })
             
         else:
             # Run the test
