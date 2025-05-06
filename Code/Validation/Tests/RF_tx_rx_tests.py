@@ -130,9 +130,7 @@ def RF_self_test():
     rx_power = 10 * np.log10(np.mean(np.abs(rx_samples)**2)) + 30 + np.abs(sdr_tx.tx_hardwaregain_chan0)
     abs_power = np.abs(tx_power - rx_power)   
 
-    # Clean up/remove extraneous print statements
-    del sdr_rx
-    del sdr_tx    
+       
     
     if(ber != 0.00):
         value = [{'name': 'Bit-Error-Rate', 'value': ber}]
@@ -155,6 +153,10 @@ def RF_self_test():
         #print(values)
         return results    
    
+# Clean up/remove extraneous print statements
+    del sdr_rx
+    del sdr_tx 
+
     # Demo code of print statements and plots
     '''
     # Create a figure and three subplots (stacked vertically)
@@ -207,7 +209,6 @@ def RF_SCuM_test():
         os.makedirs(default_results_path)
 
     # Setup Rx Pluto 
-    global sdr_rx
     sdr_rx = adi.Pluto("ip:192.168.2.2")
     sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
     sdr_rx.rx_hardwaregain_chan0 = 70.0
@@ -215,6 +216,8 @@ def RF_SCuM_test():
     sdr_rx.sample_rate = int(2e6)
     sdr_rx.rx_rf_bandwidth = int(sr)
     sdr_rx.rx_buffer_size = int(2e6)
+    global fs 
+    fs = sdr_rx.sample_rate
 
     # Clear any potential data in the buffer
     for i in range(0, 10):
@@ -253,13 +256,14 @@ def RF_SCuM_test():
     # Write data to timestamped data folder
     csv_path = os.path.join(timestamped_path, "results.csv")
     df.to_csv(csv_path, index=False)
-    pass
+    
+    # Kill Pluto Rx
+    del sdr_rx
 
     
 def RF_end_test():
     # Use DataFrame to create PSD .png file
     image_path = os.path.join(timestamped_path, "PSD.png")
-    fs = sdr_rx.sample_rate
 
     #TODO: Parse the CSV file to get the signal data
 
@@ -272,8 +276,7 @@ def RF_end_test():
     plt.savefig(image_path)
     plt.close()
 
-    # Kill Pluto Rx
-    del sdr_rx
+    
 
     # Return results
     return [{'sub-test': 'RF Test', 'pass': True, 'values': [{'name': 'PSD Image', 'value': image_path}]}]
