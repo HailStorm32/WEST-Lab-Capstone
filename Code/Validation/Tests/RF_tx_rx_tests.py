@@ -235,7 +235,6 @@ def RF_SCuM_test():
         return False
     
     sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
-    sdr_rx.rx_hardwaregain_chan0 = 70.0
     sdr_rx.rx_lo = int(cw)
     sdr_rx.sample_rate = int(2e6)
     sdr_rx.rx_rf_bandwidth = int(sr)
