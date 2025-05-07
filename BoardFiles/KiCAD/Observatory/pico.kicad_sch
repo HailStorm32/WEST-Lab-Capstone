@@ -1250,34 +1250,34 @@
 		)
 	)
 	(junction
-		(at 154.94 128.27)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "13d84b33-cfc3-4884-b9aa-2071117e35c1")
-	)
-	(junction
 		(at 73.66 102.87)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "17bfe295-a779-4fd5-b19a-2e7f19a3be67")
 	)
 	(junction
-		(at 154.94 102.87)
+		(at 180.34 128.27)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "222e6a05-231c-47fc-ad0a-92fc386e9c5a")
-	)
-	(junction
-		(at 154.94 115.57)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "3835e227-6fa3-4d00-94ad-3533cc9627b3")
+		(uuid "2b9e42fb-ae89-401c-9e34-cec9aff88b2e")
 	)
 	(junction
 		(at 73.66 115.57)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "4c278026-05fe-406e-a286-d5437f3a2889")
+	)
+	(junction
+		(at 180.34 115.57)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "4c5c4657-3a29-41b9-abd9-a46790c23cdf")
+	)
+	(junction
+		(at 180.34 102.87)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "59a1c7ae-ea74-42ad-a0a4-e6957af76ca9")
 	)
 	(junction
 		(at 73.66 128.27)
@@ -1302,10 +1302,6 @@
 		(uuid "616add5d-aab5-4fd8-94d3-fe9f2efdb607")
 	)
 	(no_connect
-		(at 144.78 100.33)
-		(uuid "6c0245ac-b075-4687-8bcc-366258e956b1")
-	)
-	(no_connect
 		(at 144.78 95.25)
 		(uuid "8bc17dc6-e032-4a5e-801e-a6e92b1b4424")
 	)
@@ -1324,26 +1320,6 @@
 	(no_connect
 		(at 109.22 133.35)
 		(uuid "d845e50c-bc17-40bb-aeea-1013cbff735c")
-	)
-	(wire
-		(pts
-			(xy 101.6 100.33) (xy 109.22 100.33)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "04cd9a36-cf17-4538-aa8e-cb9ae81179c2")
-	)
-	(wire
-		(pts
-			(xy 102.87 130.81) (xy 109.22 130.81)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0a561cc3-aeab-4f5b-963b-3238dfd440ab")
 	)
 	(wire
 		(pts
@@ -1367,16 +1343,6 @@
 	)
 	(wire
 		(pts
-			(xy 101.6 95.25) (xy 109.22 95.25)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1673526d-530f-4af3-bc9b-8bdd53fb04a6")
-	)
-	(wire
-		(pts
 			(xy 109.22 102.87) (xy 73.66 102.87)
 		)
 		(stroke
@@ -1397,23 +1363,13 @@
 	)
 	(wire
 		(pts
-			(xy 102.87 118.11) (xy 109.22 118.11)
+			(xy 151.13 107.95) (xy 144.78 107.95)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "2d80e68c-f712-4a45-bf83-4d4bd575caa4")
-	)
-	(wire
-		(pts
-			(xy 102.87 125.73) (xy 109.22 125.73)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "387a082b-9610-4727-baf2-8c5502cc7e9e")
+		(uuid "2bddcd89-09e2-448b-ac20-c675b67a62c6")
 	)
 	(wire
 		(pts
@@ -1427,27 +1383,17 @@
 	)
 	(wire
 		(pts
-			(xy 101.6 110.49) (xy 109.22 110.49)
+			(xy 101.6 107.95) (xy 109.22 107.95)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "4a12de58-458a-4da4-b029-6e56ebf2c60e")
+		(uuid "4031e939-038a-419a-b97f-ba1f9013af62")
 	)
 	(wire
 		(pts
-			(xy 102.87 123.19) (xy 109.22 123.19)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "52e35926-3b2b-4fd7-8d2b-5a07eb2db245")
-	)
-	(wire
-		(pts
-			(xy 154.94 90.17) (xy 154.94 102.87)
+			(xy 180.34 90.17) (xy 180.34 102.87)
 		)
 		(stroke
 			(width 0)
@@ -1457,13 +1403,33 @@
 	)
 	(wire
 		(pts
+			(xy 151.13 113.03) (xy 144.78 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5e1cfdb7-0a00-4550-a0ab-f9225874de0f")
+	)
+	(wire
+		(pts
 			(xy 101.6 97.79) (xy 109.22 97.79)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "62a07898-f0ee-4802-80f7-255dc8eb4b75")
+		(uuid "64c66ea4-bf0f-4bbd-aa5b-ce18875f04db")
+	)
+	(wire
+		(pts
+			(xy 101.6 100.33) (xy 109.22 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "682a535f-888e-4d90-a83f-fffd98d56973")
 	)
 	(wire
 		(pts
@@ -1477,6 +1443,16 @@
 	)
 	(wire
 		(pts
+			(xy 151.13 123.19) (xy 144.78 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "73852328-5f5e-4daa-ae82-dd65533d41c0")
+	)
+	(wire
+		(pts
 			(xy 109.22 90.17) (xy 73.66 90.17)
 		)
 		(stroke
@@ -1487,7 +1463,17 @@
 	)
 	(wire
 		(pts
-			(xy 144.78 128.27) (xy 154.94 128.27)
+			(xy 151.13 118.11) (xy 144.78 118.11)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7eff6230-29d5-4bd2-b0c2-c1ecfa5e3fcf")
+	)
+	(wire
+		(pts
+			(xy 144.78 128.27) (xy 180.34 128.27)
 		)
 		(stroke
 			(width 0)
@@ -1497,7 +1483,17 @@
 	)
 	(wire
 		(pts
-			(xy 144.78 90.17) (xy 154.94 90.17)
+			(xy 144.78 100.33) (xy 151.13 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8a752a33-c07b-4b2e-b3ac-f335904200df")
+	)
+	(wire
+		(pts
+			(xy 144.78 90.17) (xy 180.34 90.17)
 		)
 		(stroke
 			(width 0)
@@ -1517,7 +1513,7 @@
 	)
 	(wire
 		(pts
-			(xy 144.78 115.57) (xy 154.94 115.57)
+			(xy 144.78 115.57) (xy 180.34 115.57)
 		)
 		(stroke
 			(width 0)
@@ -1527,13 +1523,13 @@
 	)
 	(wire
 		(pts
-			(xy 102.87 120.65) (xy 109.22 120.65)
+			(xy 151.13 133.35) (xy 144.78 133.35)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "9b98a2b4-2392-4e0f-ae0f-e2466e3880aa")
+		(uuid "a5fadc19-aea7-4867-8c7b-8d4149cf19ce")
 	)
 	(wire
 		(pts
@@ -1557,17 +1553,17 @@
 	)
 	(wire
 		(pts
-			(xy 101.6 105.41) (xy 109.22 105.41)
+			(xy 151.13 130.81) (xy 144.78 130.81)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "ad59b6a5-af3e-416b-9f1a-031f24cc0695")
+		(uuid "adc2fc30-d894-440d-832c-c06ee274281a")
 	)
 	(wire
 		(pts
-			(xy 154.94 115.57) (xy 154.94 128.27)
+			(xy 180.34 115.57) (xy 180.34 128.27)
 		)
 		(stroke
 			(width 0)
@@ -1577,13 +1573,13 @@
 	)
 	(wire
 		(pts
-			(xy 101.6 92.71) (xy 109.22 92.71)
+			(xy 151.13 125.73) (xy 144.78 125.73)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "be87fc36-98b1-422d-9cca-5b355512b829")
+		(uuid "b2293478-a080-4d71-a1d6-66ea7a870ac1")
 	)
 	(wire
 		(pts
@@ -1597,7 +1593,7 @@
 	)
 	(wire
 		(pts
-			(xy 144.78 102.87) (xy 154.94 102.87)
+			(xy 144.78 102.87) (xy 180.34 102.87)
 		)
 		(stroke
 			(width 0)
@@ -1617,7 +1613,17 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 128.27) (xy 154.94 139.7)
+			(xy 101.6 92.71) (xy 109.22 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c7f5ffbf-2995-42bb-87b6-5b8addf8e40a")
+	)
+	(wire
+		(pts
+			(xy 180.34 128.27) (xy 180.34 139.7)
 		)
 		(stroke
 			(width 0)
@@ -1627,33 +1633,33 @@
 	)
 	(wire
 		(pts
-			(xy 101.6 87.63) (xy 109.22 87.63)
+			(xy 101.6 95.25) (xy 109.22 95.25)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "c8aea665-728e-47f9-8742-50c0519db3ce")
+		(uuid "c9c0f88b-94e3-477b-850c-c3ebf367c0bb")
 	)
 	(wire
 		(pts
-			(xy 101.6 113.03) (xy 109.22 113.03)
+			(xy 151.13 120.65) (xy 144.78 120.65)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "d86630f1-f552-41a2-a2f0-0a9b9a93629f")
+		(uuid "d0c5546c-45c5-4fa1-baeb-5ba71365aac1")
 	)
 	(wire
 		(pts
-			(xy 101.6 85.09) (xy 109.22 85.09)
+			(xy 101.6 110.49) (xy 109.22 110.49)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "dadf0120-63b3-4bb6-9b1d-aea45e845f1e")
+		(uuid "d6244be5-9c5e-4f6a-8710-627163bc7976")
 	)
 	(wire
 		(pts
@@ -1667,17 +1673,17 @@
 	)
 	(wire
 		(pts
-			(xy 101.6 107.95) (xy 109.22 107.95)
+			(xy 144.78 105.41) (xy 151.13 105.41)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "ef36502f-2adf-4182-8340-fcd083923652")
+		(uuid "ef5ce742-c58c-48c6-bf0a-734e4450e1c8")
 	)
 	(wire
 		(pts
-			(xy 154.94 102.87) (xy 154.94 115.57)
+			(xy 180.34 102.87) (xy 180.34 115.57)
 		)
 		(stroke
 			(width 0)
@@ -1685,227 +1691,17 @@
 		)
 		(uuid "f5302d15-37ca-44a7-88bc-76adc7bb6c02")
 	)
+	(wire
+		(pts
+			(xy 101.6 105.41) (xy 109.22 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f696e3f5-1870-4595-8677-82a2e5934a82")
+	)
 	(global_label "Scope 2 Mux Control 3"
-		(shape input)
-		(at 101.6 110.49 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "00796e94-1c42-4038-9fce-f1bd788f3421")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.1181 110.49 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Scope 2 Mux Control 4"
-		(shape input)
-		(at 101.6 113.03 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "07d1afab-128c-4396-9f96-e27ceb60da51")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.1181 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Scope 1 Mux Control 0"
-		(shape input)
-		(at 101.6 85.09 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "08f50015-aa0f-4f81-ac7b-5e99e1ddc9ec")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.1181 85.09 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "WaveGen. Mux Control 0"
-		(shape input)
-		(at 102.87 130.81 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "1dcb9740-9660-437d-819f-2bd70a42c07d")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.4809 130.81 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "WaveGen. Mux Control 4"
-		(shape input)
-		(at 102.87 118.11 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "3bb9e391-756a-4129-a559-1afaa5f121f8")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.4809 118.11 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "WaveGen. Mux Control 3"
-		(shape input)
-		(at 102.87 120.65 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "3c232fe6-a22e-4973-96e0-6ead06834b28")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.4809 120.65 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "WaveGen. Mux Control 1"
-		(shape input)
-		(at 102.87 125.73 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "3d970a33-299c-418b-acbe-922fded8cb47")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.4809 125.73 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Scope 2 Mux Control 2"
-		(shape input)
-		(at 101.6 107.95 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "4efa6fc7-ca78-4977-99a2-8efd8e999244")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.1181 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Scope 2 Mux Control 0"
-		(shape input)
-		(at 101.6 100.33 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "67a5c9da-26da-4458-ad07-b7680b0de868")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.1181 100.33 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Scope 2 Mux Control 1"
-		(shape input)
-		(at 101.6 105.41 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "7676631c-1c07-4e5f-acc1-79b78d123394")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.1181 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Scope 1 Mux Control 4"
 		(shape input)
 		(at 101.6 97.79 180)
 		(fields_autoplaced yes)
@@ -1915,7 +1711,7 @@
 			)
 			(justify right)
 		)
-		(uuid "81a0bdf6-b055-440b-9b47-659f3caa67c4")
+		(uuid "00796e94-1c42-4038-9fce-f1bd788f3421")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 76.1181 97.79 0)
 			(effects
@@ -1927,9 +1723,53 @@
 			)
 		)
 	)
-	(global_label "Scope 1 Mux Control 3"
+	(global_label "Scope 1 Mux Control 0"
 		(shape input)
-		(at 101.6 95.25 180)
+		(at 151.13 125.73 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "08f50015-aa0f-4f81-ac7b-5e99e1ddc9ec")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 176.6119 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "WaveGen. Mux Control 0"
+		(shape input)
+		(at 151.13 118.11 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1dcb9740-9660-437d-819f-2bd70a42c07d")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 177.5191 118.11 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Scope 1 Mux ~EN_B"
+		(shape input)
+		(at 101.6 110.49 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -1937,9 +1777,185 @@
 			)
 			(justify right)
 		)
+		(uuid "28b4ed01-e0ba-48ef-9c93-6d7e1bf44f11")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 79.5651 110.49 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "WaveGen. Mux Control 3"
+		(shape input)
+		(at 151.13 113.03 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3c232fe6-a22e-4973-96e0-6ead06834b28")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 177.5191 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "WaveGen. Mux Control 1"
+		(shape input)
+		(at 151.13 120.65 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "3d970a33-299c-418b-acbe-922fded8cb47")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 177.5191 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Scope 2 Mux Control 2"
+		(shape input)
+		(at 101.6 100.33 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "4efa6fc7-ca78-4977-99a2-8efd8e999244")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 76.1181 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Scope 2 Mux ~EN_B"
+		(shape input)
+		(at 101.6 107.95 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "61967aa5-48cf-4a4e-a8d8-d16c850da3a8")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 79.5651 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Scope 2 Mux Control 0"
+		(shape input)
+		(at 151.13 133.35 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "67a5c9da-26da-4458-ad07-b7680b0de868")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 176.6119 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Scope 2 Mux Control 1"
+		(shape input)
+		(at 151.13 130.81 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7676631c-1c07-4e5f-acc1-79b78d123394")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 176.6119 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Scope 1 Mux Control 3"
+		(shape input)
+		(at 151.13 100.33 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
 		(uuid "81c04078-9aa6-424e-9a31-61d5b7c8722a")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.1181 95.25 0)
+			(at 176.6119 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "Scope 2 Mux ~EN_A"
+		(shape input)
+		(at 101.6 105.41 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "8a08044b-80ee-40c5-9e27-470dffbafd31")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 79.7465 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1971,31 +1987,31 @@
 			)
 		)
 	)
-	(global_label "Scope 2 Mux ~EN"
+	(global_label "WaveGen. Mux Control 2"
 		(shape input)
-		(at 128.27 59.69 180)
+		(at 151.13 107.95 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right)
+			(justify left)
 		)
-		(uuid "9540a4ba-f001-4457-8d7b-2d614975267c")
+		(uuid "ac33c6fb-d184-42ff-8eb6-454367dcc8ea")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 108.4727 59.69 0)
+			(at 177.5191 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 				(hide yes)
 			)
 		)
 	)
-	(global_label "WaveGen. Mux Control 2"
+	(global_label "Scope 1 Mux ~EN_A"
 		(shape input)
-		(at 102.87 123.19 180)
+		(at 101.6 95.25 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -2003,9 +2019,9 @@
 			)
 			(justify right)
 		)
-		(uuid "ac33c6fb-d184-42ff-8eb6-454367dcc8ea")
+		(uuid "c70982e6-b6b5-4a4c-beb1-6a552d98dce0")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.4809 123.19 0)
+			(at 79.7465 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2017,66 +2033,44 @@
 	)
 	(global_label "Scope 1 Mux Control 1"
 		(shape input)
-		(at 101.6 87.63 180)
+		(at 151.13 123.19 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right)
+			(justify left)
 		)
 		(uuid "c88f25c2-afa7-47f4-80e3-d1ecd434f31d")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 76.1181 87.63 0)
+			(at 176.6119 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 				(hide yes)
 			)
 		)
 	)
 	(global_label "WaveGen. 1 Mux ~EN"
 		(shape input)
-		(at 128.27 62.23 180)
+		(at 151.13 105.41 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right)
+			(justify left)
 		)
 		(uuid "ca8a43e4-a2d1-40d5-8930-fa3207bcee20")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 105.3884 62.23 0)
+			(at 174.0116 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
-				(hide yes)
-			)
-		)
-	)
-	(global_label "Scope 1 Mux ~EN"
-		(shape input)
-		(at 128.27 57.15 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "d07cdba6-a105-43a8-a3d2-c1635e460a1f")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 108.4727 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
+				(justify left)
 				(hide yes)
 			)
 		)
@@ -2149,7 +2143,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 154.94 139.7 0)
+		(at 180.34 139.7 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2158,7 +2152,7 @@
 		(fields_autoplaced yes)
 		(uuid "a9fcb089-29e8-4a74-92ab-f961b39c1113")
 		(property "Reference" "#PWR035"
-			(at 154.94 146.05 0)
+			(at 180.34 146.05 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2167,7 +2161,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 154.94 144.78 0)
+			(at 180.34 144.78 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2175,7 +2169,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 154.94 139.7 0)
+			(at 180.34 139.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2184,7 +2178,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 154.94 139.7 0)
+			(at 180.34 139.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2193,7 +2187,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 154.94 139.7 0)
+			(at 180.34 139.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
