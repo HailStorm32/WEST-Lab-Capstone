@@ -146,6 +146,11 @@ def RF_self_test():
     rx_power = 10 * np.log10(np.mean(np.abs(rx_samples)**2)) + 30 + np.abs(sdr_tx.tx_hardwaregain_chan0)
     abs_power = np.abs(tx_power - rx_power)   
 
+    #Clean up values for sig figs
+    set_freq = set_freq / 1e9
+    peak_freq_Tx = peak_freq_Tx / 1e9
+    peak_freq_Rx = peak_freq_Rx / 1e9
+
        
     
     if(ber != 0.00):
@@ -156,14 +161,14 @@ def RF_self_test():
     
     else:
         values =[ {'name': 'Bit-Error-Rate (BER)', 'value': ber},
-        {'name': 'Set Transmission Frequency', 'value': set_freq},
-        {'name': 'Transmitted Peak Frequency', 'value': peak_freq_Tx},
-        {'name': 'Received Peak Frequency', 'value': peak_freq_Rx},
-        {'name': 'Absolute Frequency Offset', 'value': offset},
-        {'name': 'Set Tx Power Gain', 'value': sdr_tx.tx_hardwaregain_chan0},
-        {'name': 'Transmitted Power', 'value': tx_power},
-        {'name': 'Received Power', 'value': rx_power},
-        {'name': 'Absolute Power Offset', 'value': abs_power}]
+        {'name': 'Set Transmission Frequency (GHz)', 'value': np.round(set_freq, 4)},
+        {'name': 'Transmitted Peak Frequency (GHz)', 'value': np.round(peak_freq_Tx, 4)},
+        {'name': 'Received Peak Frequency (GHz)', 'value': np.round(peak_freq_Rx, 4)},
+        {'name': 'Absolute Frequency Offset (Hz)', 'value': np.round(offset, 1)},
+        {'name': 'Set Tx Power Gain (dB)', 'value': sdr_tx.tx_hardwaregain_chan0},
+        {'name': 'Transmitted Power', 'value': np.round(tx_power, 3)},
+        {'name': 'Received Power', 'value': np.round(rx_power, 3)},
+        {'name': 'Absolute Power Offset', 'value': np.round(abs_power, 3)}]
 
         results = [{'sub-test': 'Radio(RF)', 'pass': True, 'values': values}]       
         #print(values)
@@ -236,7 +241,7 @@ def RF_SCuM_test():
     
     sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
     sdr_rx.rx_lo = int(cw)
-    sdr_rx.sample_rate = int(2e6)
+    sdr_rx.sample_rate = int(5e6)
     sdr_rx.rx_rf_bandwidth = int(sr)
     sdr_rx.rx_buffer_size = int(2e6)
     
