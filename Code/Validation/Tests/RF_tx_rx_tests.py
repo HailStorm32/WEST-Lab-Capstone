@@ -1,10 +1,10 @@
 import numpy as np
 import adi 
 import matplotlib.pyplot as plt
-import time
 import pandas as pd
 import datetime 
 import os
+from Validation import wait_for_trigger
 
 
 # Global Variable declarations
@@ -14,16 +14,20 @@ samples = 100
 num_symbols = 100
 samples_per_symbol = 2
 
-timestamped_path = []
-
-
 # General overall test result storage folder
-filepath = "C:/Users/19719/OneDrive/Desktop/scum_test_results/"
-
+default_results_path = os.path.join(os.path.dirname(__file__), '..\\..', 'ResultBackups\\PlutoResults')
 
 def RF_self_test():
     # Setup Rx Pluto 
-    sdr_rx = adi.Pluto("ip:192.168.2.2")
+    try:
+        sdr_rx = adi.Pluto("ip:192.168.2.2")
+    except OSError as e:
+        print(f"Error: {e}. Please ensure the Pluto SDR is connected and accessible.\n\nIf this is the first boot of the SDR, please wait a few minutes for it to initialize and try again.")
+        return [{'sub-test': 'Radio(RF)', 'pass': False, 'values': [{'name': 'Error', 'value': str(e)}]}]
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return [{'sub-test': 'Radio(RF)', 'pass': False, 'values': [{'name': 'Error', 'value': str(e)}]}]
+
     sdr_rx.gain_control_mode_chan0 = "fast_attack" #for Automatic Gain Control
     sdr_rx.rx_lo = int(cw)
     sdr_rx.sample_rate = int(sr)
@@ -31,7 +35,15 @@ def RF_self_test():
     sdr_rx.rx_buffer_size = num_symbols * samples_per_symbol * 64
 
     # Setup Tx Pluto
-    sdr_tx = adi.Pluto("ip:192.168.2.3")
+    try:
+        sdr_tx = adi.Pluto("ip:192.168.2.3")
+    except OSError as e:
+        print(f"Error: {e}. Please ensure the Pluto SDR is connected and accessible.\n\nIf this is the first boot of the SDR, please wait a few minutes for it to initialize and try again.")
+        return [{'sub-test': 'Radio(RF)', 'pass': False, 'values': [{'name': 'Error', 'value': str(e)}]}]
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return [{'sub-test': 'Radio(RF)', 'pass': False, 'values': [{'name': 'Error', 'value': str(e)}]}]
+    
     sdr_tx.sample_rate = int(sr)
     sdr_tx.tx_rf_bandwidth = int(sr)
     sdr_tx.tx_lo = int(cw)
@@ -133,28 +145,39 @@ def RF_self_test():
     tx_power = 10 * np.log10(np.mean(np.abs(sample)**2))
     rx_power = 10 * np.log10(np.mean(np.abs(rx_samples)**2)) + 30 + np.abs(sdr_tx.tx_hardwaregain_chan0)
     abs_power = np.abs(tx_power - rx_power)   
+
+    #Clean up values for sig figs
+    set_freq = set_freq / 1e9
+    peak_freq_Tx = peak_freq_Tx / 1e9
+    peak_freq_Rx = peak_freq_Rx / 1e9
+
+       
     
     if(ber != 0.00):
-        value = {'name': 'Bit-Error-Rate', 'value': ber}
-        results = {'sub-test': 'Radio(RF)', 'pass': False, 'values': value}
+        value = [{'name': 'Bit-Error-Rate', 'value': ber}]
+        results = [{'sub-test': 'Radio(RF)', 'pass': False, 'values': value}]
         #print(value)
-        #return results
+        return results
     
     else:
-        values = {'name': 'Bit-Error-Rate (BER)', 'value': ber},
-        {'name': 'Set Transmission Frequency', 'value': set_freq},
-        {'name': 'Transmitted Peak Frequency', 'value': peak_freq_Tx},
-        {'name': 'Received Peak Frequency', 'value': peak_freq_Rx},
-        {'name': 'Absolute Frequency Offset', 'value': offset},
-        {'name': 'Set Tx Power Gain', 'value': sdr_tx.tx_hardwaregain_chan0},
-        {'name': 'Transmitted Power', 'value': tx_power},
-        {'name': 'Received Power', 'value': rx_power},
-        {'name': 'Absolute Power Offset', 'value': abs_power}
+        values =[ {'name': 'Bit-Error-Rate (BER)', 'value': ber},
+        {'name': 'Set Transmission Frequency (GHz)', 'value': np.round(set_freq, 4)},
+        {'name': 'Transmitted Peak Frequency (GHz)', 'value': np.round(peak_freq_Tx, 4)},
+        {'name': 'Received Peak Frequency (GHz)', 'value': np.round(peak_freq_Rx, 4)},
+        {'name': 'Absolute Frequency Offset (Hz)', 'value': np.round(offset, 1)},
+        {'name': 'Set Tx Power Gain (dB)', 'value': sdr_tx.tx_hardwaregain_chan0},
+        {'name': 'Transmitted Power', 'value': np.round(tx_power, 3)},
+        {'name': 'Received Power', 'value': np.round(rx_power, 3)},
+        {'name': 'Absolute Power Offset', 'value': np.round(abs_power, 3)}]
 
-        results = {'sub-test': 'Radio(RF)', 'pass': True, values: []}        
+        results = [{'sub-test': 'Radio(RF)', 'pass': True, 'values': values}]       
         #print(values)
         return results    
    
+# Clean up/remove extraneous print statements
+    del sdr_rx
+    del sdr_tx 
+
     # Demo code of print statements and plots
     '''
     # Create a figure and three subplots (stacked vertically)
@@ -192,103 +215,155 @@ def RF_self_test():
     print("")
     print("Bit-Error-Rate (BER):        {:.2f} %".format(ber)) 
     '''
-
-    # Clean up/remove extraneous print statements
-    del sdr_rx
-    del sdr_tx    
     
     #return results
 
    
-def RF_SCuM_test(path):
+def RF_SCuM_test(handle):
+
+    # Ensure the ResultsBackups directory exists
+    if not os.path.exists(os.path.join(os.path.dirname(__file__), '..\\..', 'ResultBackups')):
+        print("Error: The directory 'ResultBackups' does not exist. Please run the setup script to initialize the environment.")
+        os.exit(1)
+
+    # Create folder were all the timestamped data will be stored
+    elif not os.path.exists(default_results_path):
+        os.makedirs(default_results_path)
+
     # Setup Rx Pluto 
-    sdr_rx = adi.Pluto("ip:192.168.2.2")
-    sdr_rx.gain_control_mode_chan0 = "fast_attack" # for Automatic Gain Control
-    sdr_rx.rx_hardwaregain_chan0 = 70.0
-    sdr_rx.rx_lo = int(cw)
-    sdr_rx.sample_rate = int(2e6)
-    sdr_rx.rx_rf_bandwidth = int(sr)
-    sdr_rx.rx_buffer_size = num_symbols * samples_per_symbol * 32
+    try:
+        sdr_rx = adi.Pluto("ip:192.168.2.2")
+    except OSError as e:
+        print(f"Error: {e}. Please ensure the Pluto SDR is connected and accessible.\n\nIf this is the first boot of the SDR, please wait a few minutes for it to initialize and try again.")
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return False
+    
+    # Pre-define array of size 10e6
+    data = len(10e6)
 
-    # Clear any potential data in the buffer
-    for i in range (0, 10):
-        raw_data = sdr_rx.rx()
+    # Incremental counter for channel hopping
+    channel = 1
 
-    # Put data into a datafile
-    #
-    #
-    data = sdr_rx.rx()
-    df = pd.DataFrame(data)    
-    # May need to address data recording here if buffer is getting too full
-    #
-    #
+    #Do-While to iterate through 5 channels
+    while(channel < 6):
+        # Conditional case statement for adjusting the Pluto LO to accommodate various RF channels
+        # and to increment the index of the df for storing the data
+        match channel:
+            case 1:
+                sdr_rx.rx_lo = int(2.4125e9)
+                index = 0
+            case 2:
+                sdr_rx.rx_lo = int(2.4275e9)
+                index = 2e6
+            case 3:
+                sdr_rx.rx_lo = int(2.4425e9)
+                index = 4e6
+            case 4:
+                sdr_rx.rx_lo = int(2.4575e9)
+                index = 6e6
+            case 5:
+                sdr_rx.rx_lo = int(2.4725e9)
+                index = 8e6
+
+        sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
+        #sdr_rx.rx_lo = int(cw)
+        sdr_rx.sample_rate = int(5e6)
+        sdr_rx.rx_rf_bandwidth = int(15e6)
+        sdr_rx.rx_buffer_size = int(2e6)
+        
+        global fs 
+        fs = sdr_rx.sample_rate
+
+        # Clear any potential data in the buffer
+        for i in range(0, 10):
+            raw_data = sdr_rx.rx()
+
+        # Receive data, case statement for indexing data
+        match channel:
+            case 1:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 1")
+                    return False
+            case 2:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 2")
+                    return False
+            case 3:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 3")
+                    return False
+            case 4:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 4")
+                    return False
+            case 5:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Chanel 5")
+                    return False
+                
+        # Wait for trigger pulse
+        wait_for_trigger(handle)
+        channel += 1
+
+
+    # Reshape data if necessary
+    if len(data.shape) == 1:
+        data = data.reshape(-1, 1)  # Convert to 2D array with one column
+
+    # Create DataFrame
+    df = pd.DataFrame(data)
+
+    # Ensure the DataFrame has at least one column
+    if df.shape[1] < 1:
+        print("Warning: DataFrame has no columns")
+        return False
+
+    # This is made global just to be able to access it in the RF_end_test function
+    # This should be removed once you can read out the signal from the csv file in the RF_end_test function
+    global signal
+    # Access the first column of the DataFrame
+    signal = df.iloc[:, 0].values
+
     # Create timestamped data folder
+    global timestamped_path
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    data_path = path + now
-    timestamped_path = data_path
-    data_path = os.path.normpath(data_path)
-    os.makedirs(data_path)
+    timestamped_path = os.path.join(default_results_path, now)
+    os.makedirs(timestamped_path, exist_ok=True)
 
     # Write data to timestamped data folder
-    csv_path = data_path + "/results.csv"
-    csv_path = os.path.normpath(csv_path)
-    #print(csv_path)
-    df.to_csv(csv_path, index=False)
-    
-    # Use DF to create PSD .png file type
-    image_path = data_path + "/PSD.png"
-    image_path = os.path.normpath(image_path)
-    
-    signal = df.iloc[:, 1].values 
-    fs = sdr_rx.sample_rate 
-    
-    plt.figure(figsize=(8,4))
-    plt.psd(signal, NFFT=1024, Fs=fs)
-    plt.xlabel('Frequency [Hz]')
-    plt.ylabel('PSD [dB/Hz]')
-    plt.title('PSD of SCuM')
-    plt.tight_layout()
-    
-    plt.savefig(image_path)
-    plt.close()
-    
-    # Return filepath to .png file
-    #return image_path
-    
-    #return data_path
-    
+    csv_path = os.path.join(timestamped_path, "results.csv")
+    df.to_csv(csv_path, index=False)   
+
     # Kill Pluto Rx
     del sdr_rx
 
+    return True
 
+    
+def RF_end_test():
+    # Use DataFrame to create PSD .png file
+    image_path = os.path.join(timestamped_path, "PSD.png")
 
-def end_test():
-    # CSV path
-    data_path = timestamped_path
-    csv_path = data_path + "/results.csv"    
-    
-    # Image path
-    image_path = data_path + "/PSD.png"
+    #TODO: Parse the CSV file to get the signal data
 
-    # Create the df from the csv
-    df = pd.read_csv(csv_path)
-    
-    signal = df.iloc[:, 1].values 
-    fs = sr 
-    
-    plt.figure(figsize=(8,4))
+    plt.figure(figsize=(8, 4))
     plt.psd(signal, NFFT=1024, Fs=fs)
     plt.xlabel('Frequency [Hz]')
     plt.ylabel('PSD [dB/Hz]')
     plt.title('PSD of SCuM')
     plt.tight_layout()
-    
     plt.savefig(image_path)
     plt.close()
-    
-    # Return filepath to .png file
-    return image_path
-    
+
+    # Return results
+    return [{'sub-test': 'RF Test', 'pass': True, 'values': [{'name': 'PSD Image', 'value': image_path}]}]
 
 # Running the tests
 #results = RF_self_test()
