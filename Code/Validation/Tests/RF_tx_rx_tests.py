@@ -5,7 +5,8 @@ import time
 import pandas as pd
 import datetime 
 import os
-from Validation import wait_for_trigger
+from Validation.Tests.helpers import wait_for_trigger
+
 
 
 # Global Variable declarations
@@ -242,15 +243,16 @@ def RF_SCuM_test(handle):
         return False
     
     # Pre-define array of size 10e6
-    data = len(10e6)
+    data = np.zeros(10000000, dtype=np.complex64)
 
     # Incremental counter for channel hopping
     channel = 1
-    #DEBUG print statement
-    print("Your are listening to Channel ", channel, " radio!")
+
 
     #Do-While to iterate through 5 channels
     while(channel < 6):
+            #DEBUG print statement
+        print("Your are listening to Channel ", channel, " radio!")
         # Conditional case statement for adjusting the Pluto LO to accommodate various RF channels
         # and to increment the index of the df for storing the data
         match channel:
@@ -259,16 +261,16 @@ def RF_SCuM_test(handle):
                 index = 0
             case 2:
                 sdr_rx.rx_lo = int(2.4275e9)
-                index = 2e6
+                index = 2000000
             case 3:
                 sdr_rx.rx_lo = int(2.4425e9)
-                index = 4e6
+                index = 4000000
             case 4:
                 sdr_rx.rx_lo = int(2.4575e9)
-                index = 6e6
+                index = 6000000
             case 5:
                 sdr_rx.rx_lo = int(2.4725e9)
-                index = 8e6
+                index = 8000000
 
         sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
         #sdr_rx.rx_lo = int(cw)
@@ -286,30 +288,35 @@ def RF_SCuM_test(handle):
         # Receive data, case statement for indexing data
         match channel:
             case 1:
-                data[index] = sdr_rx.rx()
-                if data.size == 0:
+                received_data = sdr_rx.rx()
+                if received_data.size == 0:
                     print("Warning: Received empty data from sdr_rx.rx() Channel 1")
                     return False
+                data[index:index + received_data.size] = received_data
             case 2:
-                data[index] = sdr_rx.rx()
-                if data.size == 0:
+                received_data = sdr_rx.rx()
+                if received_data.size == 0:
                     print("Warning: Received empty data from sdr_rx.rx() Channel 2")
                     return False
+                data[index:index + received_data.size] = received_data
             case 3:
-                data[index] = sdr_rx.rx()
-                if data.size == 0:
+                received_data = sdr_rx.rx()
+                if received_data.size == 0:
                     print("Warning: Received empty data from sdr_rx.rx() Channel 3")
                     return False
+                data[index:index + received_data.size] = received_data
             case 4:
-                data[index] = sdr_rx.rx()
-                if data.size == 0:
+                received_data = sdr_rx.rx()
+                if received_data.size == 0:
                     print("Warning: Received empty data from sdr_rx.rx() Channel 4")
                     return False
+                data[index:index + received_data.size] = received_data
             case 5:
-                data[index] = sdr_rx.rx()
-                if data.size == 0:
+                received_data = sdr_rx.rx()
+                if received_data.size == 0:
                     print("Warning: Received empty data from sdr_rx.rx() Channel 5")
                     return False
+                data[index:index + received_data.size] = received_data
                 
         # Wait for trigger pulse
         wait_for_trigger(handle)

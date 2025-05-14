@@ -24,6 +24,7 @@ from Validation.Tests.power_test import joulescope_start, stop_joulescope
 from Validation.Tests.serial_baud_test import find_best_baud_rate
 from Validation.Tests.RF_tx_rx_tests import RF_SCuM_test, RF_end_test, RF_self_test
 
+from Validation.Tests.helpers import wait_for_trigger
 
 def clear_terminal():
     '''
@@ -35,20 +36,9 @@ def clear_terminal():
     else:  # For Unix-based systems
         os.system('clear')
 
-def wait_for_trigger(device_handle):
-    '''
-    Wait for a trigger pulse on the specified pin
-    '''
-    WF_SDK.logic.open(device_handle, buffer_size=10000)
 
-    # Wait for trigger pulse
-    WF_SDK.logic.trigger(device_handle, enable=True, channel=TRIGGER_PIN_NUM, rising_edge=True)
-    WF_SDK.logic.record(device_handle, channel=TRIGGER_PIN_NUM, )
 
-    # Close logic analyzer
-    WF_SDK.logic.close(device_handle)
-
-binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/valScript.bin'))
+binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/newRadio.bin'))
 
 # List of tests to be performed
 # Independent tests are run outside the main loop
@@ -193,7 +183,7 @@ if __name__ == '__main__':
         elif test_name == 'Radio communication':
             # Start the test
             success = test_info['function'](dd_handle)
-            
+            print(success)
             if success:
                 # Wait for SCuM to finish
                 print("Waiting for SCuM to finish sweep, this will take a few minutes...")
