@@ -5,6 +5,7 @@ import time
 import pandas as pd
 import datetime 
 import os
+from validation import wait_for_trigger
 
 
 # Global Variable declarations
@@ -219,7 +220,8 @@ def RF_self_test():
     #return results
 
    
-def RF_SCuM_test():
+def RF_SCuM_test(handle):
+
     # Ensure the ResultsBackups directory exists
     if not os.path.exists(os.path.join(os.path.dirname(__file__), '..\\..', 'ResultBackups')):
         print("Error: The directory 'ResultBackups' does not exist. Please run the setup script to initialize the environment.")
@@ -239,24 +241,80 @@ def RF_SCuM_test():
         print(f"An unexpected error occurred: {e}")
         return False
     
-    sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
-    sdr_rx.rx_lo = int(cw)
-    sdr_rx.sample_rate = int(5e6)
-    sdr_rx.rx_rf_bandwidth = int(sr)
-    sdr_rx.rx_buffer_size = int(2e6)
-    
-    global fs 
-    fs = sdr_rx.sample_rate
+    # Pre-define array of size 10e6
+    data = len(10e6)
 
-    # Clear any potential data in the buffer
-    for i in range(0, 10):
-        raw_data = sdr_rx.rx()
+    # Incremental counter for channel hopping
+    channel = 1
+    #DEBUG print statement
+    print("Your are listening to Channel ", channel, " radio!")
 
-    # Receive data
-    data = sdr_rx.rx()
-    if data.size == 0:
-        print("Warning: Received empty data from sdr_rx.rx()")
-        return False
+    #Do-While to iterate through 5 channels
+    while(channel < 6):
+        # Conditional case statement for adjusting the Pluto LO to accommodate various RF channels
+        # and to increment the index of the df for storing the data
+        match channel:
+            case 1:
+                sdr_rx.rx_lo = int(2.4125e9)
+                index = 0
+            case 2:
+                sdr_rx.rx_lo = int(2.4275e9)
+                index = 2e6
+            case 3:
+                sdr_rx.rx_lo = int(2.4425e9)
+                index = 4e6
+            case 4:
+                sdr_rx.rx_lo = int(2.4575e9)
+                index = 6e6
+            case 5:
+                sdr_rx.rx_lo = int(2.4725e9)
+                index = 8e6
+
+        sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
+        #sdr_rx.rx_lo = int(cw)
+        sdr_rx.sample_rate = int(5e6)
+        sdr_rx.rx_rf_bandwidth = int(15e6)
+        sdr_rx.rx_buffer_size = int(2e6)
+        
+        global fs 
+        fs = sdr_rx.sample_rate
+
+        # Clear any potential data in the buffer
+        for i in range(0, 10):
+            raw_data = sdr_rx.rx()
+
+        # Receive data, case statement for indexing data
+        match channel:
+            case 1:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 1")
+                    return False
+            case 2:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 2")
+                    return False
+            case 3:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 3")
+                    return False
+            case 4:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 4")
+                    return False
+            case 5:
+                data[index] = sdr_rx.rx()
+                if data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 5")
+                    return False
+                
+        # Wait for trigger pulse
+        wait_for_trigger(handle)
+        channel += 1
+
 
     # Reshape data if necessary
     if len(data.shape) == 1:
@@ -284,8 +342,8 @@ def RF_SCuM_test():
 
     # Write data to timestamped data folder
     csv_path = os.path.join(timestamped_path, "results.csv")
-    df.to_csv(csv_path, index=False)
-    
+    df.to_csv(csv_path, index=False)   
+
     # Kill Pluto Rx
     del sdr_rx
 
