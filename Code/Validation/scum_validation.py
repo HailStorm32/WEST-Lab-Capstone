@@ -192,7 +192,7 @@ if __name__ == '__main__':
 
         elif test_name == 'Radio communication':
             # Start the test
-            success = test_info['function']()
+            success = test_info['function'](dd_handle)
             
             if success:
                 # Wait for SCuM to finish
