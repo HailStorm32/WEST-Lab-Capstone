@@ -5,7 +5,7 @@ import time
 import pandas as pd
 import datetime 
 import os
-from validation import wait_for_trigger
+from Validation import wait_for_trigger
 
 
 # Global Variable declarations
