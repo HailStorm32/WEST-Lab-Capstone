@@ -617,7 +617,7 @@
     },
     "net_format_name": "",
     "page_layout_descr_file": "",
-    "plot_directory": "/home/propsman/Capstone/WEST-Lab-Capstone/CADFiles/KiCAD/Observatory/PDFs/",
+    "plot_directory": "PDFs/",
     "space_save_all_events": true,
     "spice_current_sheet_as_root": false,
     "spice_external_command": "spice \"%I\"",
@@ -646,20 +646,12 @@
       "Joule Scope"
     ],
     [
-      "e297e279-b067-4e72-a8de-e129aec16510",
-      "RF Explorer"
-    ],
-    [
       "eba82fb9-5bbe-4a15-9a34-fb0ab7bbbad2",
       "Mux Connections"
     ],
     [
       "675966a0-24dd-4202-900d-768460dd71ee",
       "Scope 1 and 2 connection"
-    ],
-    [
-      "6ad652dc-3d54-4452-8d53-5c8fcb8a7de2",
-      "Mux Config"
     ],
     [
       "425e7d77-b9d1-4360-8c64-8325327d8c9f",
