@@ -49,15 +49,16 @@ def send_command_to_pico(pico_serial, command):
             # Send command with carriage return and newline
             pico_serial.write(command.encode('ascii') + b'\n')
             pico_serial.flush()  # Ensure the command is sent immediately
-            print(f"Pico command sent: {command}")
+            print(f"Command sent: {command}")
+            time.sleep(0.1)  # Wait for the command to be processed
 
             # Read response (if any)
-            #response = pico_serial.readline().decode('ascii').strip()
+            response = pico_serial.readline().decode('ascii').strip()
             #print(f"Response: {response}")
         except serial.SerialException as e:
-            print(f"Failed to send pico command: {e}")
+            print(f"Failed to send command: {e}")
     else:
-        print("Pico Serial connection is not open.")
+        print("Serial connection is not open.")
 
 # The following functions are used only for development and testing purposes
 def send_all_commands(pico_serial):
@@ -69,10 +70,10 @@ def send_all_commands(pico_serial):
         pico_serial (serial.Serial): The connected serial object.
     """
     for i in range(32):  # Loop from 0 to 31
-        for prefix in [1, 0]:  # Iterate over the prefixes in the specified order
+        for prefix in [2,1,0]:  # Iterate over the prefixes in the specified order
             command = f"{prefix}_{i}"
             send_command_to_pico(pico_serial, command)
-            time.sleep(0.25)  # Add a small delay between commands to avoid overwhelming the Pico
+            time.sleep(0.1)  # Add a small delay between commands to avoid overwhelming the Pico
 
 def send_search(pico_serial):
     """
@@ -82,7 +83,7 @@ def send_search(pico_serial):
     Args:
         pico_serial (serial.Serial): The connected serial object.
     """
-    for i in range(16):  # Loop from 0 to 31
+    for i in range(31):  # Loop from 0 to 31
         command1 = f"{2}_{i}"
         send_command_to_pico(pico_serial, command1)
         for prefix in [1, 0]:  # Iterate over the prefixes in the specified order
@@ -104,7 +105,6 @@ if __name__ == "__main__":
     pico = connect_to_pico(port=pico_port)
     try:
         if pico:
-            #send_search(pico)
             while True:
                 
                 user_command = input("Enter a command to send to the Pico (or type 'exit' to quit): ")
@@ -116,4 +116,4 @@ if __name__ == "__main__":
     finally:
         if pico and pico.is_open:
             pico.close()
-            print("Pico Serial connection closed.")
+            print("Serial connection closed.")

@@ -6,39 +6,41 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-int scope1_EN = 6; // GPIO pin for Scope1 enable
-int scope2_EN = 7; // GPIO pin for Scope2 enable
-int wavegen2_EN = 8; // GPIO pin for Wavegen2 enable
+int scope1_EN_A = 3; // GPIO pin for Scope1 enable
+int scope1_EN_B = 8; // GPIO pin for Scope1 enable
+int scope1_S0 = 18; // GPIO pin for Scope1 S0
+int scope1_S1 = 19; // GPIO pin for Scope1 S1
+int scope1_S2 = 2; // GPIO pin for Scope1 S2
+int scope1_S3 = 28; // GPIO pin for Scope1 S3
 
-int scope1_S0 = 20; // GPIO pin for Scope1 S0
-int scope1_S1 = 21; // GPIO pin for Scope1 S1
-int scope1_S2 = 22; // GPIO pin for Scope1 S2
-int scope1_S3 = 26; // GPIO pin for Scope1 S3
-int scope1_S4 = 27; // GPIO pin for Scope1 S4
+int scope2_EN_A = 6; // GPIO pin for Scope2 enable
+int scope2_EN_B = 7; // GPIO pin for Scope1 enable
+int scope2_S0 = 16; // GPIO pin for Scope2 S0
+int scope2_S1 = 17; // GPIO pin for Scope2 S1
+int scope2_S2 = 5; // GPIO pin for Scope2 S2
+int scope2_S3 = 4; // GPIO pin for Scope2 S3
 
-int scope2_S0 = 19; // GPIO pin for Scope2 S0
-int scope2_S1 = 18; // GPIO pin for Scope2 S1
-int scope2_S2 = 17; // GPIO pin for Scope2 S2
-int scope2_S3 = 16; // GPIO pin for Scope2 S3
-int scope2_S4 = 9; // GPIO pin for Scope2 S4
-
-int wavegen2_S0 = 14; // GPIO pin for Wavegen2 S0
-int wavegen2_S1 = 13; // GPIO pin for Wavegen2 S1
-int wavegen2_S2 = 12; // GPIO pin for Wavegen2 S2
-int wavegen2_S3 = 11; // GPIO pin for Wavegen2 S3
-int wavegen2_S4 = 10; // GPIO pin for Wavegen2 S4
+int Wavegen1_EN = 27; // GPIO pin for Wavegen1 enable
+int Wavegen1_S0 = 21; // GPIO pin for Wavegen1 S0
+int Wavegen1_S1 = 20; // GPIO pin for Wavegen1 S1
+int Wavegen1_S2 = 26; // GPIO pin for Wavegen1 S2
+int Wavegen1_S3 = 22; // GPIO pin for Wavegen1 S3
 
 // Function to initialize all GPIO pins
-void initialize_all_gpio(void) {
-    for (uint gpio_num = 0; gpio_num <= 29; gpio_num++) {
+void initialize_all_gpio(void) 
+{
+    for (uint gpio_num = 0; gpio_num <= 29; gpio_num++) 
+    {
         gpio_init(gpio_num);
         gpio_set_dir(gpio_num, GPIO_OUT); // Set all GPIO pins as output
         gpio_put(gpio_num, false);       // Set all GPIO pins to low initially
     }
     // EN is active low to set high an init
-    gpio_put(scope1_EN, 1);
-    gpio_put(scope2_EN, 1);
-    gpio_put(wavegen2_EN, 1);
+    gpio_put(scope1_EN_A, 1);
+    gpio_put(scope1_EN_B, 1);
+    gpio_put(scope2_EN_A, 1);
+    gpio_put(scope2_EN_B, 1);
+    gpio_put(Wavegen1_EN, 1);
 }
 
 // Function to control a GPIO pin (set or clear)
@@ -51,8 +53,10 @@ void pico_gpio_control(uint gpio_num, bool gpio_on)
 }
 
 // Function to blink the LED
-void blink(int count, int delay_ms) {
-    for (int i = 0; i < count; i++) {
+void blink(int count, int delay_ms) 
+{
+    for (int i = 0; i < count; i++) 
+    {
         pico_gpio_control(PICO_DEFAULT_LED_PIN, 1);
         sleep_ms(delay_ms);
         pico_gpio_control(PICO_DEFAULT_LED_PIN, 0);
@@ -67,7 +71,8 @@ typedef struct {
 } ParsedCommand;
 
 // Function to parse the command string
-ParsedCommand parse_command(const char *command) {
+ParsedCommand parse_command(const char *command) 
+{
     ParsedCommand result = {0, 0}; // Initialize the struct with default values
 
     // Find the position of the underscore
@@ -90,50 +95,53 @@ ParsedCommand parse_command(const char *command) {
 }
 // Abstract the actual wiring to be 1 to 1 between devices
 int muxToPicoMap[3][32] = {
-    // here lebel refers to the schematic label number 
     // Scope1 (Index 0)
     {
-        // Label 1-16 (Index 0-15) -> MUX IO (original value - 1)  ---- BUG index 15 wont map to wavegen2
-         0,  1,  2,  3,  4,  5,  11,  10,  9,  8, 7, 6, 15, 14, 13, 12,
+        // Label 1-16 (Index 0-15) -> MUX IO (original value - 1) 
+         1,  0,  4,  6,  8,  10,  12,  14,  2,  3, 5, 7, 9, 11, 13, 15,
         // Label 17-32 (Index 16-31) -> MUX IO (original value - 1)
         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
     },
     // Scope2 (Index 1)
     {
-        // Label 1-16 (Index 0-15) -> MUX IO (original value - 1)
-        11, 10,  9,  8,  7,  6,  0,  1,  2,  3,  4,  5, 28, 29, 30, 31,
+        // Label 1-16 (Index 0-15) -> MUX IO (original value - 1) 
+        1,  0,  4,  6,  8,  10,  12,  14,  2,  3, 5, 7, 9, 11, 13, 15,
         // Label 17-32 (Index 16-31) -> MUX IO (original value - 1)
-        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 12, 13, 14, 15
+        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
     },
-    // Wavegen2 (Index 2) - Values for Labels 17-32 were assumed previously
+    // Wavegen1 (Index 2) - Values for Labels 17-32 were assumed previously
     {
-        // Label 1-16 (Index 0-15) -> MUX IO (original value - 1)
-        11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,  0, 12, 13, 14, 15,
-        // Label 17-32 (Index 16-31) -> Nothing connected
+        // Label 1-16 (Index 0-15) -> MUX IO (original value - 1) 
+        1,  0,  4,  6,  8,  10,  12,  14,  2,  3, 5, 7, 9, 11, 13, 15,
+        // Label 17-32 (Index 16-31) -> MUX IO (original value - 1)
         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
     }
 };
 
 // Function to handle parsed commands
-void handle_parsed_command(ParsedCommand command) {
+void handle_parsed_command(ParsedCommand command) 
+{
     
     // Check if the command is valid
-    if ((command.value1 <= 2 || command.value2 <= 3) && (command.value1 >= 0 || command.value2 >= 0)) {
+    if (((command.value1 >= 0) && (command.value1 <= 2)) && ((command.value2 >= 0) && (command.value2 <= 33))) 
+    {
         if (command.value2 == 32) // Check for enable
         {
             //printf("Enable command: %u\n", command.value2);
             switch (command.value1) 
             { // Index to the mux
                 case 0:
-                    pico_gpio_control(scope1_EN, 1);
+                    pico_gpio_control(scope1_EN_A, 1);
+                    pico_gpio_control(scope1_EN_B, 1);
 
                     break;
                 case 1:
-                    pico_gpio_control(scope2_EN, 1);
+                    pico_gpio_control(scope2_EN_A, 1);
+                    pico_gpio_control(scope2_EN_B, 1);
 
                     break;
                 case 2:
-                    pico_gpio_control(wavegen2_EN, 1);
+                    pico_gpio_control(Wavegen1_EN, 1);
 
                     break;
                 default:
@@ -147,15 +155,17 @@ void handle_parsed_command(ParsedCommand command) {
             switch (command.value1) 
             { // Index to the mux
                 case 0:
-                    pico_gpio_control(scope1_EN, 0);
+                    pico_gpio_control(scope1_EN_A, 0);
+                    pico_gpio_control(scope1_EN_B, 0);
 
                     break;
                 case 1:
-                    pico_gpio_control(scope2_EN, 0);
+                    pico_gpio_control(scope2_EN_A, 0);
+                    pico_gpio_control(scope2_EN_B, 0);
 
                     break;
                 case 2:
-                    pico_gpio_control(wavegen2_EN, 0);
+                    pico_gpio_control(Wavegen1_EN, 0);
 
                     break;
                 default:
@@ -171,62 +181,74 @@ void handle_parsed_command(ParsedCommand command) {
                 value2Bits[i] = (muxToPicoMap[command.value1][command.value2] >> i) & 1; // Extract the bits
             }
         
-            switch (command.value1) 
+            switch (command.value1)
             { // Index to the mux
                 case 0:
-                    pico_gpio_control(scope1_EN, 1);
+                    pico_gpio_control(scope1_EN_A, 1);
+                    pico_gpio_control(scope1_EN_B, 1);
         
                     pico_gpio_control(scope1_S0, value2Bits[0]);
                     pico_gpio_control(scope1_S1, value2Bits[1]);
                     pico_gpio_control(scope1_S2, value2Bits[2]);
                     pico_gpio_control(scope1_S3, value2Bits[3]);
-                    pico_gpio_control(scope1_S4, value2Bits[4]);
+                    if(value2Bits[4])
+                    {
+                        pico_gpio_control(scope1_EN_B, 0);
+                    }
+                    else
+                    {
+                        pico_gpio_control(scope1_EN_A, 0);
+                    }
                     
-                    pico_gpio_control(scope1_EN, 0);
+                    
+
                     break;
-                    case 1:
-                    pico_gpio_control(scope2_EN, 1);
+                case 1:
+                    pico_gpio_control(scope2_EN_A, 1);
+                    pico_gpio_control(scope2_EN_B, 1);
                     
                     pico_gpio_control(scope2_S0, value2Bits[0]);
                     pico_gpio_control(scope2_S1, value2Bits[1]);
                     pico_gpio_control(scope2_S2, value2Bits[2]);
                     pico_gpio_control(scope2_S3, value2Bits[3]);
-                    pico_gpio_control(scope2_S4,  value2Bits[4]);
+                    if(value2Bits[4])
+                    {
+                        pico_gpio_control(scope2_EN_B, 0);
+                    }
+                    else
+                    {
+                        pico_gpio_control(scope2_EN_A, 0);
+                    }
                     
-                    pico_gpio_control(scope2_EN, 0);
+    
                     break;
-                    case 2:
-                    pico_gpio_control(wavegen2_EN, 1);
+                case 2:
+                    pico_gpio_control(Wavegen1_EN, 1);
                     
-                    pico_gpio_control(wavegen2_S0, value2Bits[0]);
-                    pico_gpio_control(wavegen2_S1, value2Bits[1]);
-                    pico_gpio_control(wavegen2_S2, value2Bits[2]);
-                    pico_gpio_control(wavegen2_S3, value2Bits[3]);
-                    pico_gpio_control(wavegen2_S4, value2Bits[4]);
+                    pico_gpio_control(Wavegen1_S0, value2Bits[0]);
+                    pico_gpio_control(Wavegen1_S1, value2Bits[1]);
+                    pico_gpio_control(Wavegen1_S2, value2Bits[2]);
+                    pico_gpio_control(Wavegen1_S3, value2Bits[3]);
         
-                    pico_gpio_control(wavegen2_EN, 0);
+                    pico_gpio_control(Wavegen1_EN, 0);
                     break;
                 default:
                     // pass
                     break;
             }
         }
-        //printf("Invalid command: %u_%u\n", command.value1, command.value2);
-        // Pass and dont update the GPIO
-        return;
     }
-    // Check for EN commmands
-    //printf("%u_%u maps to %d\n", command.value1, command.value2, muxToPicoMap[command.value1][command.value2]);
-    //fflush(stdout);
 }
 
-int main() {
+int main() 
+{
     // Initialize all GPIO pins
     initialize_all_gpio();
 
     // Initialize UART for serial communication
     stdio_init_all();
-    while (!stdio_usb_connected()) {
+    while (!stdio_usb_connected()) 
+    {
         blink(3, 250);
     }
             
@@ -238,12 +260,15 @@ int main() {
         int index = 0;
 
         // Read characters from serial until a newline or buffer is full
-        while (true) {
+        while (true) 
+        {
             int c = getchar_timeout_us(100000); // Wait for 100ms for input
-            if (c == PICO_ERROR_TIMEOUT) {
+            if (c == PICO_ERROR_TIMEOUT) 
+            {
                 continue; // No input, keep waiting
             }
-            if (c == '\n' || c == '\r' || index >= sizeof(command) - 1) {
+            if (c == '\n' || c == '\r' || index >= sizeof(command) - 1) 
+            {
                 break; // End of command
             }
             command[index++] = (char)c;
