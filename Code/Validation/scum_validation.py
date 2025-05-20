@@ -156,7 +156,7 @@ if __name__ == '__main__':
         if test_info['independent']:
             continue
 
-        print("Waiting for trigger pulse...")
+        
         wait_for_trigger(dd_handle)
         sleep(1)
         # Declare the test being run

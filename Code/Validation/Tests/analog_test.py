@@ -404,8 +404,8 @@ def validate_analog_signals(device_data, pico_serial):
     ]
 
     # Switch scope channels to voltage references
-    send_command_to_pico(pico_serial, "1_19") #Scope 1 to 1.1V reference voltage
-    send_command_to_pico(pico_serial, "0_16") #Scope 2 to 1.8V reference voltage
+    send_command_to_pico(pico_serial, "1_28") #Scope 1 to 1.1V reference voltage
+    send_command_to_pico(pico_serial, "0_27") #Scope 2 to 1.8V reference voltage
 
 
     #############################

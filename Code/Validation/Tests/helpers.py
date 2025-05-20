@@ -5,6 +5,7 @@ def wait_for_trigger(device_handle):
     '''
     Wait for a trigger pulse on the specified pin
     '''
+    print("Waiting for trigger pulse...")
     WF_SDK.logic.open(device_handle, buffer_size=10000)
 
     # Wait for trigger pulse
