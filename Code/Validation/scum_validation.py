@@ -186,7 +186,7 @@ if __name__ == '__main__':
             print(success)
             if success:
                 # Wait for SCuM to finish
-                print("Waiting for SCuM to finish sweep, this will take a few minutes...")
+                print("Delay for syncing purposes, will take a minute...")
                 wait_for_trigger(dd_handle)
 
                 # End and get the results
