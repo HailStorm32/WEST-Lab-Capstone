@@ -252,7 +252,7 @@ def RF_SCuM_test(handle):
     #Do-While to iterate through 5 channels
     while(channel < 6):
             #DEBUG print statement
-        print("Your are listening to Channel ", channel, " radio!")
+        print(f"Listening to Channel {channel}. Will take a few minutes..")
         # Conditional case statement for adjusting the Pluto LO to accommodate various RF channels
         # and to increment the index of the df for storing the data
         match channel:
@@ -319,6 +319,7 @@ def RF_SCuM_test(handle):
                 data[index:index + received_data.size] = received_data
                 
         # Wait for trigger pulse
+        print("Waiting on SCuM to finish sweep...")
         wait_for_trigger(handle)
         channel += 1
 
@@ -353,6 +354,8 @@ def RF_SCuM_test(handle):
 
     # Kill Pluto Rx
     del sdr_rx
+
+    print("Sweeps completed")
 
     return True
 
