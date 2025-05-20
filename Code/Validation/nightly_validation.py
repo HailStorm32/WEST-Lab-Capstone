@@ -83,7 +83,6 @@ def pull_latest_changes():
 tests = {
     'Program upload':       { 'function': scum_program,            'independent': False },
     'Analog validation':    { 'function': validate_analog_signals, 'independent': False },
-    'Power Consumption':    { 'function': None,                    'independent': True  }, 
 }
 
 if __name__ == "__main__":
@@ -217,19 +216,20 @@ if __name__ == "__main__":
                 results_location = os.path.join(os.path.dirname(__file__), '..', 'ResultBackups\\Nightly-Validation', 'Nightly-Validation_Results.html')
                 report_generation.generate_html_report(test_results, results_location)
 
-                ret = report_generation.email_report(
-                    SMTP_SERVER,
-                    SMTP_PORT,
-                    SMTP_USERNAME,
-                    SMTP_PASSWORD,
-                    SMTP_SENDER_EMAIL,
-                    USERS_TO_EMAIL,
-                    WKHTMLTOPDF_PATH
-                )
-                if ret:
-                    print("Email sent successfully.")
-                else:
-                    print("Failed to send email.")
+                if SEND_EMAIL_ON_COMPLETION:
+                    ret = report_generation.email_report(
+                        SMTP_SERVER,
+                        SMTP_PORT,
+                        SMTP_USERNAME,
+                        SMTP_PASSWORD,
+                        SMTP_SENDER_EMAIL,
+                        USERS_TO_EMAIL,
+                        WKHTMLTOPDF_PATH
+                    )
+                    if ret:
+                        print("Email sent successfully.")
+                    else:
+                        print("Failed to send email.")
 
         # Sleep for a while before checking again
         time.sleep(60) 
