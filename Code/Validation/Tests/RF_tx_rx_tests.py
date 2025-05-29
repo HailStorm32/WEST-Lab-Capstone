@@ -273,13 +273,14 @@ def RF_SCuM_test(handle):
 
     # Plot the LUT
     # Use DataFrame to create PSD .png file
-    image_path = os.path.join(timestamped_path, "PSD.png")
+    image_path = os.path.join(timestamped_path, "LUT.png")
     plt.figure(figsize=(8, 4))
 
     # Get data from LUT df
     x_labels = lv_df.columns.tolist()
     x_labels = [label.replace(', ', '\n') for label in lv_df.columns.tolist()]
     y_values = lv_df.iloc[0].values 
+    y_values = y_values / 1e9
 
     # Plotting
     plt.scatter(x_labels, y_values)  
