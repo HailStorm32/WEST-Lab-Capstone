@@ -176,49 +176,7 @@ def RF_self_test():
         #print(values)
         return results    
    
-# Clean up/remove extraneous print statements
-    del sdr_rx
-    del sdr_tx 
 
-    # Demo code of print statements and plots
-    '''
-    # Create a figure and three subplots (stacked vertically)
-    fig, axs = plt.subplots(2, 1, figsize=(10, 4), sharex=True)
-    
-    # Plot the sample waveform on the first subplot
-    axs[0].plot(bits[0:100])
-    axs[0].set_title('Transmitted Bits')
-    axs[0].set_ylabel('Amplitude')
-    
-    # Plot the estimated bits on the third subplot
-    axs[1].plot(estimated_bits[0:100])
-    axs[1].set_title('Estimated Bits')
-    axs[1].set_ylabel('Bit Value')
-    axs[1].set_xlabel('Sample Index')
-
-    # Adjust layout so titles and labels don't overlap
-    plt.tight_layout()
-
-    # Display the plot
-    plt.show()
-    
-    print("")
-    print("Set Transmission Frequency:  {:.2f} Hz".format(set_freq))
-    print("Transmitted Peak Frequency:  {:.2f} Hz".format(peak_freq_Tx))
-    print("Received Peak Frequency:     {:.2f} Hz".format(peak_freq_Rx))
-    print("")
-    print("Absolute Frequency Offset:   {:.2f} Hz".format(offset))
-    print("")
-    print("Set Tx Power:                {:.2f} dB".format(sdr_tx.tx_hardwaregain_chan0))
-    print("Transmitted PSD:             {:.2f} dB/Hz".format(tx_power))
-    print("Received PSD:                {:.2f} dB/Hz".format(rx_power))
-    print("")
-    print("Absolute Power Offset:       {:.2f} ".format(abs_power))
-    print("")
-    print("Bit-Error-Rate (BER):        {:.2f} %".format(ber)) 
-    '''
-    
-    #return results
 
    
 def RF_SCuM_test(handle):
@@ -241,106 +199,65 @@ def RF_SCuM_test(handle):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return False
-    
-    # Pre-define array of size 10e6
-    data = np.zeros(10000000, dtype=np.complex64)
 
-    # Incremental counter for channel hopping
-    channel = 1
+    global fs 
+    sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
+    sdr_rx.rx_lo = int(2.3808e9)
+    sdr_rx.sample_rate = int(5e6)
+    sdr_rx.rx_rf_bandwidth = int(1.6e6)
+    sdr_rx.rx_buffer_size = int(1.6e6)
+    fs = sdr_rx.sample_rate
+
+    # Raw data (rd) and LUT Values (lv) dictionaries
+    rd_data = {}
+    lv_data = {}
 
 
-    #Do-While to iterate through 5 channels
-    while(channel < 6):
-            #DEBUG print statement
-        print(f"Listening to Channel {channel}. Will take a few minutes..")
-        # Conditional case statement for adjusting the Pluto LO to accommodate various RF channels
-        # and to increment the index of the df for storing the data
-        match channel:
-            case 1:
-                sdr_rx.rx_lo = int(2.4125e9)
-                index = 0
-            case 2:
-                sdr_rx.rx_lo = int(2.4275e9)
-                index = 2000000
-            case 3:
-                sdr_rx.rx_lo = int(2.4425e9)
-                index = 4000000
-            case 4:
-                sdr_rx.rx_lo = int(2.4575e9)
-                index = 6000000
-            case 5:
-                sdr_rx.rx_lo = int(2.4725e9)
-                index = 8000000
+    # Clear any potential data in the buffer
+    for i in range(0, 10):
+        raw_data = sdr_rx.rx()
 
-        sdr_rx.gain_control_mode_chan0 = "fast_attack"  # for Automatic Gain Control
-        #sdr_rx.rx_lo = int(cw)
-        sdr_rx.sample_rate = int(5e6)
-        sdr_rx.rx_rf_bandwidth = int(15e6)
-        sdr_rx.rx_buffer_size = int(2e6)
+    # Course loop
+    coarse = 23
+    fine = 0
+    for i in range(7):
         
-        global fs 
-        fs = sdr_rx.sample_rate
+        mid = 0       
+        # Mid loop
+        for i in range(18):
+            print("SCuM Radio Setting: ", coarse, ", ", mid)
+            # Update of df header name to match triplet DAC values for RF sweep
+            df_header = f"{coarse}, {mid}, {fine}"
 
-        # Clear any potential data in the buffer
-        for i in range(0, 10):
-            raw_data = sdr_rx.rx()
+            # Receive the data
+            received_data = sdr_rx.rx()
+            if received_data.size == 0:
+                print("Warning: Received empty data from sdr_rx.rx() Channel 1")
+                return False
+            
+            # Put raw data to rd dataframe
+            #rd_df[df_header] = received_data
+            rd_data[df_header] = received_data
 
-        # Receive data, case statement for indexing data
-        match channel:
-            case 1:
-                received_data = sdr_rx.rx()
-                if received_data.size == 0:
-                    print("Warning: Received empty data from sdr_rx.rx() Channel 1")
-                    return False
-                data[index:index + received_data.size] = received_data
-            case 2:
-                received_data = sdr_rx.rx()
-                if received_data.size == 0:
-                    print("Warning: Received empty data from sdr_rx.rx() Channel 2")
-                    return False
-                data[index:index + received_data.size] = received_data
-            case 3:
-                received_data = sdr_rx.rx()
-                if received_data.size == 0:
-                    print("Warning: Received empty data from sdr_rx.rx() Channel 3")
-                    return False
-                data[index:index + received_data.size] = received_data
-            case 4:
-                received_data = sdr_rx.rx()
-                if received_data.size == 0:
-                    print("Warning: Received empty data from sdr_rx.rx() Channel 4")
-                    return False
-                data[index:index + received_data.size] = received_data
-            case 5:
-                received_data = sdr_rx.rx()
-                if received_data.size == 0:
-                    print("Warning: Received empty data from sdr_rx.rx() Channel 5")
-                    return False
-                data[index:index + received_data.size] = received_data
-                
-        # Wait for trigger pulse
-        print("Waiting on SCuM to finish sweep...")
-        wait_for_trigger(handle)
-        channel += 1
+            # FFT the data
+            fft = np.fft.fft(received_data)
+            freqs = np.fft.fftfreq(len(received_data), 1/fs)  # fs is the sampling rate
+            max_index = np.argmax(np.abs(fft))                # use magnitude
+            max_freq = freqs[max_index] + sdr_rx.rx_lo  # Add the LO frequency to get the actual frequency       
 
+            # Put the max_freq data to lv dataframe
+            lv_data[df_header] = max_freq
 
-    # Reshape data if necessary
-    if len(data.shape) == 1:
-        data = data.reshape(-1, 1)  # Convert to 2D array with one column
+            # Increment values and wait for the next tone to transmit
+            mid += 1
+            sdr_rx.rx_lo += 800000
+            wait_for_trigger(handle)
 
-    # Create DataFrame
-    df = pd.DataFrame(data)
+        coarse += 1
+        sdr_rx.rx_lo + 600000 #Increment the LO to match the sweep values on SCuM
 
-    # Ensure the DataFrame has at least one column
-    if df.shape[1] < 1:
-        print("Warning: DataFrame has no columns")
-        return False
-
-    # This is made global just to be able to access it in the RF_end_test function
-    # This should be removed once you can read out the signal from the csv file in the RF_end_test function
-    global signal
-    # Access the first column of the DataFrame
-    signal = df.iloc[:, 0].values
+    rd_df = pd.DataFrame.from_dict(rd_data, orient='columns')
+    lv_df = pd.DataFrame([lv_data])  # one row of LUT values
 
     # Create timestamped data folder
     global timestamped_path
@@ -349,13 +266,38 @@ def RF_SCuM_test(handle):
     os.makedirs(timestamped_path, exist_ok=True)
 
     # Write data to timestamped data folder
-    csv_path = os.path.join(timestamped_path, "results.csv")
-    df.to_csv(csv_path, index=False)   
+    rd_csv_path = os.path.join(timestamped_path, "results.csv")
+    lv_csv_path = os.path.join(timestamped_path, "lut_values.csv")
+    rd_df.to_csv(rd_csv_path, index=False)
+    lv_df.to_csv(lv_csv_path, index=False)   
+
+    # Plot the LUT
+    # Use DataFrame to create PSD .png file
+    image_path = os.path.join(timestamped_path, "PSD.png")
+    plt.figure(figsize=(8, 4))
+
+    # Get data from LUT df
+    x_labels = lv_df.columns.tolist()
+    x_labels = [label.replace(', ', '\n') for label in lv_df.columns.tolist()]
+    y_values = lv_df.iloc[0].values 
+
+    # Plotting
+    plt.scatter(x_labels, y_values)  
+    plt.xlabel('SCuM RF Sweep Triplet DAC Values\nCoarse\nMid\nFine')
+    plt.ylabel('Frequency (GHz)')
+    plt.title('Look-up-table (LUT) of SCuM Radio Values')
+    step = 9
+    plt.xticks(
+        ticks=range(0, len(x_labels), step),
+        labels=[x_labels[i] for i in range(0, len(x_labels), step)],
+        rotation=0
+    )
+    plt.tight_layout()
+    plt.savefig(image_path)
+    plt.close()
 
     # Kill Pluto Rx
     del sdr_rx
-
-    print("Sweeps completed")
 
     return True
 
@@ -364,22 +306,7 @@ def RF_end_test():
     # Use DataFrame to create PSD .png file
     image_path = os.path.join(timestamped_path, "PSD.png")
 
-    #TODO: Parse the CSV file to get the signal data
-
-    plt.figure(figsize=(8, 4))
-    plt.psd(signal, NFFT=1024, Fs=fs)
-    plt.xlabel('Frequency [Hz]')
-    plt.ylabel('PSD [dB/Hz]')
-    plt.title('PSD of SCuM')
-    plt.tight_layout()
-    plt.savefig(image_path)
-    plt.close()
-
     # Return results
     return [{'sub-test': 'RF Test', 'pass': True, 'values': [{'name': 'PSD Image', 'value': image_path}]}]
 
-# Running the tests
-#results = RF_self_test()
-#RF_self_test()
-#image_path = RF_SCuM_test(filepath)
-#print(results)
+
