@@ -20,7 +20,7 @@ def generate_html_report(test_results, filename="test_results_report.html"):
       4. Display all graphable values (with graphs) first, then the remaining values as plain text.
     
     Args:
-        test_results (dict): Dictionary containing test results.
+        test_results (dict): Dictionary containing test results. See section 4.2 of the wiki for structure requirements.
         filename (str): Output HTML file path.
     
     Returns:
