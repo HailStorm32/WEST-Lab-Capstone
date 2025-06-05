@@ -38,7 +38,7 @@ def clear_terminal():
 
 
 
-binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/newRadio.bin'))
+binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/fastradio_nodata.bin'))
 
 # List of tests to be performed
 # Independent tests are run outside the main loop

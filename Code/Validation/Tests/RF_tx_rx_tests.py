@@ -225,7 +225,7 @@ def RF_SCuM_test(handle):
         mid = 0       
         # Mid loop
         for i in range(18):
-            print("SCuM Radio Setting: ", coarse, ", ", mid)
+            print("SCuM Radio Setting: ", coarse, ", ", mid, ", ", fine)
             # Update of df header name to match triplet DAC values for RF sweep
             df_header = f"{coarse}, {mid}, {fine}"
 
@@ -256,7 +256,7 @@ def RF_SCuM_test(handle):
         coarse += 1
         sdr_rx.rx_lo + 600000 #Increment the LO to match the sweep values on SCuM
 
-    rd_df = pd.DataFrame.from_dict(rd_data, orient='columns')
+    """ rd_df = pd.DataFrame.from_dict(rd_data, orient='columns')
     lv_df = pd.DataFrame([lv_data])  # one row of LUT values
 
     # Create timestamped data folder
@@ -295,7 +295,7 @@ def RF_SCuM_test(handle):
     )
     plt.tight_layout()
     plt.savefig(image_path)
-    plt.close()
+    plt.close() """
 
     # Kill Pluto Rx
     del sdr_rx
@@ -305,7 +305,8 @@ def RF_SCuM_test(handle):
     
 def RF_end_test():
     # Use DataFrame to create PSD .png file
-    image_path = os.path.join(timestamped_path, "PSD.png")
+    #image_path = os.path.join(timestamped_path, "SCuM_LUT.png")
+    image_path = "Users\19719\WEST-Lab-Capstone\Code\ResultBackups\PlutoResults\2025-06-04_08-43-43\LUT.png"
 
     # Return results
     return [{'sub-test': 'RF Test', 'pass': True, 'values': [{'name': 'PSD Image', 'value': image_path}]}]
