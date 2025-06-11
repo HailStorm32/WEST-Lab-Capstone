@@ -256,6 +256,7 @@ def RF_SCuM_test(handle):
         coarse += 1
         sdr_rx.rx_lo + 600000 #Increment the LO to match the sweep values on SCuM
 
+    print("SCuM Radio Sweep Complete")
     rd_df = pd.DataFrame.from_dict(rd_data, orient='columns')
     lv_df = pd.DataFrame([lv_data])  # one row of LUT values
 
@@ -305,7 +306,7 @@ def RF_SCuM_test(handle):
     
 def RF_end_test():
     # Use DataFrame to create PSD .png file
-    image_path = os.path.join(timestamped_path, "SCuM_LUT.png")
+    image_path = os.path.join(timestamped_path, "LUT.png")
     
     # Return results
     return [{'sub-test': 'RF Test', 'pass': True, 'values': [{'name': 'PSD Image', 'value': image_path}]}]

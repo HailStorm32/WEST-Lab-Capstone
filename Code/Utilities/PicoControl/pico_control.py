@@ -50,10 +50,9 @@ def send_command_to_pico(pico_serial, command):
             pico_serial.write(command.encode('ascii') + b'\n')
             pico_serial.flush()  # Ensure the command is sent immediately
             print(f"Command sent: {command}")
-            time.sleep(0.1)  # Wait for the command to be processed
 
             # Read response (if any)
-            response = pico_serial.readline().decode('ascii').strip()
+            #response = pico_serial.readline().decode('ascii').strip()
             #print(f"Response: {response}")
         except serial.SerialException as e:
             print(f"Failed to send command: {e}")

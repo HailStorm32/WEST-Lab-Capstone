@@ -88,7 +88,7 @@ def run_logic_analysis(device_data, trigger_channel=0):
     # Initialize the logic analyzer with default settings
     logic.open(device_data, buffer_size=5000)
 
-    sleep(0.3)
+    #sleep(0.3)
 
     # **Record data for each DIO channel separately**
     all_buffers = [logic.record(device_data, channel=i) for i in range(16)]
