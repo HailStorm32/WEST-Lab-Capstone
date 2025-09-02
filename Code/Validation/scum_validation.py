@@ -103,7 +103,7 @@ if __name__ == '__main__':
         print("Error: Unable to connect to PICO board!\n Exiting...")
         report_generation.generate_html_report(test_results, results_location)
         sys.exit(1)
-
+    print("PICO board connected successfully!\n")
     # Connect to the Digital Discovery device
     if not AD2_FOR_DIGITAL:
         try:    
@@ -111,14 +111,14 @@ if __name__ == '__main__':
         except Exception as e:
             print("Error: " + str(e))
             sys.exit(1)
-
+    print("Digital Discovery connected successfully!\n")
     # Connect to Analog Discovery 2
     try:
         ad_handle = WF_SDK.device.open("analogdiscovery2")
     except Exception as e:
         print("Error: " + str(e))
         sys.exit(1)
-
+    print("Analog Discovery 2 connected successfully!\n")
     if AD2_FOR_DIGITAL:
         # Use AD2 for digital testing
         dd_handle = ad_handle
@@ -175,7 +175,7 @@ if __name__ == '__main__':
             # Enable all MUX
             send_command_to_pico(pico_serial, "0_33")
             send_command_to_pico(pico_serial, "1_33")
-            send_command_to_pico(pico_serial, "2_33")
+            #send_command_to_pico(pico_serial, "2_33")
         elif test_name == 'Analog validation':
             # Run the test
             results_handle.extend(test_info['function'](ad_handle, pico_serial))

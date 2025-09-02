@@ -232,8 +232,8 @@ def stop_joulescope(file_path=DEFAULT_CSV_PATH, delete_file=True, save_backup_fl
 
 # Run (Main) Function that runs both power cycle and Joulescope functions.
 def joulescope_start():
-    print(f"Current working directory: {os.getcwd()}")
-
+    #print(f"Current working directory: {os.getcwd()}")
+    print("Starting Joulescope...")
     if power_cycle() is None:
         return False # Return false if power cycle has failed.
     # Wait for power up sequence to complete

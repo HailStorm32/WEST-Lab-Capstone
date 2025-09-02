@@ -49,7 +49,7 @@ def send_command_to_pico(pico_serial, command):
             # Send command with carriage return and newline
             pico_serial.write(command.encode('ascii') + b'\n')
             pico_serial.flush()  # Ensure the command is sent immediately
-            print(f"Command sent: {command}")
+            #print(f"Command sent: {command}")
 
             # Read response (if any)
             #response = pico_serial.readline().decode('ascii').strip()
