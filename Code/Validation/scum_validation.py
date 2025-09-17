@@ -9,6 +9,9 @@ The following tests are performed:
 '''
 import os
 import sys
+import contextlib
+import io
+import time
 from time import sleep
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../__VendorAPIs/Diligent')))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
@@ -38,7 +41,7 @@ def clear_terminal():
 
 
 
-binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/tester.bin'))
+binary_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'C-Source/Bin/fastestradio_nodata-3.bin'))
 
 # List of tests to be performed
 # Independent tests are run outside the main loop
@@ -75,6 +78,8 @@ if __name__ == '__main__':
     results_location = os.path.join(os.path.dirname(__file__), '..', 'ResultBackups\\SCuM-Validation', 'SCuM-Validation_Results.html')
     
     clear_terminal()
+    start_time = time.time()
+    #print(start_time)
 
     # Get the name of the first unit test
     first_unit_test_name = list(test_results.keys())[0]
@@ -82,21 +87,37 @@ if __name__ == '__main__':
     # Get handle to self test results
     results_handle = test_results[first_unit_test_name]['tests']['Radio Self Test']['results']
 
+    # Begin the validation process
+    print("---------------------------------------------")
+    print("       Starting SCuM validation test...")
+    print("---------------------------------------------\n")
+
     # Run self test for spectrum analyzer
     print("Running self test for spectrum analyzer...")
-    
+    print("---------------------------------------------")
+
     results_handle.extend(tests['Radio Self Test']['function']())
 
+    # If the self test fails, retry up to 2 more times
     if len(results_handle) == 0 or not results_handle[0]['pass']:
+        counter = 1
+        while counter < 4 and (len(results_handle) == 0 or not results_handle[0]['pass']):
+            print("Retrying self test...")
+            results_handle.clear()
+            results_handle.extend(tests['Radio Self Test']['function']())
+            counter += 1
         print("Spectrum analyzer self test failed!\n Exiting...")
 
         report_generation.generate_html_report(test_results, results_location)
         sys.exit(1)
     else:
+        print("Rx Pluto SDR connected on ip:192.168.2.2")
+        print("Tx Pluto SDR connected on ip:192.168.2.3")
         print("Spectrum analyzer self test passed!\n")
 
     # Connect to the PICO board
     print("Connecting to PICO board...")
+    print("---------------------------------------------")
     pico_serial = connect_to_pico(port=PICO_COM_PORT)
 
     if pico_serial is None:
@@ -104,14 +125,17 @@ if __name__ == '__main__':
         report_generation.generate_html_report(test_results, results_location)
         sys.exit(1)
     print("PICO board connected successfully!\n")
+
     # Connect to the Digital Discovery device
+    print("Connecting to Analog and Digital Discovery...")
+    print("---------------------------------------------")
     if not AD2_FOR_DIGITAL:
         try:    
             dd_handle = WF_SDK.device.open("Digital Discovery")
         except Exception as e:
             print("Error: " + str(e))
             sys.exit(1)
-    print("Digital Discovery connected successfully!\n")
+    print("Digital Discovery connected successfully!")
     # Connect to Analog Discovery 2
     try:
         ad_handle = WF_SDK.device.open("analogdiscovery2")
@@ -128,6 +152,7 @@ if __name__ == '__main__':
 
     # Upload the test program to the SCuM chip
     print("Uploading test program to SCuM chip...")
+    print("---------------------------------------------")
     try:
         test_results[first_unit_test_name]['tests']['Program upload']['results'] = tests['Program upload']['function'](SCUM_NRF_COM_PORT, binary_path)
     
@@ -156,8 +181,13 @@ if __name__ == '__main__':
         if test_info['independent']:
             continue
 
-        
-        wait_for_trigger(dd_handle)
+        # Begin radio test
+        print(f"Starting {test_name} test...")
+        print("---------------------------------------------")
+        # Wait for trigger from SCuM to start the test
+        with contextlib.redirect_stdout(io.StringIO()):
+                    wait_for_trigger(dd_handle)
+        #wait_for_trigger(dd_handle)
         sleep(1)
         # Declare the test being run
         print(f"Running test: {test_name}")
@@ -179,15 +209,23 @@ if __name__ == '__main__':
         elif test_name == 'Analog validation':
             # Run the test
             results_handle.extend(test_info['function'](ad_handle, pico_serial))
+            print("\n")
 
         elif test_name == 'Radio communication':
-            # Start the test
+            end_time = time.time()
+            elapsed_time = (end_time - start_time) / 60
+            #print(f"Total elapsed time: {elapsed_time:.2f} minutes")# Start the test
+            
             success = test_info['function'](dd_handle)
-            print(success)
+            print("Delay for syncing purposes, will take a minute...")
+            sleep(20)
+            
+            #print(success)
             if success:
                 # Wait for SCuM to finish
-                print("Delay for syncing purposes, will take a minute...")
-                wait_for_trigger(dd_handle)
+                with contextlib.redirect_stdout(io.StringIO()):
+                    wait_for_trigger(dd_handle)
+                #wait_for_trigger(dd_handle)
 
                 # End and get the results
                 results_handle.extend(RF_end_test())
@@ -201,7 +239,11 @@ if __name__ == '__main__':
                         {'name': 'error', 'value': "Radio communication test failed!"}
                     ]
                 })
+            print("SCuM radio communication test complete!\n")
             
+            end_time = time.time()
+            elapsed_time = (end_time - start_time) / 60
+            #print(f"Total elapsed time: {elapsed_time:.2f} minutes")
         else:
             # Run the test
             results_handle.extend(test_info['function']())
@@ -228,3 +270,7 @@ if __name__ == '__main__':
         WF_SDK.device.close(ad_handle)
 
     print("\n\nTest Completed!\n")
+
+    end_time = time.time()
+    elapsed_time = (end_time - start_time) / 60
+    print(f"Test Duration: {elapsed_time:.2f} minutes")

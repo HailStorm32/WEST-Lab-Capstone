@@ -84,7 +84,7 @@ def run_logic_analysis(device_data, trigger_channel=0):
     """
 
     #configure_vio_voltage(device_data, voltage_level=1.2)
-    print(device_data.name)
+    #print(device_data.name)
     # Initialize the logic analyzer with default settings
     logic.open(device_data, buffer_size=5000)
 
@@ -112,5 +112,5 @@ def run_logic_analysis(device_data, trigger_channel=0):
 
     # Reset the logic analyzer
     logic.close(device_data)
-
+    print("\n")
     return tests  # Return the test results

@@ -63,7 +63,7 @@ def scum_program(nrf_com_port, binary_image):
     nRF_ser.reset_input_buffer()       
 
     # Send the binary data over uart
-    print("\r\nScuM nRF Serial Programmer.\r\n")
+    print("\rScuM nRF Serial Programmer.\r\n")
     print("\rPress (Ctrl + c) to Exit\r\n")
     nRF_ser.write(bindata)
     # and wait for response that writing is complete
@@ -78,7 +78,7 @@ def scum_program(nrf_com_port, binary_image):
         print("\rClosing serial port...")
         nRF_ser.reset_input_buffer()
         nRF_ser.close()
-    print("\rBye...")
+    print("\rBye...\n")
 
     return [{
         'sub-test': 'Program upload',

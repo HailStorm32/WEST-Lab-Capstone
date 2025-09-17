@@ -5,6 +5,9 @@ import time
 import pandas as pd
 import datetime 
 import os
+import sys
+import contextlib
+import io
 from Validation.Tests.helpers import wait_for_trigger
 
 
@@ -29,7 +32,7 @@ def RF_self_test():
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return [{'sub-test': 'Radio(RF)', 'pass': False, 'values': [{'name': 'Error', 'value': str(e)}]}]
-
+    
     sdr_rx.gain_control_mode_chan0 = "fast_attack" #for Automatic Gain Control
     sdr_rx.rx_lo = int(cw)
     sdr_rx.sample_rate = int(sr)
@@ -217,6 +220,9 @@ def RF_SCuM_test(handle):
     for i in range(0, 10):
         raw_data = sdr_rx.rx()
 
+    
+
+
     # Course loop
     coarse = 23
     fine = 0
@@ -225,7 +231,12 @@ def RF_SCuM_test(handle):
         mid = 0       
         # Mid loop
         for i in range(18):
-            print("SCuM Radio Setting: ", coarse, ", ", mid, ", ", fine)
+            # Write the triplet DAC values to the console over previous line
+            sys.stdout.write("\r")
+            sys.stdout.write(f"\rSCuM Radio Setting: {coarse}, {mid}, {fine}   ")
+            #sys.stdout.write(f"\rSCuM Radio Setting: ", coarse, ", ", mid, ", ", fine)
+            sys.stdout.flush()
+            #print("SCuM Radio Setting: ", coarse, ", ", mid, ", ", fine)
             # Update of df header name to match triplet DAC values for RF sweep
             df_header = f"{coarse}, {mid}, {fine}"
 
@@ -251,13 +262,18 @@ def RF_SCuM_test(handle):
             # Increment values and wait for the next tone to transmit
             mid += 1
             sdr_rx.rx_lo += 800000
-            wait_for_trigger(handle)
+            with contextlib.redirect_stdout(io.StringIO()):
+                wait_for_trigger(handle)
+            #wait_for_trigger(handle)
 
         coarse += 1
         sdr_rx.rx_lo + 600000 #Increment the LO to match the sweep values on SCuM
 
-    print("SCuM Radio Sweep Complete")
-    rd_df = pd.DataFrame.from_dict(rd_data, orient='columns')
+
+        
+
+    print("\nSCuM Radio Sweep Complete!\n")
+    #rd_df = pd.DataFrame.from_dict(rd_data, orient='columns')
     lv_df = pd.DataFrame([lv_data])  # one row of LUT values
 
     # Create timestamped data folder
@@ -267,9 +283,9 @@ def RF_SCuM_test(handle):
     os.makedirs(timestamped_path, exist_ok=True)
 
     # Write data to timestamped data folder
-    rd_csv_path = os.path.join(timestamped_path, "results.csv")
+    #rd_csv_path = os.path.join(timestamped_path, "results.csv")
     lv_csv_path = os.path.join(timestamped_path, "lut_values.csv")
-    rd_df.to_csv(rd_csv_path, index=False)
+    #rd_df.to_csv(rd_csv_path, index=False) try not saving raw data to save space because its A LOT of data
     lv_df.to_csv(lv_csv_path, index=False)   
 
     # Plot the LUT
@@ -312,3 +328,91 @@ def RF_end_test():
     return [{'sub-test': 'RF Test', 'pass': True, 'values': [{'name': 'PSD Image', 'value': image_path}]}]
 
 
+
+
+
+
+
+
+""" # Course loop
+    coarse = 23
+    for i in range(7):
+        mid = 0
+        for i in range(32):
+            # Mid loop
+            fine = 0
+            for i in range(32):
+                # Write the triplet DAC values to the console over previous line
+                sys.stdout.write("\r")
+                sys.stdout.write(f"\rSCuM Radio Setting: {coarse}, {mid}, {fine}   ")
+                #sys.stdout.write(f"\rSCuM Radio Setting: ", coarse, ", ", mid, ", ", fine)
+                sys.stdout.flush()
+                #print("SCuM Radio Setting: ", coarse, ", ", mid, ", ", fine)
+                # Update of df header name to match triplet DAC values for RF sweep
+                df_header = f"{coarse}, {mid}, {fine}"
+
+                # Receive the data
+                received_data = sdr_rx.rx()
+                if received_data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 1")
+                    return False
+
+                # --- keep this line REMOVED or store only a tiny slice ---
+                # rd_data[df_header] = received_data            # REMOVE
+
+                # Compute peak on a smaller window & FFT length
+                NFFT = 131072            # 128k – plenty for 800 kHz steps
+                win = received_data[:NFFT]
+
+                # FFT and peak
+                fft = np.fft.fft(win, n=NFFT)
+                freqs = np.fft.fftfreq(NFFT, 1/fs)
+                max_index = np.argmax(np.abs(fft))
+                max_freq = freqs[max_index] + sdr_rx.rx_lo
+
+                # Store only the summary
+                lv_data[df_header] = max_freq
+
+                # Free big arrays before next iteration
+                del fft, freqs, win, received_data
+                import gc; gc.collect()
+
+                # Increment sweep and wait
+                fine += 1
+                sdr_rx.rx_lo += 100000
+                with contextlib.redirect_stdout(io.StringIO()):
+                    wait_for_trigger(handle)
+
+
+                # Receive the data
+                received_data = sdr_rx.rx()
+                if received_data.size == 0:
+                    print("Warning: Received empty data from sdr_rx.rx() Channel 1")
+                    return False
+                
+                # Put raw data to rd dataframe
+                #rd_df[df_header] = received_data
+                rd_data[df_header] = received_data
+
+                # FFT the data
+                fft = np.fft.fft(received_data)
+                freqs = np.fft.fftfreq(len(received_data), 1/fs)  # fs is the sampling rate
+                max_index = np.argmax(np.abs(fft))                # use magnitude
+                max_freq = freqs[max_index] + sdr_rx.rx_lo  # Add the LO frequency to get the actual frequency       
+
+                # Put the max_freq data to lv dataframe
+                lv_data[df_header] = max_freq
+
+                # Increment values and wait for the next tone to transmit
+                fine += 1
+                sdr_rx.rx_lo += 100000
+                with contextlib.redirect_stdout(io.StringIO()):
+                    wait_for_trigger(handle)
+                #wait_for_trigger(handle)
+            sdr_rx.rx_lo -= 3200000 #Reset LO to beginning of next mid step
+            mid += 1
+            sdr_rx.rx_lo += 800000 #Increment the LO to match the sweep values on SCuM
+        sdr_rx.rx_lo -= 25600000 #Reset LO to beginning of next course step
+        coarse += 1
+        sdr_rx.rx_lo += 15000000 #Increment the LO to match the sweep values on SCuM
+ """

@@ -70,6 +70,9 @@ def power_cycle():
     
     try:
         subprocess.run([ykushcmd_path, "--reset"],shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Power cycle the Yepkit USB hub to reset the SCuM/Nordic device.
+        print("Power cycling SCuM to ensure clean state...")
+        print("---------------------------------------------")
         # Power Cycle USB Downstream Port 1 (Nordic/SCuM).
         print("Turning off Yepkit USB Port 1")
         subprocess.run([ykushcmd_path, "-d", "1"], shell=True)
@@ -103,11 +106,16 @@ def device_operations():
         device.parameter_set('i_range', 'auto')
         device.parameter_set('v_range', '15V')
 
-        print("Joulescope set up and collecting data...")
+        #print("Connecting to Joulescope device...")
+        #print("---------------------------------------------")
+        #print("Joulescope connected successfully!")
         return True # Return True to indicate device operation success.
     except Exception as e:
         print(f"Error during device operations: {e}")
         return None # Return None to propagate error(s) to caller.
+    
+    
+    
 
 # Function to stop the device & process the results.
 def stop_joulescope(file_path=DEFAULT_CSV_PATH, delete_file=True, save_backup_flag=True):
@@ -225,19 +233,21 @@ def stop_joulescope(file_path=DEFAULT_CSV_PATH, delete_file=True, save_backup_fl
         if delete_file:
             try:
                 os.remove(file_path)
-                print(f"File {file_path} deleted.")
+                #print(f"File {file_path} deleted.")
+                print("\n")
             except Exception as e:
-                print(f"Error deleting file: {e}")
+                #print(f"Error deleting file: {e}")
                 return None # Return None to propagate error(s) to caller.
 
 # Run (Main) Function that runs both power cycle and Joulescope functions.
 def joulescope_start():
     #print(f"Current working directory: {os.getcwd()}")
-    print("Starting Joulescope...")
+    #print("Starting Joulescope...")
     if power_cycle() is None:
         return False # Return false if power cycle has failed.
+    #print("Joulescope connected successfully!")
     # Wait for power up sequence to complete
-    print("Waiting for SCuM chip to power up...")
+    print("Waiting for SCuM chip to power up...\n")
 
 
     # Start the device operations in a separate thread
@@ -246,7 +256,7 @@ def joulescope_start():
     device_thread.start()
 
     # Print that Joulescope started in another thread.
-    print("Joulescope started...")
+    #print("Joulescope started...")
     return True # Return True to indicate success.
 
 # Function to save backups in the ResultBackups directory
@@ -259,7 +269,7 @@ def save_backup(file_path, category="joulescope"):
 
     # Check if the ResultBackups directory exists
     if not os.path.exists(base_dir):
-        print(f"Error: {base_dir} directory does not exist. Backup not saved.")
+        #print(f"Error: {base_dir} directory does not exist. Backup not saved.")
         return None  # Return None to propagate error(s) to caller.
 
     # Create the category subdirectory if it doesn't exist

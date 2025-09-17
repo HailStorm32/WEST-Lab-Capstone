@@ -80,7 +80,7 @@ def find_best_baud_rate(port=SCUM_SERIAL_COM_PORT):
 
         if baud_found:
             values.append({'name': "Successful Baud Rate (bps)", 'value': baud})
-            print(f"Baud rate {baud} is working.")
+            print(f"Baud rate {baud} is working.\n")
             break
 
     values.append({'name': "Tested Rates (bps)", 'value': ",".join(map(str, COMMON_BAUD_RATES))})
